@@ -250,6 +250,87 @@
     opacity: 0;
   }
 
+/* ── List category multi-select combobox ── */
+#list-cat-trigger {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s;
+  min-width: 140px;
+}
+#list-cat-trigger[aria-expanded="true"] {
+  border-color: #5FCEB1;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(95,206,177,0.15);
+}
+#list-cat-trigger:hover:not([aria-expanded="true"]) { border-color: #9CA3AF; }
+
+.list-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #F3F4F6;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+.list-cat-pill-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6B7280;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 14px;
+  line-height: 1;
+}
+.list-cat-pill-x:hover { color: #030712; }
+
+#list-cat-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  min-width: 200px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px -4px rgba(0,0,0,0.12), 0 4px 8px -4px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+.list-cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #213C50;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  line-height: 1.4;
+}
+.list-cat-item:hover { background: #F9FAFB; }
+
 /* ── Talent Pool category checkbox ── */
 .tp-cat-cb {
   appearance: none;
@@ -530,23 +611,29 @@
       <div class="px-4 pt-4 pb-3 flex items-center justify-between flex-wrap gap-3 border-b border-border">
         <!-- Status tabs -->
         <div class="flex items-center gap-2" role="tablist" aria-label="Filter by status">
-          <button class="admin-status-pill px-4 py-2 rounded-lg text-base font-medium transition-colors text-primary-700 bg-primary-100" data-status="all">All</button>
-          <button class="admin-status-pill px-4 py-2 rounded-lg text-base font-medium transition-colors text-gray-600 hover:bg-gray-100" data-status="Draft">Draft</button>
-          <button class="admin-status-pill px-4 py-2 rounded-lg text-base font-medium transition-colors text-gray-600 hover:bg-gray-100" data-status="Published">Published</button>
+          <button class="admin-status-pill px-4 py-2 rounded-lg text-sm font-medium transition-colors text-primary-700 bg-primary-100" data-status="all">All</button>
+          <button class="admin-status-pill px-4 py-2 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100" data-status="Draft">Draft</button>
+          <button class="admin-status-pill px-4 py-2 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100" data-status="Published">Published</button>
         </div>
-        <!-- Category filter -->
+        <!-- Category multi-select combobox -->
         <div class="flex items-center gap-2.5">
-          <span class="text-base font-medium text-gray-600">Category</span>
-          <div class="relative">
+          <span class="text-sm font-medium text-gray-600" style="white-space:nowrap">Category</span>
+          <div class="relative" id="list-cat-wrap">
             <button type="button" id="list-cat-trigger"
-              class="ellipsis-trigger inline-flex items-center justify-between gap-2 whitespace-nowrap rounded-md border border-border bg-background text-sm shadow-xs hover:bg-secondary hover:text-secondary-foreground h-9 px-3 min-w-[180px]"
               aria-haspopup="listbox" aria-expanded="false" aria-controls="list-cat-dropdown"
               onclick="event.stopPropagation(); toggleListCatFilter()">
-              <span id="list-cat-label" class="text-foreground">All</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              <span id="list-cat-pills" class="inline-flex items-center flex-wrap gap-1.5"></span>
+              <svg id="list-cat-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform 0.15s;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
-            <div id="list-cat-dropdown" role="listbox" aria-label="Filter by category"
-                 class="ellipsis-menu text-left" style="left:0;right:auto;min-width:12rem" hidden>
+            <div id="list-cat-dropdown" role="listbox" aria-label="Filter by category" aria-multiselectable="true" hidden>
+              <div id="list-cat-options" style="padding:4px 0"></div>
+              <div id="list-cat-footer" class="hidden" style="border-top:1px solid #E5E7EB;padding:8px 16px">
+                <button type="button" onclick="event.stopPropagation(); clearListCategoryFilters()"
+                  class="w-full text-sm font-semibold text-center"
+                  style="color:#007460;background:transparent;border:none;cursor:pointer;font-family:var(--font-sans)">
+                  Clear selection
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1203,48 +1290,102 @@ const adminSkills = (function seed() {
   ];
 })();
 
-const adminSkillsState = { statusFilter: 'all', categoryFilter: 'all', editingId: null };
+const adminSkillsState = { statusFilter: 'all', categoryFilters: new Set(), editingId: null };
 
 function renderListCategoryFilter() {
-  const menu = document.getElementById('list-cat-dropdown');
-  if (!menu) return;
-  const cats = [...new Set(adminSkills.map(s => s.category).filter(Boolean))].sort();
-  if (adminSkillsState.categoryFilter !== 'all' && !cats.includes(adminSkillsState.categoryFilter)) {
-    adminSkillsState.categoryFilter = 'all';
-    const labelEl = document.getElementById('list-cat-label');
-    if (labelEl) labelEl.textContent = 'All';
-  }
-  menu.innerHTML = [
-    `<button type="button" role="option" class="list-cat-option ellipsis-menu-item" data-cat="all" aria-selected="${adminSkillsState.categoryFilter === 'all'}">All</button>`,
-    ...cats.map(cat => `<button type="button" role="option" class="list-cat-option ellipsis-menu-item" data-cat="${cat.replace(/"/g,'&quot;')}" aria-selected="${adminSkillsState.categoryFilter === cat}">${cat}</button>`)
-  ].join('');
-  menu.querySelectorAll('.list-cat-option').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  const optionsEl = document.getElementById('list-cat-options');
+  const footerEl  = document.getElementById('list-cat-footer');
+  if (!optionsEl) return;
+
+  const allCats = [...new Set(adminSkills.map(s => s.category).filter(Boolean))].sort();
+  const sel = adminSkillsState.categoryFilters;
+  const isAll = sel.size === 0;
+
+  const checkSvg = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  const allRow = `<button type="button" role="option" class="list-cat-item" id="list-cat-all" aria-selected="${isAll}">
+    <span>All</span>
+    ${isAll ? checkSvg : ''}
+  </button>`;
+
+  const catRows = allCats.map(cat => {
+    const checked = sel.has(cat);
+    const safeVal = cat.replace(/"/g, '&quot;');
+    return `<button type="button" role="option" class="list-cat-item" data-cat="${safeVal}" aria-selected="${checked}">
+      <span>${cat}</span>
+      ${checked ? checkSvg : ''}
+    </button>`;
+  }).join('');
+
+  optionsEl.innerHTML = allRow + catRows;
+
+  document.getElementById('list-cat-all').addEventListener('click', e => {
+    e.stopPropagation();
+    sel.clear();
+    renderListCategoryFilter();
+    updateListCatTrigger();
+    renderAdminSkillsList();
+  });
+
+  optionsEl.querySelectorAll('.list-cat-item[data-cat]').forEach(btn => {
+    btn.addEventListener('click', e => {
       e.stopPropagation();
       const cat = btn.dataset.cat;
-      adminSkillsState.categoryFilter = cat;
-      const labelEl = document.getElementById('list-cat-label');
-      if (labelEl) labelEl.textContent = cat === 'all' ? 'All' : cat;
-      menu.querySelectorAll('.list-cat-option').forEach(b =>
-        b.setAttribute('aria-selected', b === btn ? 'true' : 'false')
-      );
-      closeListCatFilter();
+      if (sel.has(cat)) sel.delete(cat); else sel.add(cat);
+      renderListCategoryFilter();
+      updateListCatTrigger();
       renderAdminSkillsList();
     });
   });
+
+  if (footerEl) footerEl.classList.toggle('hidden', sel.size === 0);
+}
+
+function updateListCatTrigger() {
+  const pillsEl  = document.getElementById('list-cat-pills');
+  const chevron  = document.getElementById('list-cat-chevron');
+  if (!pillsEl) return;
+  const sel = [...adminSkillsState.categoryFilters];
+  const MAX_PILLS = 2;
+
+  if (sel.length === 0) {
+    pillsEl.innerHTML = `<span style="color:#9CA3AF;font-size:14px;font-family:var(--font-sans)">All categories</span>`;
+  } else {
+    const visible = sel.slice(0, MAX_PILLS);
+    const extra   = sel.length - MAX_PILLS;
+    pillsEl.innerHTML = visible.map(cat =>
+      `<span class="list-cat-pill">${cat}
+        <button type="button" class="list-cat-pill-x" data-cat="${cat.replace(/"/g,'&quot;')}" onclick="event.stopPropagation(); removeCategoryFilter('${cat.replace(/'/g,"\\'")}')">×</button>
+      </span>`
+    ).join('') + (extra > 0 ? `<span class="list-cat-pill">+${extra} more</span>` : '');
+  }
+}
+
+function removeCategoryFilter(cat) {
+  adminSkillsState.categoryFilters.delete(cat);
+  renderListCategoryFilter();
+  updateListCatTrigger();
+  renderAdminSkillsList();
+}
+
+function clearListCategoryFilters() {
+  adminSkillsState.categoryFilters.clear();
+  renderListCategoryFilter();
+  updateListCatTrigger();
+  renderAdminSkillsList();
 }
 
 function renderAdminSkillsList() {
   const tbody = document.getElementById('admin-skills-rows');
   const empty = document.getElementById('admin-skills-empty');
   if (!tbody || !empty) return;
-  renderListCategoryFilter();
+  updateListCatTrigger();
 
   const f = adminSkillsState.statusFilter;
-  const catF = adminSkillsState.categoryFilter;
+  const selCats = adminSkillsState.categoryFilters;
   const rows = adminSkills.filter(s =>
     (f === 'all' || s.status === f) &&
-    (catF === 'all' || s.category === catF)
+    (selCats.size === 0 || selCats.has(s.category))
   );
 
   if (!rows.length) {
@@ -1605,12 +1746,10 @@ function toggleListCatFilter() {
   if (!menu || !trigger) return;
   const isOpen = !menu.hidden;
   closeAllRowMenus();
-  if (isOpen) {
-    trigger.setAttribute('aria-expanded', 'false');
-    return;
-  }
+  if (isOpen) { closeListCatFilter(); return; }
   menu.hidden = false;
   trigger.setAttribute('aria-expanded', 'true');
+  renderListCategoryFilter();
 }
 
 function closeListCatFilter() {
@@ -1639,10 +1778,10 @@ function updateCatCounter(input) {
   const len = input.value.length;
   const counter = document.getElementById('asf-cat-counter');
   if (!counter) return;
-  if (len === 0) { counter.classList.add('hidden'); return; }
+  if (len <= max) { counter.classList.add('hidden'); counter.textContent = ''; return; }
   counter.classList.remove('hidden');
   counter.textContent = `${len}/${max}`;
-  counter.style.color = len >= max ? '#ef4444' : '';
+  counter.style.color = '#ef4444';
 }
 
 /* ---------- Boot ---------- */
@@ -1670,7 +1809,7 @@ function boot() {
     const t = e.target;
     if (t && (t.closest && (t.closest('.ellipsis-menu') || t.closest('.ellipsis-trigger')))) return;
     closeAllRowMenus();
-    closeListCatFilter();
+    if (t && t.closest && !t.closest('#list-cat-wrap')) closeListCatFilter();
     if (t && t.closest && !t.closest('#asf-category-wrap')) {
       closeCategoryCombobox();
     }
