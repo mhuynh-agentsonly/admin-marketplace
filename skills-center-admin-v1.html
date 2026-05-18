@@ -609,11 +609,18 @@
     <div class="bg-white rounded-lg border border-border">
       <!-- Filter row inside card -->
       <div class="px-4 pt-4 pb-3 flex items-center justify-between flex-wrap gap-3 border-b border-border">
-        <!-- Status tabs -->
-        <div class="flex items-center gap-2" role="tablist" aria-label="Filter by status">
-          <button class="admin-status-pill px-4 py-2 rounded-lg text-sm font-medium transition-colors text-primary-700 bg-primary-100" data-status="all">All</button>
-          <button class="admin-status-pill px-4 py-2 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100" data-status="Draft">Draft</button>
-          <button class="admin-status-pill px-4 py-2 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100" data-status="Published">Published</button>
+        <!-- Name search -->
+        <div class="relative flex items-center" style="width:400px;flex-shrink:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;left:10px;flex-shrink:0;pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="admin-name-search" type="text" placeholder="Search by test name"
+            oninput="adminSkillsState.nameSearch = this.value.trim().toLowerCase(); adminSkillsState.page = 1; renderAdminSkillsList(); document.getElementById('admin-search-clear').style.display = this.value ? 'flex' : 'none';"
+            class="border-input w-full rounded-md border bg-transparent py-1.5 text-sm outline-none transition-[color,box-shadow] focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
+            style="padding-left:32px;padding-right:30px;height:34px"/>
+          <button id="admin-search-clear" type="button" aria-label="Clear search"
+            onclick="document.getElementById('admin-name-search').value=''; adminSkillsState.nameSearch=''; renderAdminSkillsList(); this.style.display='none';"
+            style="display:none;position:absolute;right:8px;align-items:center;justify-content:center;width:18px;height:18px;border:none;background:transparent;cursor:pointer;color:#9CA3AF;padding:0;line-height:1;font-size:16px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
         <!-- Category multi-select combobox -->
         <div class="flex items-center gap-2.5">
@@ -645,16 +652,63 @@
           <thead class="bg-gray-50 text-left">
             <tr class="border-b border-border">
               <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider">Name</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider">Category</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider" style="width:129px">Status</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider" style="min-width:260px">Typeform URL</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider text-right" style="width:80px"></th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider" style="width:180px">Category</th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider" style="width:130px">Status</th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider" style="width:110px">Threshold</th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider" style="width:200px">
+                <button type="button" onclick="adminSkillsState.sortDir = adminSkillsState.sortDir === 'desc' ? 'asc' : 'desc'; adminSkillsState.page = 1; renderAdminSkillsList();"
+                  class="inline-flex items-center gap-1 hover:text-gray-700">
+                  Created
+                  <span id="skills-sort-icon" style="display:inline-flex;flex-direction:column;gap:1px">
+                    <svg width="8" height="5" viewBox="0 0 8 5" fill="none"><path d="M4 0L7.5 5H0.5L4 0Z" fill="#9CA3AF"/></svg>
+                    <svg width="8" height="5" viewBox="0 0 8 5" fill="none" id="skills-sort-desc"><path d="M4 5L0.5 0H7.5L4 5Z" fill="#374151"/></svg>
+                  </span>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500 tracking-wider text-right" style="width:60px"></th>
             </tr>
           </thead>
           <tbody id="admin-skills-rows" class="divide-y divide-border"></tbody>
         </table>
       </div>
-      <div id="admin-skills-empty" class="hidden p-10 text-center text-sm text-muted-foreground">No skill tests match this filter.</div>
+      <div id="admin-skills-empty" class="hidden py-16 flex flex-col items-center justify-center gap-3">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8.5715 62.9779C8.57763 74.3146 12.3983 85.3208 19.4207 94.231C26.443 103.141 36.2601 109.439 47.2971 112.114C58.3341 114.789 69.9514 113.686 80.2856 108.983C90.6197 104.28 99.0718 96.2482 104.286 86.1767C109.5 76.1052 111.174 64.5775 109.04 53.4427C106.905 42.308 101.086 32.2114 92.5152 24.7727C83.9444 17.3339 73.1189 12.9841 61.7752 12.4209C50.4315 11.8577 39.227 15.1138 29.9589 21.6669C26.0493 24.445 22.55 27.7573 19.5635 31.507C12.427 40.4478 8.55057 51.5463 8.5715 62.9779Z" fill="#F9FAFB"/>
+          <path d="M57.9132 80.0304V104.442L86.0275 96.0397C86.3332 95.9481 86.6003 95.7586 86.7874 95.5005C86.9746 95.2424 87.0714 94.93 87.0629 94.6115L86.2903 70.7676L57.9132 80.0304Z" fill="#D0D5DD"/>
+          <path d="M57.9132 80.03V104.442L29.799 96.0392C29.4934 95.9473 29.2266 95.7577 29.0395 95.4997C28.8524 95.2416 28.7555 94.9294 28.7635 94.611L29.5315 70.7603L57.9132 80.03Z" fill="#E4E7EC"/>
+          <path d="M29.5566 70.7466L57.9201 61.9697V80.0506L29.5566 70.7466Z" fill="#98A2B3"/>
+          <path d="M86.2812 70.7466L57.92 61.9697V80.0506L86.2812 70.7466Z" fill="#D0D5DD"/>
+          <path d="M57.9132 61.9929L67.7578 55.2054C67.8942 55.1004 68.0546 55.031 68.2246 55.0035C68.3947 54.976 68.5689 54.9913 68.7315 55.048L94.8298 64.0736C95.0093 64.1375 95.1676 64.2496 95.2875 64.3974C95.4074 64.5453 95.4842 64.7232 95.5094 64.9118C95.5347 65.1003 95.5075 65.2921 95.4307 65.4662C95.354 65.6403 95.2307 65.79 95.0743 65.8988L86.2903 70.7675L57.9132 61.9929Z" fill="#F2F4F7"/>
+          <path d="M57.9132 61.9924L48.0663 55.2049C47.9304 55.0999 47.7703 55.0305 47.6007 55.003C47.431 54.9756 47.2571 54.9908 47.0949 55.0475L20.9966 64.0731C20.8166 64.1364 20.6575 64.2481 20.5371 64.396C20.4167 64.5439 20.3396 64.7221 20.3143 64.9109C20.2889 65.0998 20.3164 65.292 20.3937 65.4662C20.471 65.6405 20.595 65.79 20.752 65.8983L29.536 70.7602L57.9132 61.9924Z" fill="#F2F4F7"/>
+          <path d="M57.9132 80.0304L67.9041 85.5471C68.0354 85.6346 68.185 85.691 68.3415 85.712C68.4979 85.7329 68.6572 85.7179 68.8069 85.668L95.2092 76.9048C95.3965 76.843 95.5622 76.729 95.6868 76.5763C95.8114 76.4237 95.8898 76.2387 95.9126 76.0431C95.9354 75.8475 95.9017 75.6494 95.8156 75.4723C95.7295 75.2951 95.5944 75.1462 95.4263 75.0431L86.2835 70.7676L57.9132 80.0304Z" fill="#F2F4F7"/>
+          <path d="M57.9132 80.0304L47.9224 85.5471C47.7895 85.6359 47.6379 85.693 47.4794 85.714C47.3208 85.7349 47.1596 85.7192 47.0081 85.668L20.6149 76.9048C20.4269 76.8443 20.2601 76.7314 20.1343 76.5794C20.0085 76.4273 19.9289 76.2426 19.9048 76.0468C19.8808 75.8511 19.9134 75.6526 19.9987 75.4747C20.084 75.2969 20.2185 75.1471 20.3864 75.0431L29.5292 70.7676L57.9132 80.0304Z" fill="#F2F4F7"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M60.4121 35.2195C60.5838 34.927 60.7241 34.6162 60.8302 34.2856L61.3103 34.4397C61.1927 34.8062 61.037 35.1509 60.847 35.4747C60.7765 35.5948 60.622 35.635 60.502 35.5646C60.3819 35.4941 60.3417 35.3396 60.4121 35.2195ZM58.5301 37.4305C58.6014 37.55 58.5623 37.7048 58.4427 37.7761C57.8388 38.1365 57.1676 38.4467 56.447 38.714C56.3165 38.7624 56.1714 38.6959 56.123 38.5653C56.0746 38.4348 56.1411 38.2897 56.2717 38.2413C56.9693 37.9825 57.6118 37.6848 58.1844 37.3431C58.304 37.2718 58.4587 37.3109 58.5301 37.4305ZM53.4871 39.2854C53.5143 39.4219 53.4257 39.5547 53.2892 39.5819C52.5903 39.7213 51.8707 39.8369 51.1405 39.9327C51.0025 39.9508 50.8759 39.8536 50.8578 39.7156C50.8396 39.5775 50.9369 39.4509 51.0749 39.4328C51.7958 39.3383 52.5042 39.2243 53.1906 39.0874C53.3271 39.0602 53.4599 39.1488 53.4871 39.2854ZM48.1329 39.9702C48.1415 40.1092 48.0358 40.2288 47.8968 40.2374C47.1682 40.2824 46.4428 40.3135 45.7301 40.3343C45.5909 40.3383 45.4748 40.2288 45.4708 40.0896C45.4667 39.9505 45.5762 39.8344 45.7154 39.8303C46.4235 39.8096 47.1433 39.7787 47.8657 39.7341C48.0047 39.7256 48.1243 39.8313 48.1329 39.9702ZM37.3352 40.0545C37.3377 40.1937 37.2269 40.3086 37.0877 40.3111C36.6032 40.3197 36.2601 40.343 36.0643 40.3847C35.8055 40.4397 35.4949 40.4907 35.1541 40.5467C35.1154 40.5531 35.0763 40.5595 35.0369 40.566C34.8995 40.5887 34.7698 40.4957 34.7471 40.3583C34.7245 40.2209 34.8175 40.0912 34.9549 40.0685C34.994 40.0621 35.0326 40.0557 35.0707 40.0495C35.4148 39.9929 35.713 39.9439 35.9595 39.8915C36.2087 39.8385 36.5971 39.8155 37.0787 39.8069C37.2179 39.8045 37.3327 39.9153 37.3352 40.0545ZM40.0681 40.088C40.0705 39.9488 40.1852 39.8378 40.3244 39.8401C40.9976 39.8513 41.7231 39.8615 42.4858 39.8651C42.6251 39.8658 42.7374 39.9792 42.7367 40.1184C42.7361 40.2577 42.6227 40.37 42.4834 40.3693C41.7178 40.3657 40.9901 40.3554 40.316 40.3442C40.1768 40.3419 40.0658 40.2272 40.0681 40.088ZM32.2136 40.9342C32.2585 41.066 32.1881 41.2092 32.0563 41.2541C31.4381 41.4647 30.8171 41.7354 30.2288 42.0922C30.1097 42.1644 29.9547 42.1264 29.8825 42.0073C29.8103 41.8883 29.8483 41.7332 29.9673 41.6611C30.5932 41.2815 31.2488 40.9966 31.8936 40.7769C32.0254 40.732 32.1687 40.8024 32.2136 40.9342ZM28.0024 43.7809C28.1181 43.8583 28.1492 44.0149 28.0717 44.1306C27.728 44.6442 27.434 45.238 27.2089 45.9268C27.1657 46.0591 27.0233 46.1314 26.891 46.0881C26.7586 46.0449 26.6864 45.9025 26.7296 45.7702C26.9686 45.0388 27.2826 44.4032 27.6527 43.8502C27.7301 43.7345 27.8867 43.7034 28.0024 43.7809ZM26.4838 48.6479C26.6229 48.6519 26.7325 48.7679 26.7285 48.9071C26.7191 49.2339 26.7209 49.5743 26.7346 49.929C26.7479 50.2705 26.7874 50.598 26.8517 50.9122C26.8796 51.0486 26.7916 51.1818 26.6552 51.2097C26.5188 51.2376 26.3856 51.1496 26.3577 51.0132C26.2878 50.6713 26.2451 50.3165 26.2308 49.9485C26.2166 49.583 26.2148 49.2313 26.2245 48.8926C26.2285 48.7535 26.3446 48.6439 26.4838 48.6479ZM27.807 53.4992C27.912 53.4077 28.0713 53.4187 28.1627 53.5237C28.5786 54.0013 29.0793 54.4375 29.6569 54.8349C29.7716 54.9138 29.8006 55.0708 29.7217 55.1855C29.6428 55.3002 29.4858 55.3292 29.3711 55.2503C28.7639 54.8326 28.2301 54.3689 27.7824 53.8548C27.691 53.7498 27.702 53.5906 27.807 53.4992ZM32.0212 56.363C32.0717 56.2332 32.2178 56.169 32.3476 56.2195C32.9532 56.4551 33.598 56.6679 34.277 56.8594C34.411 56.8972 34.489 57.0364 34.4512 57.1704C34.4134 57.3044 34.2741 57.3824 34.1401 57.3447C33.4476 57.1494 32.7873 56.9316 32.1647 56.6894C32.035 56.6389 31.9707 56.4928 32.0212 56.363ZM69.8388 58.008C69.1959 57.9878 68.5269 57.9794 67.8317 57.9817C67.6925 57.9821 67.5793 57.8696 67.5788 57.7304C67.5784 57.5912 67.6908 57.4779 67.8301 57.4775C68.5303 57.4752 69.2052 57.4837 69.8546 57.5041C69.9938 57.5085 70.1031 57.6248 70.0987 57.764C70.0943 57.9032 69.9779 58.0124 69.8388 58.008ZM36.9684 57.7367C36.9928 57.5996 37.1237 57.5082 37.2608 57.5326C37.9169 57.6492 38.5925 57.7516 39.2845 57.8408C39.4225 57.8587 39.5201 57.985 39.5022 58.1231C39.4844 58.2612 39.3581 58.3587 39.22 58.3409C38.5209 58.2508 37.8372 58.1472 37.1725 58.029C37.0354 58.0046 36.9441 57.8738 36.9684 57.7367ZM65.0627 57.7876C65.0681 57.9267 64.9597 58.0439 64.8206 58.0493C64.1706 58.0746 63.5019 58.1067 62.8145 58.1448C62.6754 58.1525 62.5565 58.0461 62.5488 57.907C62.5411 57.768 62.6475 57.6491 62.7865 57.6414C63.4764 57.6031 64.1479 57.5709 64.801 57.5455C64.9401 57.54 65.0573 57.6484 65.0627 57.7876ZM72.6133 57.9332C72.6287 57.7948 72.7534 57.6952 72.8918 57.7106C73.6017 57.79 74.2722 57.8912 74.9032 58.0164C75.0398 58.0435 75.1285 58.1761 75.1014 58.3127C75.0743 58.4493 74.9417 58.538 74.8051 58.5109C74.19 58.3889 73.5336 58.2898 72.8358 58.2117C72.6974 58.1963 72.5978 58.0715 72.6133 57.9332ZM60.035 58.0703C60.0452 58.2091 59.9408 58.3299 59.8019 58.34C59.4702 58.3642 59.1348 58.3894 58.7956 58.4157C58.4565 58.4419 58.1145 58.4673 57.7698 58.4919C57.6309 58.5018 57.5103 58.3972 57.5004 58.2583C57.4905 58.1195 57.5951 57.9988 57.7339 57.9889C58.0776 57.9645 58.4186 57.9391 58.7567 57.913C59.0966 57.8867 59.4328 57.8614 59.7653 57.8372C59.9041 57.827 60.0249 57.9314 60.035 58.0703ZM42.0734 58.3791C42.0837 58.2402 42.2045 58.1359 42.3434 58.1461C43.0173 58.1957 43.7008 58.2354 44.3913 58.2662C44.5304 58.2724 44.6381 58.3902 44.632 58.5293C44.6258 58.6683 44.508 58.7761 44.3689 58.7699C43.6739 58.7389 42.9855 58.6989 42.3064 58.649C42.1675 58.6388 42.0632 58.5179 42.0734 58.3791ZM54.921 58.4173C54.9281 58.5564 54.8212 58.6749 54.6822 58.6821C54.0006 58.7172 53.3132 58.7478 52.6224 58.7731C52.4833 58.7781 52.3664 58.6695 52.3613 58.5303C52.3562 58.3912 52.4649 58.2743 52.604 58.2692C53.2921 58.244 53.977 58.2135 54.6563 58.1785C54.7953 58.1714 54.9138 58.2783 54.921 58.4173ZM49.778 58.593C49.7796 58.7322 49.6679 58.8463 49.5287 58.8479C48.8397 58.8554 48.1508 58.8566 47.4646 58.8505C47.3254 58.8493 47.2136 58.7354 47.2148 58.5962C47.216 58.4569 47.3299 58.3451 47.4691 58.3463C48.1518 58.3524 48.8372 58.3512 49.5232 58.3437C49.6624 58.3422 49.7765 58.4538 49.778 58.593ZM77.5105 59.0322C77.5664 58.9047 77.7151 58.8466 77.8426 58.9025C78.5111 59.1955 79.1083 59.5407 79.6327 59.9447C79.743 60.0297 79.7635 60.188 79.6786 60.2983C79.5936 60.4086 79.4353 60.4291 79.325 60.3441C78.8373 59.9685 78.2765 59.6431 77.6402 59.3643C77.5127 59.3084 77.4546 59.1598 77.5105 59.0322ZM81.2494 62.2453C81.3754 62.1862 81.5255 62.2405 81.5846 62.3665C81.7292 62.6748 81.8536 62.9995 81.9579 63.341C82.0642 63.6889 82.1447 64.1116 82.1734 64.5762C82.182 64.7152 82.0763 64.8348 81.9373 64.8434C81.7984 64.852 81.6788 64.7463 81.6702 64.6073C81.6438 64.1805 81.57 63.7969 81.4757 63.4883C81.378 63.1685 81.2621 62.8662 81.1281 62.5806C81.069 62.4546 81.1233 62.3044 81.2494 62.2453ZM81.1236 67.7802C81.2353 67.8633 81.2586 68.0212 81.1755 68.1329C80.7255 68.7384 80.1012 69.2866 79.2571 69.7167C79.133 69.7799 78.9812 69.7306 78.918 69.6066C78.8548 69.4825 78.9041 69.3307 79.0282 69.2675C79.8053 68.8715 80.3687 68.3732 80.7708 67.8322C80.8539 67.7204 81.0118 67.6972 81.1236 67.7802ZM75.9332 70.3509C75.944 70.4898 75.8402 70.611 75.7014 70.6218C75.3164 70.6517 74.9101 70.6673 74.4817 70.6673C74.1037 70.6673 73.7444 70.6839 73.403 70.7154C73.2644 70.7282 73.1416 70.6261 73.1288 70.4875C73.116 70.3489 73.218 70.2261 73.3567 70.2133C73.7142 70.1803 74.0889 70.1631 74.4817 70.1631C74.8979 70.1631 75.2911 70.1479 75.6624 70.1191C75.8012 70.1083 75.9224 70.2121 75.9332 70.3509ZM70.4364 71.2353C70.5016 71.3583 70.4548 71.5109 70.3318 71.5761C69.6505 71.9374 69.1036 72.3827 68.6684 72.8674C68.5754 72.971 68.416 72.9795 68.3124 72.8865C68.2088 72.7935 68.2003 72.6341 68.2933 72.5305C68.7668 72.0031 69.3603 71.5206 70.0956 71.1307C70.2186 71.0654 70.3712 71.1123 70.4364 71.2353ZM67.0633 75.3744C67.1997 75.4027 67.2873 75.5361 67.259 75.6724C67.1796 76.0557 67.1457 76.4109 67.1457 76.7156H66.6415C66.6415 76.3747 66.6793 75.9852 66.7653 75.5701C66.7936 75.4338 66.927 75.3462 67.0633 75.3744Z" fill="#98A2B3"/>
+          <path d="M83.535 15.3201L60.4454 23.7716L54.7059 20.6677C54.5273 20.5719 54.3837 20.422 54.296 20.2395C54.2082 20.057 54.1808 19.8513 54.2177 19.6521C54.2546 19.453 54.3539 19.2706 54.5012 19.1313C54.6486 18.992 54.8364 18.903 55.0376 18.8771L82.8677 15.1541C82.9844 15.1363 83.1035 15.1417 83.2181 15.1702C83.3326 15.1987 83.4404 15.2497 83.535 15.3201Z" fill="#E4E7EC"/>
+          <path d="M83.8251 16.5717L75.7778 30.9721C75.7177 31.0817 75.6366 31.1784 75.539 31.2566C75.4415 31.3349 75.3294 31.3932 75.2093 31.4281C75.0892 31.4631 74.9634 31.4741 74.8391 31.4604C74.7147 31.4468 74.5944 31.4087 74.4848 31.3485L66.995 27.3021L83.8161 15.6127C83.9023 15.7575 83.9486 15.9225 83.9501 16.0909C83.9517 16.2594 83.9085 16.4253 83.8251 16.5717Z" fill="#E4E7EC"/>
+          <path d="M83.8094 15.6139L66.9882 27.3033L62.3199 32.8511C62.2119 32.9784 62.0681 33.0704 61.9071 33.1152C61.7461 33.16 61.5754 33.1556 61.4171 33.1024C61.2588 33.0492 61.1201 32.9498 61.0191 32.817C60.9181 32.6842 60.8594 32.5242 60.8506 32.3576L60.4367 23.7642L83.5263 15.3126C83.6406 15.3924 83.7369 15.495 83.8094 15.6139Z" fill="#98A2B3"/>
+          <path d="M71.6226 29.804L63.2942 33.5188C63.0968 33.6043 62.8824 33.6432 62.6675 33.6326C62.4527 33.6219 62.2432 33.5621 62.0554 33.4576L61.3837 33.0845C61.5449 33.1525 61.7238 33.1669 61.8938 33.1253C62.0638 33.0838 62.216 32.9887 62.3276 32.8541L66.9959 27.3062L71.6226 29.804Z" fill="#D0D5DD"/>
+        </svg>
+        <div class="text-center">
+          <p style="font-size:15px;font-weight:600;color:#111827;margin:0">No results</p>
+          <p style="font-size:13px;color:#6B7280;margin:4px 0 0">Try searching by another name</p>
+        </div>
+      </div>
+      <!-- Pagination -->
+      <div id="skills-pagination" class="hidden px-4 py-3 flex items-center justify-between border-t border-border gap-4">
+        <div id="skills-page-nav" class="flex items-center gap-1"></div>
+        <div class="flex items-center gap-2">
+          <select id="skills-per-page"
+            onchange="adminSkillsState.perPage = parseInt(this.value); adminSkillsState.page = 1; renderAdminSkillsList();"
+            class="border-input rounded-md border bg-transparent py-1 text-sm cursor-pointer"
+            style="height:32px;padding-left:10px;padding-right:28px;outline:none"
+            onfocus="this.style.borderColor='#5FCEB1';this.style.boxShadow='0 0 0 3px rgba(95,206,177,0.15)'"
+            onblur="this.style.borderColor='';this.style.boxShadow=''">
+            <option value="10">10/page</option>
+            <option value="20">20/page</option>
+            <option value="50">50/page</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -681,10 +735,31 @@
     <!-- Test name — full width -->
     <div>
       <label for="asf-name" class="block text-xs font-medium text-foreground mb-1.5">Test name</label>
-      <input id="asf-name" required type="text" placeholder="e.g. Coding Fundamentals" data-slot="input"
-             oninput="updateNameCounter(this); checkFormValidity()"
-             class="file:text-foreground placeholder:text-muted-foreground border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"/>
+      <textarea id="asf-name" required rows="1" placeholder="e.g. Coding Fundamentals" data-slot="input"
+             oninput="autoExpand(this); updateNameCounter(this); checkFormValidity()"
+             class="placeholder:text-muted-foreground border-input w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
+             style="resize:none;overflow:hidden;min-height:36px;line-height:1.5"></textarea>
       <div id="asf-name-counter" class="hidden text-right text-xs mt-1 text-muted-foreground"></div>
+    </div>
+
+    <!-- Description — full width -->
+    <div>
+      <label for="asf-description" class="block text-xs font-medium text-foreground mb-1.5">Description</label>
+      <textarea id="asf-description" rows="1" data-slot="input"
+             oninput="autoExpand(this); updateDescCounter(this)"
+             class="placeholder:text-muted-foreground border-input w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
+             style="resize:none;overflow:hidden;min-height:36px;line-height:1.5"></textarea>
+      <div id="asf-desc-counter" class="text-right text-xs mt-1 text-muted-foreground">0/100</div>
+    </div>
+
+    <!-- Format — full width -->
+    <div>
+      <label for="asf-format" class="block text-xs font-medium text-foreground mb-1.5">Format</label>
+      <textarea id="asf-format" rows="1" placeholder="e.g. Multiple Choice" data-slot="input"
+             oninput="autoExpand(this); updateFormatCounter(this)"
+             class="placeholder:text-muted-foreground border-input w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
+             style="resize:none;overflow:hidden;min-height:36px;line-height:1.5"></textarea>
+      <div id="asf-format-counter" class="text-right text-xs mt-1 text-muted-foreground">0/60</div>
     </div>
 
     <!-- Category — half width combobox -->
@@ -1257,40 +1332,25 @@ function renderAdmin() {
 /* ---------- ADMIN · SKILLS CENTER (list + form) ---------- */
 const adminSkills = (function seed() {
   return [
-    {
-      id: 'coding-fundamentals',
-      name: 'Coding Fundamentals',
-      category: 'Coding',
-      typeformUrl: 'https://agentsonly.typeform.com/to/coding-fund',
-      threshold: 70,
-      duration: 25,
-      status: 'Published',
-      createdAt: '2026-04-15',
-    },
-    {
-      id: 'gen-ai-labeling',
-      name: 'Gen AI Labeling',
-      category: 'AI/ML',
-      typeformUrl: 'https://agentsonly.typeform.com/to/gen-ai-lab',
-      threshold: 70,
-      duration: 35,
-      status: 'Published',
-      createdAt: '2026-04-22',
-    },
-    {
-      id: 'customer-service-foundations',
-      name: 'Customer Service Foundations',
-      category: 'Customer Service',
-      typeformUrl: 'https://agentsonly.typeform.com/to/cust-svc',
-      threshold: 70,
-      duration: 25,
-      status: 'Draft',
-      createdAt: '2026-05-01',
-    },
+    { id: 'coding-fundamentals',        name: 'Coding Fundamentals',        category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/coding-fund',  threshold: 80, duration: 25, status: 'Published', createdAt: '2026-05-15T10:50:00' },
+    { id: 'customer-service-basics',    name: 'Customer Service Basics',    category: 'Customer service',  typeformUrl: 'https://agentsonly.typeform.com/to/cust-svc',     threshold: 80, duration: 20, status: 'Draft',     createdAt: '2026-05-10T10:48:00' },
+    { id: 'data-labeling-fund',         name: 'Data Labeling Fundamentals', category: 'Data labeling',     typeformUrl: 'https://agentsonly.typeform.com/to/data-label',   threshold: 80, duration: 30, status: 'Published', createdAt: '2026-05-08T08:23:00' },
+    { id: 'english-proficiency',        name: 'English Proficiency',        category: 'Language',          typeformUrl: 'https://agentsonly.typeform.com/to/english-prof', threshold: 80, duration: 15, status: 'Published', createdAt: '2026-05-04T05:24:00' },
+    { id: 'technical-support-tier1',    name: 'Technical Support Tier 1',   category: 'Technical support', typeformUrl: 'https://agentsonly.typeform.com/to/tech-sup-t1',  threshold: 80, duration: 25, status: 'Published', createdAt: '2025-08-08T06:12:00' },
+    { id: 'python-test',                name: 'Python Test',                category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/python-test',  threshold: 80, duration: 40, status: 'Published', createdAt: '2025-08-08T09:50:00' },
+    { id: 'prompt-eval-script',         name: 'Prompt Evaluation Script',   category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/prompt-eval',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2025-08-08T09:50:00' },
+    { id: 'json-data-annotation',       name: 'JSON Data Annotation',       category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/json-annot',   threshold: 80, duration: 35, status: 'Published', createdAt: '2025-08-08T09:50:00' },
+    { id: 'general-physicians',         name: 'General Physicians',         category: 'Medical',           typeformUrl: 'https://agentsonly.typeform.com/to/gen-phys',     threshold: 80, duration: 20, status: 'Published', createdAt: '2025-08-08T09:50:00' },
+    { id: 'general-lawyers',            name: 'General Lawyers',            category: 'Lawyers',           typeformUrl: 'https://agentsonly.typeform.com/to/gen-law',      threshold: 80, duration: 20, status: 'Published', createdAt: '2025-08-08T09:50:00' },
+    { id: 'gen-ai-labeling',            name: 'Gen AI Labeling',            category: 'AI/ML',             typeformUrl: 'https://agentsonly.typeform.com/to/gen-ai-lab',   threshold: 80, duration: 35, status: 'Published', createdAt: '2025-07-20T14:00:00' },
+    { id: 'sales-fundamentals',         name: 'Sales Fundamentals',         category: 'Sales',             typeformUrl: 'https://agentsonly.typeform.com/to/sales-fund',   threshold: 80, duration: 25, status: 'Published', createdAt: '2025-07-10T09:00:00' },
+    { id: 'technical-support-tier2',    name: 'Technical Support Tier 2',   category: 'Technical support', typeformUrl: 'https://agentsonly.typeform.com/to/tech-sup-t2',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2025-06-15T11:30:00' },
+    { id: 'ai-evaluation',              name: 'AI Evaluation',              category: 'AI/ML',             typeformUrl: 'https://agentsonly.typeform.com/to/ai-eval',      threshold: 80, duration: 40, status: 'Published', createdAt: '2025-05-20T08:00:00' },
+    { id: 'content-moderation',         name: 'Content Moderation',         category: 'Data labeling',     typeformUrl: 'https://agentsonly.typeform.com/to/content-mod',  threshold: 80, duration: 20, status: 'Published', createdAt: '2025-04-10T10:00:00' },
   ];
 })();
 
-const adminSkillsState = { statusFilter: 'all', categoryFilters: new Set(), editingId: null };
+const adminSkillsState = { nameSearch: '', categoryFilters: new Set(), editingId: null, page: 1, perPage: 10, sortDir: 'desc' };
 
 function renderListCategoryFilter() {
   const optionsEl = document.getElementById('list-cat-options');
@@ -1332,6 +1392,7 @@ function renderListCategoryFilter() {
       e.stopPropagation();
       const cat = btn.dataset.cat;
       if (sel.has(cat)) sel.delete(cat); else sel.add(cat);
+      adminSkillsState.page = 1;
       renderListCategoryFilter();
       updateListCatTrigger();
       renderAdminSkillsList();
@@ -1375,33 +1436,70 @@ function clearListCategoryFilters() {
   renderAdminSkillsList();
 }
 
+function fmtSkillDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const dy = String(d.getDate()).padStart(2, '0');
+  const yr = d.getFullYear();
+  let hr = d.getHours(), ampm = 'AM';
+  if (hr >= 12) { ampm = 'PM'; if (hr > 12) hr -= 12; }
+  if (hr === 0) hr = 12;
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${mo}/${dy}/${yr}, ${hr}:${min} ${ampm}`;
+}
+
 function renderAdminSkillsList() {
   const tbody = document.getElementById('admin-skills-rows');
   const empty = document.getElementById('admin-skills-empty');
+  const pagination = document.getElementById('skills-pagination');
   if (!tbody || !empty) return;
   updateListCatTrigger();
 
-  const f = adminSkillsState.statusFilter;
+  const q = adminSkillsState.nameSearch;
   const selCats = adminSkillsState.categoryFilters;
-  const rows = adminSkills.filter(s =>
-    (f === 'all' || s.status === f) &&
+  let filtered = adminSkills.filter(s =>
+    (!q || s.name.toLowerCase().includes(q)) &&
     (selCats.size === 0 || selCats.has(s.category))
   );
 
-  if (!rows.length) {
+  // Sort by createdAt
+  const dir = adminSkillsState.sortDir === 'asc' ? 1 : -1;
+  filtered.sort((a, b) => dir * (new Date(a.createdAt) - new Date(b.createdAt)));
+
+  // Update sort icon
+  const descIcon = document.getElementById('skills-sort-desc');
+  if (descIcon) descIcon.style.fill = adminSkillsState.sortDir === 'desc' ? '#374151' : '#9CA3AF';
+
+  if (!filtered.length) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
+    if (pagination) pagination.classList.add('hidden');
     return;
   }
   empty.classList.add('hidden');
 
+  // Pagination
+  const total = filtered.length;
+  const perPage = adminSkillsState.perPage;
+  const totalPages = Math.ceil(total / perPage);
+  if (adminSkillsState.page > totalPages) adminSkillsState.page = totalPages;
+  const page = adminSkillsState.page;
+  const pageRows = filtered.slice((page - 1) * perPage, page * perPage);
+
+  if (pagination) {
+    pagination.classList.toggle('hidden', totalPages <= 1);
+    renderSkillsPagination(page, totalPages);
+    const sel = document.getElementById('skills-per-page');
+    if (sel) sel.value = String(perPage);
+  }
+
   const STATUS_BADGE_ADMIN = {
-    'Draft':     'inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-gray-100 text-gray-700',
-    'Published': 'inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-primary-50 text-primary-700',
+    'Draft':     'inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium bg-gray-100 text-gray-600',
+    'Published': 'inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium bg-[#ECFDF5] text-[#059669]',
   };
 
-  tbody.innerHTML = rows.map(s => {
-    const truncatedUrl = s.typeformUrl.length > 40 ? '…' + s.typeformUrl.slice(-39) : s.typeformUrl;
+  tbody.innerHTML = pageRows.map(s => {
     const badgeClass = STATUS_BADGE_ADMIN[s.status] || STATUS_BADGE_ADMIN['Draft'];
     const isPublished = s.status === 'Published';
 
@@ -1418,14 +1516,15 @@ function renderAdminSkillsList() {
              onclick="event.stopPropagation(); deleteAdminSkill('${s.id}'); closeAllRowMenus();">Delete</button>`;
 
     return `
-      <tr class="hover:bg-gray-50" style="height:72px">
-        <td class="px-4 py-4 font-medium text-gray-900">${s.name}</td>
-        <td class="px-4 py-4 text-gray-600">${s.category}</td>
-        <td class="px-4 py-4"><span class="${badgeClass}">${s.status}</span></td>
-        <td class="px-4 py-4 text-xs text-gray-500 font-mono" title="${s.typeformUrl}">${truncatedUrl}</td>
-        <td class="px-4 py-4 text-right whitespace-nowrap relative">
+      <tr class="hover:bg-gray-50" style="height:64px;border-bottom:1px solid #F3F4F6">
+        <td class="px-4 py-3 font-medium text-gray-900 text-sm">${s.name}</td>
+        <td class="px-4 py-3 text-gray-600 text-sm">${s.category}</td>
+        <td class="px-4 py-3"><span class="${badgeClass}">${s.status}</span></td>
+        <td class="px-4 py-3 text-gray-600 text-sm">${s.threshold}%</td>
+        <td class="px-4 py-3 text-gray-600 text-sm whitespace-nowrap">${fmtSkillDate(s.createdAt)}</td>
+        <td class="px-4 py-3 text-right whitespace-nowrap relative">
           <button type="button"
-                  class="ellipsis-trigger inline-flex items-center justify-center rounded-md text-gray-500 h-8 w-8 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
+                  class="ellipsis-trigger inline-flex items-center justify-center rounded-md text-gray-500 h-8 w-8 hover:bg-gray-100"
                   aria-haspopup="menu" aria-expanded="false"
                   aria-controls="admin-row-menu-${s.id}"
                   aria-label="Actions for ${s.name}"
@@ -1438,6 +1537,43 @@ function renderAdminSkillsList() {
         </td>
       </tr>`;
   }).join('');
+}
+
+function renderSkillsPagination(page, totalPages) {
+  const nav = document.getElementById('skills-page-nav');
+  if (!nav) return;
+
+  const btnBase = 'inline-flex items-center justify-center rounded-md text-sm w-8 h-8';
+  const inactiveCls = `${btnBase} text-gray-600 hover:bg-gray-100`;
+  const arrowCls = `${btnBase} text-gray-500 hover:bg-gray-100`;
+
+  function pageBtn(p) {
+    if (p === page) {
+      return `<button type="button" class="${btnBase} font-medium" style="background:#E6F7F4;color:#007460;border:1.5px solid #5FCEB1" onclick="adminSkillsState.page=${p}; renderAdminSkillsList();">${p}</button>`;
+    }
+    return `<button type="button" class="${inactiveCls}" onclick="adminSkillsState.page=${p}; renderAdminSkillsList();">${p}</button>`;
+  }
+
+  let pages = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(pageBtn(i));
+  } else {
+    pages.push(pageBtn(1));
+    if (page > 3) pages.push(`<span class="px-1 text-gray-400 text-sm">…</span>`);
+    const start = Math.max(2, page - 1), end = Math.min(totalPages - 1, page + 1);
+    for (let i = start; i <= end; i++) pages.push(pageBtn(i));
+    if (page < totalPages - 2) pages.push(`<span class="px-1 text-gray-400 text-sm">…</span>`);
+    pages.push(pageBtn(totalPages));
+  }
+
+  nav.innerHTML =
+    `<button type="button" class="${arrowCls}" onclick="if(adminSkillsState.page>1){adminSkillsState.page--;renderAdminSkillsList();}" ${page===1?'disabled':''}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>` +
+    pages.join('') +
+    `<button type="button" class="${arrowCls}" onclick="if(adminSkillsState.page<${totalPages}){adminSkillsState.page++;renderAdminSkillsList();}" ${page===totalPages?'disabled':''}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>`;
 }
 
 /* ---------- Row-action dropdown menu ---------- */
@@ -1556,8 +1692,13 @@ function openAdminSkillForm(id) {
   nameInput.style.borderColor = '';
   nameInput.style.boxShadow = '';
   updateNameCounter(nameInput);
+  autoExpand(nameInput);
   const catCounter = document.getElementById('asf-cat-counter');
   if (catCounter) { catCounter.classList.add('hidden'); catCounter.textContent = ''; }
+  const descInput = form.querySelector('#asf-description');
+  if (descInput) { descInput.value = s ? (s.description || '') : ''; descInput.style.borderColor = ''; descInput.style.boxShadow = ''; updateDescCounter(descInput); autoExpand(descInput); }
+  const fmtInput = form.querySelector('#asf-format');
+  if (fmtInput) { fmtInput.value = s ? (s.format || '') : ''; fmtInput.style.borderColor = ''; fmtInput.style.boxShadow = ''; updateFormatCounter(fmtInput); autoExpand(fmtInput); }
   form.querySelector('#asf-typeform').value = s ? s.typeformUrl : '';
   form.querySelector('#asf-threshold').value = s ? s.threshold : '';
   form.querySelector('#asf-duration').value = s ? s.duration : '';
@@ -1597,6 +1738,10 @@ function openAdminSkillView(id) {
   if (breadcrumbEl) breadcrumbEl.textContent = 'View Skills Test';
 
   form.querySelector('#asf-name').value = s.name;
+  const descInput = form.querySelector('#asf-description');
+  if (descInput) { descInput.value = s.description || ''; updateDescCounter(descInput); autoExpand(descInput); }
+  const fmtInput = form.querySelector('#asf-format');
+  if (fmtInput) { fmtInput.value = s.format || ''; updateFormatCounter(fmtInput); autoExpand(fmtInput); }
   form.querySelector('#asf-typeform').value = s.typeformUrl;
   form.querySelector('#asf-threshold').value = s.threshold;
   form.querySelector('#asf-duration').value = s.duration;
@@ -1613,7 +1758,7 @@ function openAdminSkillView(id) {
 function setAdminFormViewMode(isView) {
   const form = document.getElementById('admin-skill-form');
   if (!form) return;
-  ['asf-name', 'asf-typeform', 'asf-threshold', 'asf-duration'].forEach(fid => {
+  ['asf-name', 'asf-description', 'asf-format', 'asf-typeform', 'asf-threshold', 'asf-duration'].forEach(fid => {
     const el = document.getElementById(fid);
     if (el) {
       el.disabled = isView;
@@ -1643,6 +1788,8 @@ function setAdminFormViewMode(isView) {
 function saveAdminSkill(event, status) {
   if (event) event.preventDefault();
   const nameVal = document.getElementById('asf-name').value.trim();
+  const descVal = (document.getElementById('asf-description')?.value || '').trim();
+  const formatVal = (document.getElementById('asf-format')?.value || '').trim();
   const categoryVal = document.getElementById('asf-category').value;
   const typeformVal = document.getElementById('asf-typeform').value.trim();
   const thresholdVal = parseInt(document.getElementById('asf-threshold').value, 10);
@@ -1665,6 +1812,8 @@ function saveAdminSkill(event, status) {
 
   const data = {
     name: nameVal,
+    description: descVal,
+    format: formatVal,
     category: categoryVal,
     typeformUrl: typeformVal,
     threshold: isNaN(thresholdVal) ? 70 : thresholdVal,
@@ -1723,20 +1872,6 @@ function saveDraftAdminSkill(event) {
 }
 
 function bindAdminSkillsFilters() {
-  // Status tab pills
-  document.querySelectorAll('.admin-status-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.admin-status-pill').forEach(b => {
-        b.classList.remove('text-primary-700', 'bg-primary-100');
-        b.classList.add('text-gray-600', 'hover:bg-gray-100');
-      });
-      btn.classList.add('text-primary-700', 'bg-primary-100');
-      btn.classList.remove('text-gray-600', 'hover:bg-gray-100');
-      adminSkillsState.statusFilter = btn.dataset.status;
-      renderAdminSkillsList();
-    });
-  });
-
   // Category filter is built dynamically by renderListCategoryFilter() — no static binding needed here.
 }
 
@@ -1759,6 +1894,12 @@ function closeListCatFilter() {
   if (trigger) trigger.setAttribute('aria-expanded', 'false');
 }
 
+/* ---------- Auto-expand textareas ---------- */
+function autoExpand(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
 /* ---------- Character counters ---------- */
 function updateNameCounter(input) {
   const max = 60;
@@ -1767,6 +1908,30 @@ function updateNameCounter(input) {
   if (!counter) return;
   const over = len > max;
   counter.classList.remove('hidden');
+  counter.textContent = `${len}/${max}`;
+  counter.style.color = over ? '#ef4444' : '';
+  input.style.borderColor = over ? '#f87171' : '';
+  input.style.boxShadow = over ? '0 0 0 3px rgba(248,113,113,0.15)' : '';
+}
+
+function updateDescCounter(input) {
+  const max = 100;
+  const len = input.value.length;
+  const counter = document.getElementById('asf-desc-counter');
+  if (!counter) return;
+  const over = len > max;
+  counter.textContent = `${len}/${max}`;
+  counter.style.color = over ? '#ef4444' : '';
+  input.style.borderColor = over ? '#f87171' : '';
+  input.style.boxShadow = over ? '0 0 0 3px rgba(248,113,113,0.15)' : '';
+}
+
+function updateFormatCounter(input) {
+  const max = 60;
+  const len = input.value.length;
+  const counter = document.getElementById('asf-format-counter');
+  if (!counter) return;
+  const over = len > max;
   counter.textContent = `${len}/${max}`;
   counter.style.color = over ? '#ef4444' : '';
   input.style.borderColor = over ? '#f87171' : '';
