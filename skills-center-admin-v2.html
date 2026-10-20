@@ -561,7 +561,7 @@
 .list-cat-item:hover { background: #F9FAFB; }
 
 /* ── Agent Profile skills category multi-select combobox ── */
-#ap-cat-trigger, #ap-proctor-trigger {
+#ap-cat-trigger, #ap-proctor-trigger, #ap-method-trigger {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -580,15 +580,19 @@
 #ap-cat-trigger:focus-visible,
 #ap-proctor-trigger:focus,
 #ap-proctor-trigger:focus-visible,
+#ap-method-trigger:focus,
+#ap-method-trigger:focus-visible,
+#ap-method-trigger[aria-expanded="true"],
 #ap-cat-trigger[aria-expanded="true"], #ap-proctor-trigger[aria-expanded="true"] {
   border-color: #5FCEB1 !important;
   outline: none !important;
   box-shadow: 0 0 0 3px #c5fcee !important;
 }
 #ap-cat-trigger:hover:not([aria-expanded="true"]),
-#ap-proctor-trigger:hover:not([aria-expanded="true"]) { border-color: #9CA3AF; }
+#ap-proctor-trigger:hover:not([aria-expanded="true"]),
+#ap-method-trigger:hover:not([aria-expanded="true"]) { border-color: #9CA3AF; }
 
-#ap-cat-dropdown, #ap-proctor-dropdown {
+#ap-cat-dropdown, #ap-proctor-dropdown, #ap-method-dropdown {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
@@ -3517,6 +3521,7 @@ function boot() {
     if (t && t.closest && !t.closest('#ats1-cat-wrap')) ats1CloseCat();
     if (t && t.closest && !t.closest('#ap-cat-wrap')) closeApCatFilter();
     if (t && t.closest && !t.closest('#ap-proctor-wrap')) closeApProcFilter();
+    if (t && t.closest && !t.closest('#ap-method-wrap')) closeApMethodFilter();
     if (t && t.closest && !t.closest('#atm-modality-wrap')) closeAtmDropdown('modality');
     if (t && t.closest && !t.closest('#atm-format-wrap')) closeAtmDropdown('format');
     if (t && t.closest && !t.closest('#atm-cat-wrap')) closeAtmCatCombobox();
@@ -3924,6 +3929,10 @@ function renderAgentProfile(agent) {
   allTests.push({name:'Python', category:'Coding', status: 'Not passed', result: '30%', date:'05/29/2026', proctored: true});
   const vePassed = true; // always passed for demo
   allTests.push({name:'Video Editing', category:'Video editing', status: 'Passed', result: '83%', date:'05/28/2026', proctored: false});
+  // AAS simulation tests (one per mode) — reviewable via openSimReview()
+  allTests.push({name:'Hotel Training', category:'Customer service', status:'Passed', result:'89%', date:'05/27/2026', proctored:false, method:'Simulation', simId:'hotel-training'});
+  allTests.push({name:'Apple Order Entry', category:'Sales', status:'Not passed', result:'60%', date:'05/26/2026', proctored:false, method:'Simulation', simId:'apple-order'});
+  allTests.push({name:'Hotel Booking Annotation', category:'Operations', status:'Not passed', result:'0%', date:'05/25/2026', proctored:false, method:'Simulation', simId:'hotel-annotation'});
   ti = 2;
 
   // Agent's other passed tests (skip Python if already added)
@@ -4272,6 +4281,24 @@ function renderAgentProfile(agent) {
                   </button>`).join('')}
               </div>
               <div style="display:flex;align-items:center;gap:8px">
+                <div style="position:relative" id="ap-method-wrap">
+                  <button type="button" id="ap-method-trigger"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ap-method-dropdown"
+                    onclick="event.stopPropagation(); toggleApMethodFilter()">
+                    <span id="ap-method-pills" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px"><span style="color:#030712;font-size:14px;font-family:var(--font-sans)">All test methods</span></span>
+                    <svg id="ap-method-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform 0.15s;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div id="ap-method-dropdown" role="listbox" aria-label="Filter by test method" aria-multiselectable="true" hidden style="min-width:240px">
+                    <div id="ap-method-options" style="padding:4px 0"></div>
+                    <div id="ap-method-footer" style="display:none;border-top:1px solid #E5E7EB;padding:8px 16px">
+                      <button type="button" onclick="event.stopPropagation(); clearApMethodFilters()"
+                        style="width:100%;font-size:14px;font-weight:500;text-align:center;color:#007460;background:transparent;border:none;cursor:pointer;font-family:var(--font-sans)">
+                        Clear selection
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
                 <div style="position:relative" id="ap-proctor-wrap">
                   <button type="button" id="ap-proctor-trigger"
                     aria-haspopup="listbox" aria-expanded="false" aria-controls="ap-proctor-dropdown"
@@ -4312,6 +4339,7 @@ function renderAgentProfile(agent) {
               <thead>
                 <tr style="background:#F9FAFB;border-bottom:1px solid #E5E7EB">
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Name</th>
+                  <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Test method</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280;width:96px">Proctored</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Category</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Status</th>
@@ -4347,6 +4375,7 @@ function renderAgentProfile(agent) {
   root._apSkillSearch = '';
   root._apCatFilters = new Set();
   root._apProcFilter = 'All';
+  root._apMethodFilters = new Set();
   root._apPage = 1;
   root._apDateSort = 'desc';
   renderSkillsTestRows(allTests, 'All', '', new Set(), 1);
@@ -4545,6 +4574,96 @@ function renderApProcFilter() {
   }).join('');
 }
 
+// ── Test method filter (Typeform / AAS simulation modes) ──
+const AP_METHOD_OPTIONS = ['All', 'Typeform', 'Audio simulation', 'Image simulation', 'Audio & Image simulation'];
+function apTestMethodLabel(t) {
+  if (!t.simId) return 'Typeform';
+  return SIM_REVIEWS[t.simId] ? SIM_REVIEWS[t.simId].modeLabel + ' simulation' : 'Simulation';
+}
+function toggleApMethodFilter() {
+  const menu = document.getElementById('ap-method-dropdown');
+  const trigger = document.getElementById('ap-method-trigger');
+  if (!menu || !trigger) return;
+  if (!menu.hidden) { closeApMethodFilter(); return; }
+  menu.hidden = false;
+  trigger.setAttribute('aria-expanded', 'true');
+  const chevron = document.getElementById('ap-method-chevron');
+  if (chevron) chevron.style.transform = 'rotate(180deg)';
+  renderApMethodFilter();
+}
+function closeApMethodFilter() {
+  const menu = document.getElementById('ap-method-dropdown');
+  const trigger = document.getElementById('ap-method-trigger');
+  const chevron = document.getElementById('ap-method-chevron');
+  if (menu) menu.hidden = true;
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  if (chevron) chevron.style.transform = '';
+}
+function renderApMethodFilter() {
+  const optionsEl = document.getElementById('ap-method-options');
+  const footerEl = document.getElementById('ap-method-footer');
+  const root = document.getElementById('ap-root');
+  if (!optionsEl || !root) return;
+  if (!(root._apMethodFilters instanceof Set)) root._apMethodFilters = new Set();
+  const sel = root._apMethodFilters;
+  const isAll = sel.size === 0;
+  const checkSvg = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const allRow = `<button type="button" role="option" class="list-cat-item" aria-selected="${isAll}" onclick="event.stopPropagation(); clearApMethodFilters(true)">
+    <span>All</span>${isAll ? checkSvg : ''}
+  </button>`;
+  optionsEl.innerHTML = allRow + AP_METHOD_OPTIONS.filter(v => v !== 'All').map(val => {
+    const on = sel.has(val);
+    return `<button type="button" role="option" class="list-cat-item" aria-selected="${on}" onclick="event.stopPropagation(); apToggleMethodFilter('${val}')">
+      <span>${val}</span>${on ? checkSvg : ''}
+    </button>`;
+  }).join('');
+  if (footerEl) footerEl.style.display = sel.size > 0 ? '' : 'none';
+}
+function apMethodRefresh() {
+  const root = document.getElementById('ap-root');
+  if (!root) return;
+  root._apPage = 1;
+  renderApMethodFilter();
+  updateApMethodTrigger();
+  renderSkillsTestRows(root._apAllTests || [], root._apSkillFilter || 'All', root._apSkillSearch || '', root._apCatFilters || new Set(), 1);
+}
+function apToggleMethodFilter(val) {
+  const root = document.getElementById('ap-root');
+  if (!root) return;
+  if (!(root._apMethodFilters instanceof Set)) root._apMethodFilters = new Set();
+  const sel = root._apMethodFilters;
+  if (sel.has(val)) sel.delete(val); else sel.add(val);
+  apMethodRefresh();
+}
+function removeApMethodFilter(val) {
+  const root = document.getElementById('ap-root');
+  if (root && root._apMethodFilters instanceof Set) root._apMethodFilters.delete(val);
+  apMethodRefresh();
+}
+function clearApMethodFilters(keepOpen) {
+  const root = document.getElementById('ap-root');
+  if (root) root._apMethodFilters = new Set();
+  apMethodRefresh();
+  if (!keepOpen) closeApMethodFilter();
+}
+function updateApMethodTrigger() {
+  const pillsEl = document.getElementById('ap-method-pills');
+  if (!pillsEl) return;
+  const root = document.getElementById('ap-root');
+  const sel = root && root._apMethodFilters instanceof Set ? [...root._apMethodFilters] : [];
+  const MAX_PILLS = 2;
+  if (sel.length === 0) {
+    pillsEl.innerHTML = `<span style="color:#030712;font-size:14px;font-family:var(--font-sans)">All test methods</span>`;
+    return;
+  }
+  const extra = sel.length - MAX_PILLS;
+  pillsEl.innerHTML = sel.slice(0, MAX_PILLS).map(v =>
+    `<span class="list-cat-pill">${v}
+      <button type="button" class="list-cat-pill-x" onclick="event.stopPropagation(); removeApMethodFilter('${v}')">×</button>
+    </span>`
+  ).join('') + (extra > 0 ? `<span class="list-cat-pill">+${extra} more</span>` : '');
+}
+
 function updateApProcTrigger() {
   const labelEl = document.getElementById('ap-proctor-label');
   if (!labelEl) return;
@@ -4579,6 +4698,8 @@ function renderSkillsTestRows(tests, filter, search, catFilter, page) {
   if (filter && filter !== 'All') rows = rows.filter(t => t.status === filter);
   if (procFilter === 'Proctored')     rows = rows.filter(t => t.proctored === true);
   if (procFilter === 'Not proctored') rows = rows.filter(t => t.proctored !== true);
+  const methodSet = root && root._apMethodFilters instanceof Set ? root._apMethodFilters : new Set();
+  if (methodSet.size > 0) rows = rows.filter(t => methodSet.has(apTestMethodLabel(t)));
   if (catSet.size > 0) rows = rows.filter(t => catSet.has(t.category));
   if (q) rows = rows.filter(t => t.name.toLowerCase().includes(q) || t.category.toLowerCase().includes(q));
   rows = [...rows].sort((a,b) => {
@@ -4594,7 +4715,7 @@ function renderSkillsTestRows(tests, filter, search, catFilter, page) {
   const pageRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   if (!pageRows.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="padding:28px;text-align:center;font-size:14px;color:#6B7280">No tests found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:28px;text-align:center;font-size:14px;color:#6B7280">No tests found</td></tr>`;
     renderApPagination(0, 1, 1);
     return;
   }
@@ -4603,16 +4724,20 @@ function renderSkillsTestRows(tests, filter, search, catFilter, page) {
     const passed = t.status === 'Passed';
     const lastRow = i === pageRows.length - 1;
     const tdBorder = lastRow ? '' : 'border-bottom:1px solid #F3F4F6';
-    const isReviewable = t.name === 'Python' || t.name === 'Video Editing';
+    const isSim = !!t.simId;
+    const isReviewable = isSim || t.name === 'Python' || t.name === 'Video Editing';
     const trStyle = isReviewable
       ? `cursor:pointer;transition:background 0.1s`
       : '';
+    const openCall = isSim ? `openSimReview('${t.simId}','${agentId}')` : `openTestReview('${t.name}','${agentId}')`;
     const trAttrs = isReviewable
-      ? `onclick="openTestReview('${t.name}','${agentId}')" onmouseenter="this.style.background='#F9FAFB'" onmouseleave="this.style.background=''"`
+      ? `onclick="${openCall}" onmouseenter="this.style.background='#F9FAFB'" onmouseleave="this.style.background=''"`
       : '';
     const nameCell = t.name;
+    const methodLabel = apTestMethodLabel(t);
     return `<tr style="${trStyle}" ${trAttrs}>
       <td style="padding:13px 16px;font-size:14px;color:#030712;font-weight:500;${tdBorder}">${nameCell}</td>
+      <td style="padding:13px 16px;font-size:14px;color:#374151;white-space:nowrap;${tdBorder}">${methodLabel}</td>
       <td style="padding:13px 16px;font-size:14px;color:#374151;${tdBorder}">${t.proctored ? 'Yes' : 'No'}</td>
       <td style="padding:13px 16px;font-size:14px;color:#374151;${tdBorder}">${t.category}</td>
       <td style="padding:13px 16px;${tdBorder}">
@@ -4882,6 +5007,376 @@ function openTestReview(testName, agentId) {
   // Question cards
   const container = document.getElementById('trm-questions');
   if (container) container.innerHTML = buildTestReviewCards(wrongQs, totalQs);
+  const panel = document.getElementById('trm-panel');
+  if (panel) panel.style.maxWidth = '680px';
+
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── AAS Simulation result review (Talent Pool › Agent profile › Skills) ─────
+// Simplified MP version of the AAS agent "Review actions" page: no playback,
+// no per-screen audio player, no coaching tips. Shows correct + incorrect.
+// Keyword markup in scripts: [[keyword]]. Hotspot result: ok | wrong | terminal.
+const SIM_REVIEWS = {
+  'apple-order': {
+    title: 'Apple Order Entry', mode: 'audio', modeLabel: 'Audio',
+    date: '05/26/2026', time: '4:12', passMark: 80, score: 60, passed: false,
+    feedback: 'Lina opened the call confidently and confirmed stock and delivery clearly. She paraphrased several scripted phrases, missing key terms like “available stocks”, “full name”, “shipping address” and “secure payment link”. Using the exact wording helps the customer feel the order is handled accurately.',
+    exchanges: [
+      { customer: 'Hello?',
+        script: 'Welcome to [[Apple]]! This is [agent name]. How can I help? We have product A, B, C currently on [[sales]]. Do you want to learn more?',
+        said: 'Welcome to Apple! This is Lina. How can I help? We have a few products on sales right now — want to hear more?',
+        hits: ['Apple','sales'] },
+      { customer: 'Yes. I\'d like to place an order for the new iPhone 16 SE, please.',
+        script: 'Definitely. Let me look at [[available stocks]] and I\'ll ask a few questions and get your information for this [[purchase]]. Sounds good?',
+        said: 'Sure. Let me check and I\'ll ask a few questions to get your information for this purchase.',
+        hits: ['purchase'] },
+      { customer: 'That sounds good.',
+        script: 'Could I get your [[full name]] and the [[shipping address]] for this order?',
+        said: 'Can I have your name and where you\'d like it delivered?',
+        hits: [] },
+      { customer: 'Sure, it\'s Daniel Park, 42 Bay Street, Toronto.',
+        script: 'Thank you, Daniel. The iPhone 16 SE is [[in stock]] and will arrive in [[3–5 business days]].',
+        said: 'Thanks Daniel. Good news, it\'s in stock and should arrive in 3–5 business days.',
+        hits: ['in stock','3–5 business days'] },
+      { customer: 'Great. Can I pay by card?',
+        script: 'Absolutely — I\'ll send a [[secure payment link]] to your email. Is there [[anything else]] I can help with?',
+        said: 'Yes, I\'ll send you a payment link by email. Anything else today?',
+        hits: ['anything else'] },
+    ],
+  },
+  'hotel-annotation': {
+    title: 'Hotel Booking Annotation', mode: 'image', modeLabel: 'Image',
+    date: '05/25/2026', time: '0:58', passMark: 80, score: 0, passed: false, terminal: true,
+    feedback: 'The simulation ended early on Screen 3 because a terminal action was taken (“Pay Now”). Screens after this point were not reached.',
+    notReached: 'Screens 4–6 were not reached',
+    screens: [
+      { img: 0, name: 'HP Landing Page', hotspots: [
+        { name: 'Hotel Location', type: 'Text field', r: 'ok', agent: 'Ohio', pts: 1 },
+        { name: 'Check-in Date', type: 'Dropdown', r: 'wrong', agent: 'May 2', correct: 'Apr 30', pts: -1 },
+        { name: 'Check-out Date', type: 'Dropdown', r: 'wrong', agent: 'May 4', correct: 'May 1', pts: -1 },
+        { name: 'Find Hotels', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 2', pts: 1 },
+      ]},
+      { img: 1, name: 'Hotel Search Results', hotspots: [
+        { name: 'Five Star', type: 'Click', r: 'wrong', note: 'Clicked a penalty area — simulation continued', pts: -1 },
+        { name: 'Choose Hotel', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 3', pts: 1 },
+      ]},
+      { img: 2, name: 'Hotel Detail', hotspots: [
+        { name: 'Adult Count', type: 'Text field', r: 'wrong', agent: '2', correct: '1', pts: -1 },
+        { name: 'Pay Now', type: 'Click', r: 'terminal', note: 'Clicked — simulation terminated', correctPath: 'Pay at Hotel → Screen 4', pts: 0 },
+      ]},
+    ],
+  },
+  'hotel-training': {
+    title: 'Hotel Training', mode: 'audio-image', modeLabel: 'Audio & Image',
+    date: '05/27/2026', time: '5:23', passMark: 80, score: 89, passed: true,
+    feedback: 'Great work on this booking — Lina guided the customer clearly, gathered all required details and kept a professional tone. Two slips to note: the adult count on Screen 3 and the travel insurance checkbox on Screen 5.',
+    screens: [
+      { img: 0, name: 'HP Landing Page', hotspots: [
+        { name: 'Hotel Location', type: 'Text field', r: 'ok', agent: 'Ohio', pts: 1 },
+        { name: 'Check-in Date', type: 'Dropdown', r: 'ok', agent: 'Apr 30', pts: 1 },
+        { name: 'Check-out Date', type: 'Dropdown', r: 'ok', agent: 'May 1', pts: 1 },
+        { name: 'Find Hotels', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 2', pts: 1 },
+      ], exchanges: [
+        { customer: 'Hi, I\'d like to book a hotel room in Ohio for next weekend — checking in Apr 30, checking out May 1.',
+          script: 'Of course! Let me look that up for you. Could you confirm the [[city]]? I want to make sure I search the [[right area]].',
+          said: 'Of course! I\'ll help with that. Can you confirm the city you\'re looking in?', hits: ['city'] },
+      ]},
+      { img: 1, name: 'Hotel Search Results', hotspots: [
+        { name: 'Five Star', type: 'Checkbox', r: 'ok', agent: 'Checked', pts: 1 },
+        { name: 'No Pool', type: 'Checkbox', r: 'ok', agent: 'Unchecked', pts: 1 },
+        { name: 'Choose Hotel', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 3', pts: 1 },
+      ], exchanges: [
+        { customer: 'Yes, Ohio — anywhere nearby works.',
+          script: 'Perfect, I\'ll search [[Ohio]]. And the dates were [[Apr 30 to May 1]] — I\'ll enter those now.',
+          said: 'Perfect, I\'ll search Ohio. Dates Apr 30 to May 1 — entering those now.', hits: ['Ohio','Apr 30 to May 1'] },
+      ]},
+      { img: 2, name: 'Hotel Detail', hotspots: [
+        { name: 'Adult Count', type: 'Text field', r: 'wrong', agent: '2', correct: '1', pts: -1 },
+        { name: 'Pay at Hotel', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 4', pts: 1 },
+      ], exchanges: [
+        { customer: 'Great, I can see a few options. Holiday Inn Express looks nice — can we go with that one?',
+          script: 'Sure! I\'ll select [[Holiday Inn Express]] for you now.',
+          said: 'Sure! I\'ll select Holiday Inn Express for you.', hits: ['Holiday Inn Express'] },
+        { customer: 'It\'s just for two adults. We\'d prefer to pay at the hotel rather than upfront if that\'s an option.',
+          script: 'Absolutely, I\'ll set the [[adult count]] to 2 and select [[Pay at Hotel]] for you.',
+          said: 'I\'ll set it to 2 and choose pay at hotel.', hits: ['Pay at Hotel'] },
+      ]},
+      { img: 3, name: 'Room Selection', hotspots: [
+        { name: 'Confirm Room', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 5', pts: 1 },
+      ], exchanges: [
+        { customer: 'Wonderful, thank you!' },
+      ]},
+      { img: 4, name: 'Guest Details & Payment', hotspots: [
+        { name: 'Guest Name', type: 'Text field', r: 'ok', agent: 'Claire', pts: 1 },
+        { name: 'Travel Insurance', type: 'Checkbox', r: 'wrong', agent: 'Unchecked', correct: 'Checked', pts: -1 },
+        { name: 'Save Payment Details', type: 'Checkbox', r: 'ok', agent: 'Unchecked', pts: 1 },
+        { name: 'Complete Booking', type: 'Click', r: 'ok', note: 'Clicked — navigated to Screen 6', pts: 1 },
+      ], exchanges: [
+        { customer: 'My name is Claire. Can you make sure the booking is under that name?',
+          script: 'Of course — I\'ll enter [[\'Claire\']] as the guest name and [[complete the booking]] now.',
+          said: 'Of course — entering \'Claire\' as the guest name and completing the booking now.', hits: ['\'Claire\'','complete the booking'] },
+      ]},
+      { img: 5, name: 'Booking Confirmation', hotspots: [
+        { name: 'Confirmation', type: 'Click', r: 'ok', note: 'Clicked — simulation completed', pts: 1 },
+      ], exchanges: [
+        { customer: 'I see the confirmation on my end — booking number HC-4421. Thank you so much!',
+          script: 'You\'re all set! Your booking at [[Holiday Inn Express]] in [[Ohio]] is confirmed for [[Apr 30 – May 1]], two adults, [[pay at hotel]]. Is there anything else I can help with?',
+          said: 'You\'re all set! Your booking at Holiday Inn Express in Ohio is confirmed for Apr 30 to May 1, two adults, pay at hotel. Anything else I can help with?',
+          hits: ['Holiday Inn Express','Ohio','Apr 30 – May 1','pay at hotel'] },
+      ]},
+    ],
+  },
+};
+
+let _simReviewState = { id: null };
+
+function srvKw(script) { return (script.match(/\[\[(.+?)\]\]/g) || []).map(s => s.slice(2, -2)); }
+function srvExKw(ex) { const k = ex.script ? srvKw(ex.script) : []; return { total: k.length, hit: k.filter(x => (ex.hits||[]).includes(x)).length }; }
+function srvEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function srvRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function srvScreenStats(sc) {
+  let plus = 0, minus = 0, wrong = 0, term = 0;
+  sc.hotspots.forEach(h => { if (h.pts > 0) plus += h.pts; if (h.pts < 0) minus += h.pts; if (h.r !== 'ok') wrong++; if (h.r === 'terminal') term++; });
+  return { plus, minus, wrong, term };
+}
+
+function srvTotals(sim) {
+  let plus = 0, minus = 0, term = 0, kwT = 0, kwH = 0;
+  (sim.screens || []).forEach(sc => { const s = srvScreenStats(sc); plus += s.plus; minus += s.minus; term += s.term; });
+  (sim.exchanges || []).forEach(ex => { const k = srvExKw(ex); kwT += k.total; kwH += k.hit; });
+  return { plus, minus, term, kwT, kwH, kwPct: kwT ? Math.round(kwH / kwT * 100) : 0 };
+}
+
+// ── Hotspot result row — reuses the Scoring step's Screen Flow Summary styles (sc-*) ──
+const SRV_TYPE_KEY = { 'Text field': 'text-field', 'Dropdown': 'dropdown', 'Checkbox': 'checkbox', 'Click': 'click-area' };
+function srvBadge(kind, pts) {
+  if (kind === 'term') return '<span class="sc-bdg is-term"><i></i></span>';
+  const n = Math.abs(pts || 1);
+  return `<span class="sc-bdg is-${kind}">${kind === 'ok' ? '+' : '−'}${n} pt${n === 1 ? '' : 's'}</span>`;
+}
+function srvPath(kind, pts, html) {
+  return `<div class="sc-path"><span class="sc-bh">${srvBadge(kind, pts)}</span><span class="sc-res" style="white-space:normal;flex-wrap:wrap">${html}</span></div>`;
+}
+function srvOutcome(h) {
+  // where the action led
+  const n = h.note || '';
+  if (/navigated to (Screen \d+)/.test(n)) return n.match(/navigated to (Screen \d+)/)[1];
+  if (/completed/.test(n)) return 'Result Screen';
+  if (h.r === 'terminal') return 'End simulation';
+  return 'Continue';
+}
+function srvHotspotRow(h) {
+  const typeKey = SRV_TYPE_KEY[h.type] || 'click-area';
+  const icon = (typeof SC_IC !== 'undefined' && SC_IC[typeKey]) || '';
+  const arrow = (typeof SC_IC !== 'undefined' && SC_IC.arrow) || '→';
+  const typeLabel = h.type === 'Click' ? 'Click area' : h.type;
+  const val = v => `<b style="font-weight:600">“${srvEsc(v)}”</b>`;
+  let rows;
+  if (h.r === 'ok') {
+    rows = srvPath('ok', h.pts, `Correct${h.agent !== undefined ? ' · ' + val(h.agent) : ''}${arrow}${srvOutcome(h)}`);
+  } else if (h.r === 'wrong') {
+    const what = h.agent !== undefined
+      ? `Wrong · Agent: ${val(h.agent)}<span style="color:#98A2B3;margin:0 2px">·</span>Answer key: ${val(h.correct)}`
+      : `Wrong · Clicked a penalty area`;
+    rows = srvPath('warn', h.pts, `${what}${arrow}Continue`);
+  } else {
+    rows = srvPath('term', 0, `Wrong · Clicked${arrow}End simulation`) +
+      (h.correctPath ? `<div class="sc-path" style="opacity:.75"><span class="sc-bh"></span><span class="sc-res" style="color:#667085">Correct path: ${srvEsc(h.correctPath.split(' → ')[0])}${arrow}${srvEsc(h.correctPath.split(' → ')[1] || '')}</span></div>` : '');
+  }
+  const cls = h.r === 'terminal' ? ' is-term' : '';
+  const warnStyle = h.r === 'wrong' ? ' style="background:#FFFCF5;border-color:#FEDF89"' : '';
+  return `<div class="sc-hs${cls}"${warnStyle}><span class="sc-hs-ic">${icon}</span>
+    <div class="sc-hs-main"><div class="sc-hs-name"><b>“${srvEsc(h.name)}”</b><span>— ${typeLabel}</span></div>
+    <div class="sc-paths">${rows}</div></div></div>`;
+}
+
+// ── Conversation (indigo agent bubbles, yellow keywords — matches the creation flow palette) ──
+const SRV_CUST_IC = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#667085" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+const SRV_AGENT_IC = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444CE7" stroke-width="2" stroke-linecap="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>';
+
+function srvScriptHtml(ex, withKw) {
+  return srvEsc(ex.script).replace(/\[\[(.+?)\]\]/g, (m, k) => withKw ? `<span style="background:#FEC84B;border-radius:2px;padding:0 1px">${k}</span>` : k);
+}
+function srvSaidHtml(ex, withKw) {
+  let out = srvEsc(ex.said);
+  if (!withKw) return out;
+  (ex.hits || []).forEach(k => {
+    const re = new RegExp('(' + srvRe(srvEsc(k)) + ')', 'i');
+    out = out.replace(re, '<span style="background:#A9EFD8;border-radius:2px;padding:0 1px">$1</span>');
+  });
+  return out;
+}
+function srvExchangeHtml(ex, withKw) {
+  const cust = `<div style="display:flex;gap:8px;align-items:flex-start;max-width:80%">
+      <span style="flex-shrink:0;width:24px;height:24px;border-radius:999px;background:#F2F4F7;display:flex;align-items:center;justify-content:center">${SRV_CUST_IC}</span>
+      <div style="background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.06);border-radius:8px;padding:9px 12px;font-size:13px;color:#101828;line-height:1.5">${srvEsc(ex.customer)}</div>
+    </div>`;
+  if (!ex.script) return `<div style="display:flex;flex-direction:column;gap:10px">${cust}</div>`;
+  const k = srvExKw(ex);
+  const ks = withKw ? `<div style="display:flex;justify-content:flex-end;font-size:12px;color:#344054">Keyword score:&nbsp;<b style="font-weight:600;color:#101828">${k.hit}/${k.total}</b></div>` : '';
+  return `<div style="display:flex;flex-direction:column;gap:10px">
+    ${cust}
+    <div style="display:flex;gap:8px;align-items:flex-start;justify-content:flex-end">
+      <div style="max-width:82%;display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:12px;color:#475467;line-height:1.6;padding:0 2px"><span style="font-weight:600;color:#667085">Script: </span>${srvScriptHtml(ex, withKw)}</div>
+        <div style="background:#EEF4FF;border:1px solid #E0EAFF;border-radius:8px;padding:9px 12px;font-size:13px;color:#101828;line-height:1.5">${srvSaidHtml(ex, withKw)}</div>
+        ${ks}
+      </div>
+      <span style="flex-shrink:0;width:24px;height:24px;border-radius:999px;background:#EEF4FF;display:flex;align-items:center;justify-content:center">${SRV_AGENT_IC}</span>
+    </div>
+  </div>`;
+}
+function srvThread(exchanges, withKw) {
+  return `<div style="background:#F9FAFB;border-radius:12px;padding:16px 14px;display:flex;flex-direction:column;gap:16px">
+    ${exchanges.map(ex => srvExchangeHtml(ex, withKw)).join('')}
+  </div>`;
+}
+
+function srvTab(btn, idx, which) {
+  const card = document.getElementById('sim-sc-' + idx);
+  if (!card) return;
+  card.querySelectorAll('.srv-tab').forEach(b => {
+    const on = b === btn;
+    b.style.color = on ? '#007460' : '#667085';
+    b.style.borderBottomColor = on ? '#007460' : 'transparent';
+  });
+  card.querySelector('.srv-pane-actions').style.display = which === 'actions' ? 'flex' : 'none';
+  card.querySelector('.srv-pane-transcript').style.display = which === 'transcript' ? 'block' : 'none';
+}
+
+function srvOpenImage(i) {
+  if (typeof SIM_HOTEL_IMGS === 'undefined' || !SIM_HOTEL_IMGS[i]) return;
+  const old = document.getElementById('sim-lightbox'); if (old) old.remove();
+  const lb = document.createElement('div');
+  lb.id = 'sim-lightbox';
+  lb.style.cssText = 'position:fixed;inset:0;z-index:70;background:rgba(17,24,39,0.8);display:flex;align-items:center;justify-content:center;padding:32px;cursor:zoom-out';
+  lb.onclick = () => lb.remove();
+  lb.innerHTML = `<img src="${SIM_HOTEL_IMGS[i].src}" alt="Screen ${i + 1}" style="max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 40px rgba(0,0,0,0.3)"/>`;
+  document.body.appendChild(lb);
+}
+
+function srvScreenCard(sim, sc, i) {
+  const st = srvScreenStats(sc);
+  const hasAudio = sim.mode === 'audio-image';
+  const thumb = (typeof SIM_HOTEL_IMGS !== 'undefined' && SIM_HOTEL_IMGS[sc.img]) ? SIM_HOTEL_IMGS[sc.img].src : '';
+  const dot = st.term ? '#F04438' : st.wrong ? '#FDB022' : '#D0D5DD';
+  const net = st.plus + st.minus;
+  const actions = `<div class="sc-hslist srv-pane-actions">${sc.hotspots.map(srvHotspotRow).join('')}</div>`;
+  const tabBtn = (label, which, on) => `<button type="button" class="srv-tab" onclick="srvTab(this,${i},'${which}')" style="background:none;border:none;border-bottom:2px solid ${on ? '#007460' : 'transparent'};padding:0 2px 8px;font-size:14px;font-weight:500;color:${on ? '#007460' : '#667085'};cursor:pointer;font-family:var(--font-sans)">${label}</button>`;
+  const tabs = hasAudio ? `<div style="display:flex;gap:24px;border-bottom:1px solid #EAECF0;margin-bottom:12px">${tabBtn('Hotspot Results', 'actions', true)}${tabBtn('Transcript', 'transcript', false)}</div>` : '';
+  const transcript = hasAudio ? `<div class="srv-pane-transcript" style="display:none">${srvThread(sc.exchanges || [], false)}</div>` : '';
+  return `<div class="sc-fc">
+    <div class="sc-rail"><i style="background:${dot}"></i><b style="margin-bottom:-12px"></b></div>
+    <div class="sc-card" id="sim-sc-${i}" style="${st.term ? 'border-color:#FECDCA' : ''}">
+      <div class="sc-shot">
+        <button type="button" class="sc-thumb" onclick="srvOpenImage(${sc.img})" title="View full screen" style="padding:0;cursor:zoom-in;display:block;width:100%">
+          ${thumb ? `<img src="${thumb}" alt="${srvEsc(sc.name)}"/>` : ''}
+        </button>
+        <div class="sc-sname">${srvEsc(sc.name)}</div>
+        <div class="sc-snum">Screen ${sc.img + 1}</div>
+        <div style="font-size:12px;color:#344054;font-weight:500">${net >= 0 ? '+' : '−'}${Math.abs(net)} pts</div>
+      </div>
+      <div class="sc-body" style="gap:0">${tabs}${actions}${transcript}</div>
+    </div>
+  </div>`;
+}
+
+function srvEndBar(sim) {
+  const rail = '<div class="sc-rail"><i style="background:' + (sim.terminal ? '#F04438' : '#009170') + '"></i></div>';
+  if (sim.terminal) {
+    return `<div class="sc-fc">${rail}<div style="flex:1;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#FFFBFA;border:1px dashed #FDA29B;font-size:13px;color:#B42318;font-weight:500">
+        <span style="width:10px;height:10px;border-radius:2px;background:#F04438;flex-shrink:0"></span>Simulation ended here — a terminal action ended the simulation
+      </div>
+      ${sim.notReached ? `<div style="font-size:12px;color:#667085;padding-left:2px">${sim.notReached}</div>` : ''}
+    </div></div>`;
+  }
+  return `<div class="sc-fc">${rail}<div style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#E9FEF9;border:1px dashed #31C09A;font-size:13px;color:#006650;font-weight:500">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#009170" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Simulation completed — agent reached the end
+  </div></div>`;
+}
+
+function srvStat(label, value, color) {
+  return `<div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+    <span style="font-size:11px;color:#6B7280">${label}</span>
+    <span style="font-size:15px;font-weight:600;color:${color || '#030712'}">${value}</span>
+  </div>`;
+}
+
+function renderSimReviewBody() {
+  const sim = SIM_REVIEWS[_simReviewState.id];
+  const container = document.getElementById('trm-questions');
+  if (!sim || !container) return;
+
+  const fbLabel = sim.mode === 'image' ? 'Summary' : 'AI feedback';
+  const feedback = `<div style="padding:12px 14px;border-radius:10px;background:#F9FAFB;border:1px solid #E5E7EB">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">
+        ${sim.mode === 'image' ? '' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="#007460"><path d="M12 2l1.9 5.6L19.5 9.5l-5.6 1.9L12 17l-1.9-5.6L4.5 9.5l5.6-1.9z"/></svg>'}${fbLabel}
+      </div>
+      <div style="font-size:13px;color:#374151;line-height:1.6">${srvEsc(sim.feedback)}</div>
+    </div>`;
+
+  let listTitle, listDesc, list;
+  if (sim.mode === 'audio') {
+    listTitle = 'Conversation review';
+    listDesc = 'Script keywords are highlighted in yellow. Keywords the agent said are highlighted in green.';
+    list = srvThread(sim.exchanges, true);
+  } else {
+    listTitle = 'Screen flow review';
+    listDesc = sim.mode === 'image'
+      ? 'Actions per screen. Only screens the agent reached are shown. Click a thumbnail to enlarge.'
+      : 'Actions and conversation per screen. Only screens the agent reached are shown. Click a thumbnail to enlarge.';
+    list = `<div style="display:flex;flex-direction:column;gap:12px">${sim.screens.map((sc, i) => srvScreenCard(sim, sc, i)).join('')}${srvEndBar(sim)}</div>`;
+  }
+
+  container.innerHTML = `
+    ${feedback}
+    <div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:15px;font-weight:600;color:#030712">${listTitle}</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:2px">${listDesc}</div>
+      </div>
+      ${list}
+    </div>`;
+}
+
+
+function openSimReview(simId, agentId) {
+  const sim = SIM_REVIEWS[simId];
+  const modal = document.getElementById('test-review-modal');
+  if (!sim || !modal) return;
+  _simReviewState = { id: simId };
+  // sc-* (Screen Flow Summary) styles live in the sim wizard's lazily-injected stylesheet
+  if (typeof simEnsureStyles === 'function') simEnsureStyles();
+  const t = srvTotals(sim);
+
+  document.getElementById('trm-title').textContent = sim.title + ' — Result Review';
+  document.getElementById('trm-subtitle').textContent = sim.modeLabel + ' simulation · Taken ' + sim.date + ' · Required pass mark ' + sim.passMark + '%';
+
+  const badge = sim.terminal
+    ? '<span style="padding:3px 12px;border-radius:999px;background:#FEE2E2;color:#B91C1C;font-size:12px;font-weight:500;white-space:nowrap">Terminal</span>'
+    : `<span style="padding:3px 12px;border-radius:999px;background:${sim.passed ? '#E9FEF9' : '#F3F4F6'};color:${sim.passed ? '#007460' : '#374151'};font-size:12px;font-weight:500;white-space:nowrap">${sim.passed ? 'Passed' : 'Not passed'}</span>`;
+  const stats = [srvStat('Overall score', sim.score + '%'), srvStat('Completion time', sim.time)];
+  if (sim.mode !== 'audio') {
+    stats.push(srvStat('Correct actions', '+' + t.plus + ' pts', '#007460'));
+    stats.push(srvStat('Mistakes', (t.minus ? '−' + Math.abs(t.minus) : '0') + ' pts', t.minus ? '#DC2626' : null));
+    stats.push(srvStat('Terminal actions', t.term || '—', t.term ? '#DC2626' : null));
+  }
+  if (sim.mode === 'audio') stats.push(srvStat('Keyword score', t.kwH + '/' + t.kwT + ' · ' + t.kwPct + '%', null));
+  document.getElementById('trm-stats-bar').innerHTML =
+    `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">${stats.join('<span style="width:1px;height:28px;background:#E5E7EB"></span>')}</div>
+      ${badge}
+    </div>`;
+
+  const panel = document.getElementById('trm-panel');
+  if (panel) panel.style.maxWidth = '880px';
+  renderSimReviewBody();
+  const qs = document.getElementById('trm-questions'); if (qs) qs.scrollTop = 0;
 
   modal.classList.remove('hidden');
   modal.setAttribute('aria-hidden', 'false');
@@ -5454,6 +5949,8 @@ function submitAddTestModal(status) {
 }
 
 function closeTestReview() {
+  const lb = document.getElementById('sim-lightbox');
+  if (lb) { lb.remove(); return; } // Esc / close: dismiss enlarged screen first
   const modal = document.getElementById('test-review-modal');
   if (!modal) return;
   modal.classList.add('hidden');
@@ -5787,7 +6284,7 @@ function ats1CreateTest() {
   if (isSim) {
     window._simName = name;
     window._simCat = cat;
-    window._simThreshold = 75; /* sim Pass Rate is its own setting — default 75%, not Step 1's threshold */
+    window._simThreshold = threshold; /* PO 19 Oct: Step 1 Passing threshold is the single pass mark */
     window._simMode = ats1SimMode || 'audio_image';
     skillStartSim();
   } else {
@@ -6260,12 +6757,11 @@ function simStepValid(){ return simStepValidAt(simStepIndex); }
 function simStepValidAt(idx){
   const step = simSteps()[idx];
   if (step === 'Overview' && !simOvValid()) return false;
-  if (step === 'Scoring') return simPassRateValid(simPassVal());
   if (simMode() === 'audio' || simMode() === 'audio_image'){
     if (step === 'Mapping') return SIM_MAP.state !== 'mapping';
     if (step === 'Script & Audio') return SIM_A.status === 'ready' && SIM_ALINES.length > 0 && !SIM_ALINES.some(function(l){ return l.audio === 'generating'; }) && SIM_A.editIdx < 0;
     if (step === 'AI Scoring' && simMode() === 'audio_image') return ai2Valid();
-    if (step === 'AI Scoring' && simMode() === 'audio') { const pr = Number(SIM_AIS.passRate); return SIM_AIS.prompt.trim().length > 0 && SIM_AIS.passRate !== '' && pr >= 0 && pr <= 100; }
+    if (step === 'AI Scoring' && simMode() === 'audio') return SIM_AIS.prompt.trim().length > 0;
   }
   if (step === 'Images') return simImgStepReady();
   return true;
@@ -6395,7 +6891,6 @@ function simBodyOverview(){
       '<textarea id="sim-ov-ta" class="' + (simOvErr('overview') ? 'is-err' : '') + '" maxlength="700" aria-label="Overview" aria-required="true" oninput="simOvInput(\'overview\',this)" onblur="simOvBlur(\'overview\')" placeholder="Enter an overview…" style="' + SIM_IN + ';min-height:140px;line-height:1.5;resize:vertical">' + simEsc(SIM_OVERVIEW.overview) + '</textarea>' +
       '<div class="sim-req-row"><span class="sim-req-err" id="sim-ov-err" role="alert">' + (simOvErr('overview') ? 'Overview is required.' : '') + '</span><span id="sim-ov-ct">' + ovLen + '/700</span></div></div>' +
     '<div style="margin-bottom:18px"><label style="' + SIM_LBL + '">Video Upload <span style="color:#9CA3AF;font-weight:400">(Optional)</span></label>' + dz + err + card + '</div>' +
-    '<div><label style="' + SIM_LBL + '">Module <span style="color:#9CA3AF;font-weight:400">(Optional)</span></label>' + moduleBox + '</div>' +
     instructions;
 }
 
@@ -7025,8 +7520,8 @@ function simStepHint(){
   if (step === 'Overview') return simMode() === 'audio' ? 'Add an overview to continue.' : 'Add an overview and simulation instructions to continue.';
   if (step === 'Images') return 'Every image needs hotspots and must be linked from Screen 1.';
   if (step === 'Script & Audio') return 'Generate the script and wait for the audio to finish.';
-  if (step === 'AI Scoring' && simMode() === 'audio_image'){ const m = ai2Missing(); return m.length ? 'Select ' + m.join(' and ') + ' to continue.' : 'Enter a pass rate between 0 and 100.'; }
-  if (step === 'AI Scoring') return 'Add a scoring prompt and a pass rate between 0 and 100.';
+  if (step === 'AI Scoring' && simMode() === 'audio_image'){ const m = ai2Missing(); return m.length ? 'Select ' + m.join(' and ') + ' to continue.' : ''; }
+  if (step === 'AI Scoring') return 'Add a scoring prompt to continue.';
   if (step === 'Scoring') return 'Enter a pass rate between 0 and 100.';
   return '';
 }
@@ -7041,7 +7536,7 @@ function simStepClick(i){
 const SIM_PROTO_OV = 'Welcome to the Hotel Training simulation. You’ll help a customer book a hotel room in Ohio from start to finish — searching, choosing a room, entering guest details and confirming the booking.';
 const SIM_PROTO_IN = 'Read the customer’s request carefully, then complete each screen in order. Fill in the fields exactly as the customer asks and choose the payment option they prefer. Avoid shortcuts — some wrong clicks will end the simulation.';
 const SIM_PROTO_NAMES = ['HP Landing Page', 'Search Results', 'Hotel Detail', 'Room Selection', 'Guest Details & Payment', 'Booking Confirmation'];
-function simProtoHas(step){ return ['Overview', 'Images', 'Scoring', 'AI Scoring', 'Mapping'].indexOf(step) >= 0 || (step === 'Script & Audio' && (simMode() === 'audio' || simMode() === 'audio_image')); }
+function simProtoHas(step){ return ['Overview', 'Images', 'AI Scoring', 'Mapping'].indexOf(step) >= 0 || (step === 'Script & Audio' && (simMode() === 'audio' || simMode() === 'audio_image')); }
 function simProtoIsEmpty(step){
   if (step === 'Overview') return !SIM_OVERVIEW.overview.trim() && !(SIM_OVERVIEW.instructions || '').trim();
   if (step === 'Images') return !simImgHasHotspots();
@@ -7057,7 +7552,6 @@ function simProtoFill(step, on){
     if (on){
       if (!SIM_OVERVIEW.overview.trim()) SIM_OVERVIEW.overview = SIM_PROTO_OV;
       if (simMode() !== 'audio' && !(SIM_OVERVIEW.instructions || '').trim()) SIM_OVERVIEW.instructions = SIM_PROTO_IN;
-      if (!SIM_OVERVIEW.modules.length) SIM_OVERVIEW.modules = ['New Hire Essentials'];
     } else {
       SIM_OVERVIEW.overview = ''; SIM_OVERVIEW.instructions = ''; SIM_OVERVIEW.modules = []; SIM_OVERVIEW.video = null;
       SIM_TOUCHED = {};
@@ -7107,11 +7601,11 @@ function simProtoFill(step, on){
     }
   } else if (step === 'AI Scoring'){
     if (simMode() === 'audio'){
-      if (on){ SIM_AIS.prompt = SIM_AIS.prompt.trim() ? SIM_AIS.prompt : [].concat(SIM_AIS_EXAMPLE).join('\n'); if (!simPassRateValid(SIM_AIS.passRate)) SIM_AIS.passRate = 75; }
+      if (on){ SIM_AIS.prompt = SIM_AIS.prompt.trim() ? SIM_AIS.prompt : [].concat(SIM_AIS_EXAMPLE).join('\n'); }
       else { SIM_AIS.prompt = ''; SIM_AIS.showExample = false; }
     } else if (simMode() === 'audio_image'){
-      if (on){ if (!SIM_AI2.specs.length) SIM_AI2.specs = [1, 2, 3, 4, 5]; if (SIM_AI2.ev == null) SIM_AI2.ev = 21; if (!simPassRateValid(simPassVal())) window._simThreshold = 75; SIM_AI2.sel = 'e' + SIM_AI2.ev; }
-      else { SIM_AI2 = ai2Default(); if (!simPassRateValid(simPassVal())) window._simThreshold = 75; }
+      if (on){ if (!SIM_AI2.specs.length) SIM_AI2.specs = [1, 2, 3, 4, 5]; if (SIM_AI2.ev == null) SIM_AI2.ev = 21; SIM_AI2.sel = 'e' + SIM_AI2.ev; }
+      else { SIM_AI2 = ai2Default(); }
     } else {
       SIM_AI.generated = !!on;
     }
@@ -7590,12 +8084,7 @@ function scResultCard(kind, pr){
 function simBodyScoringImage(){
   const pr = simPassVal(); const prBad = !simPassRateValid(pr);
   const cards = SIM_IMGS.map(scFlowCard).join('');
-  return '<div class="sc-sec">' +
-      '<div class="sc-h">Pass Rate</div><div class="sc-d">The minimum score an agent must achieve to pass this simulation. Default is 75%.</div>' +
-      '<div class="sc-pr' + (prBad ? ' is-err' : '') + '"><input type="number" min="0" max="100" value="' + pr + '" class="' + (prBad ? 'is-err' : '') + '" aria-label="Pass rate" aria-required="true" oninput="simPassInput(this);this.parentNode.classList.toggle(\'is-err\',this.classList.contains(\'is-err\'));scRefreshPM()"/><span>%</span></div>' +
-      '<div class="sim-req-err" id="sim-pr-err" role="alert" style="font-size:12px;margin-top:6px">' + (prBad ? (pr === '' ? 'Pass rate is required.' : 'Enter a value between 0 and 100.') : '') + '</div>' +
-    '</div>' +
-    '<div class="sum-hr" style="margin:32px 0"></div>' +
+  return '' +
     '<div class="sc-sec"><div class="sc-h">Screen Flow Summary</div><div class="sc-d">Auto-generated from your image configuration. Review the flow and branching paths before proceeding.</div>' +
       '<div class="sc-timeline">' + cards +
         '<div class="sc-fc is-result"><div class="sc-rail"><i></i><b></b></div><div class="sc-results"><div class="sc-rs-t">Result Screens</div>' +
@@ -8053,12 +8542,10 @@ function simBodySummaryImage(){
   return '<h3 class="sum-title">Summary</h3><div class="sum-hr" style="margin-top:14px"></div>' +
     '<div class="sum-sec"><div class="sum-h">Overview</div>' +
       '<div class="sum-text' + (ov ? '' : ' sum-muted') + '">' + (ov ? simEsc(ov) : 'No overview provided.') + '</div>' + video +
-      '<div class="sum-mod"><span>Module:</span>' + (mods.length ? mods.map(function(m){ return '<span class="sum-chip">' + simEsc(m) + '</span>'; }).join('') : '<span class="sum-muted">None</span>') + '</div>' +
+      '' +
     '</div>' +
     '<div class="sum-hr"></div>' +
     '<div class="sum-sec"><div class="sum-h">Simulation Instructions</div><div class="sum-text' + (ins ? '' : ' sum-muted') + '">' + (ins ? simEsc(ins) : 'No instructions provided.') + '</div></div>' +
-    '<div class="sum-hr"></div>' +
-    '<div class="sum-sec"><div class="sum-h">Pass Rate</div><div class="sum-text">' + simEsc(pr === '' ? '—' : pr) + '%</div></div>' +
     '<div class="sum-hr"></div>' +
     '<div class="sum-sec"><div class="sum-h">Hotspots</div>' +
       '<div class="ssum-hs" aria-label="Hotspots (view only)"><iframe id="sim-hsv-frame" title="Hotspots — view only"></iframe></div></div>';
@@ -8473,11 +8960,7 @@ function simBodyAIScoringAudio(){
       '<div class="ais-badges">' + badges + '</div>' +
       '<button type="button" class="ais-ex-btn" aria-expanded="' + ex + '" onclick="simAisToggleEx()">View prompt example' + (ex ? SA_IC.chevUp : SA_IC.chev) + '</button>' +
       (ex ? '<div class="ais-ex">' + SIM_AIS_EXAMPLE.map(function(p){ return '<p>' + p + '</p>'; }).join('') + '</div>' : '') +
-    '</div>' +
-    '<div class="ais-div"></div>' +
-    '<div class="ais-pr"><div class="ais-pr-t">Pass Rate</div><div class="ais-pr-d">The minimum score an agent must achieve to pass this simulation. Default is 75%.</div>' +
-      '<div class="ais-pr-in' + (prErr ? ' is-err' : '') + '" id="ais-pr-in"><input id="ais-pass" type="number" min="0" max="100" step="1" value="' + simEsc(pr) + '" aria-label="Pass rate percent" oninput="simAisPass(this)"/><span>%</span></div>' +
-      '<div class="ais-err" id="ais-pr-err"' + (prErr ? '' : ' hidden') + '>Enter a value between 0 and 100.</div></div>';
+    '</div>';
 }
 function simAisAutosize(){ const t = document.getElementById('ais-prompt'); if (!t) return; t.style.height = 'auto'; t.style.height = Math.max(250, t.scrollHeight + 2) + 'px'; }
 function simAisInput(el){ SIM_AIS.prompt = el.value; simAisAutosize(); simUpdateFooter(); }
@@ -8547,7 +9030,7 @@ const AI2_IC = {
 function ai2SortedSpecs(list){
   return (list || SIM_AI2.specs).slice().sort(function(a, b){ return AI2_SPECS[a].name.localeCompare(AI2_SPECS[b].name); });
 }
-function ai2Valid(){ return SIM_AI2.specs.length >= 1 && SIM_AI2.specs.length <= AI2_MAX && SIM_AI2.ev != null && simPassRateValid(simPassVal()); }
+function ai2Valid(){ return SIM_AI2.specs.length >= 1 && SIM_AI2.specs.length <= AI2_MAX && SIM_AI2.ev != null; }
 function ai2Missing(){
   const m = [];
   if (!SIM_AI2.specs.length) m.push('a specialist');
@@ -8601,9 +9084,7 @@ function ai2PanelHTML(ro){
 }
 function simBodyAIScoring2(){
   const pr = simPassVal(), prBad = !simPassRateValid(pr);
-  return '<div class="sc-sec ai2-pr"><div class="sc-h">Pass Rate</div><div class="sc-d">The minimum score an agent must achieve to pass this simulation. Default is 75%.</div>' +
-      '<div class="sc-pr' + (prBad ? ' is-err' : '') + '"><input type="number" min="0" max="100" value="' + pr + '" class="' + (prBad ? 'is-err' : '') + '" aria-label="Pass rate" aria-required="true" oninput="simPassInput(this);this.parentNode.classList.toggle(\'is-err\',this.classList.contains(\'is-err\'))"/><span>%</span></div>' +
-      '<div class="sim-req-err" id="sim-pr-err" role="alert" style="font-size:12px;margin-top:6px">' + (prBad ? (pr === '' ? 'Pass rate is required.' : 'Enter a value between 0 and 100.') : '') + '</div></div>' +
+  return simHead('AI Scoring', '') +
     ai2PanelHTML(false);
 }
 function ai2FooterHint(){
@@ -8773,7 +9254,7 @@ function simBodySummaryAI(){
   return '<h3 class="sum-title">Summary</h3><div class="sum-hr" style="margin-top:14px"></div>' +
     '<div class="sum-sec"><div class="sum-h">Overview</div>' +
       '<div class="sum-text' + (ov ? '' : ' sum-muted') + '">' + (ov ? simEsc(ov) : 'No overview provided.') + '</div>' + video +
-      '<div class="sum-mod"><span>Module:</span>' + (mods.length ? mods.map(function(m){ return '<span class="sum-chip">' + simEsc(m) + '</span>'; }).join('') : '<span class="sum-muted">None</span>') + '</div></div>' +
+      '</div>' +
     '<div class="sum-hr"></div>' +
     '<div class="sum-sec"><div class="sum-h">Simulation Instructions</div><div class="sum-text' + (ins ? '' : ' sum-muted') + '">' + (ins ? simEsc(ins) : 'No instructions provided.') + '</div></div>' +
     '<div class="sum-hr"></div>' +
@@ -8790,7 +9271,7 @@ function simBodySummaryAI(){
     '<div class="sum-sec"><div class="sum-h">Hotspots</div>' +
       '<div class="ssum-hs" aria-label="Hotspots (view only)"><iframe id="sim-hsv-frame" title="Hotspots — view only"></iframe></div></div>' +
     '<div class="sum-hr"></div>' +
-    '<div class="sum-sec"><div class="sum-h">AI Scoring</div><div class="ssum-pr">Pass rate: <b>' + simEsc(pr === '' ? '—' : pr) + '%</b></div>' +
+    '<div class="sum-sec"><div class="sum-h">AI Scoring</div>' +
       '<div id="ssum-ai2">' + ai2PanelHTML(true) + '</div></div>';
 }
 
@@ -8807,13 +9288,13 @@ function simBodySummaryAudio(){
   const v = SIM_OVERVIEW.video;
   const ov = SIM_OVERVIEW.overview.trim();
   const mods = SIM_OVERVIEW.modules;
-  const pr = (SIM_AIS.passRate === '' ? 75 : SIM_AIS.passRate);
+  const pr = simPassVal();
   const video = v ? '<div class="sum-video"><div class="sum-vthumb"><video src="' + v.url + '#t=0.5" controls preload="metadata"></video></div><div class="sum-vname">' + simEsc(v.name) + '</div><div class="sum-vsize">' + simEsc(v.sizeLabel) + '</div></div>' : '';
   return '<h3 class="sum-title">Summary</h3><div class="sum-hr" style="margin-top:14px"></div>' +
     '<div class="sum-sec"><div class="sum-h">Overview</div>' +
       '<div class="sum-text' + (ov ? '' : ' sum-muted') + '">' + (ov ? simEsc(ov) : 'No overview provided.') + '</div>' +
       video +
-      '<div class="sum-mod"><span>Module:</span>' + (mods.length ? mods.map(function(m){ return '<span class="sum-chip">' + simEsc(m) + '</span>'; }).join('') : '<span class="sum-muted">None</span>') + '</div>' +
+      '' +
     '</div>' +
     '<div class="sum-hr"></div>' +
     '<div class="sum-sec"><div class="sum-h">Script &amp; Audio</div>' +
@@ -8843,8 +9324,19 @@ function simApplyFit(){
   card.style.setProperty('--sim-nav-h', (nav ? nav.offsetHeight : 0) + 'px');
   card.style.setProperty('--sim-step-h', (st ? st.offsetHeight : 0) + 'px');
   card.style.setProperty('--sim-foot-h', (ft ? ft.offsetHeight : 0) + 'px');
+  { const mh = document.querySelector('#sim-body .mp-wrap:not(.ssum-map) .mp-lh'); if (mh) card.style.setProperty('--mp-head-h', mh.offsetHeight + 'px'); simMapFitCards(); }
   simStuckCheck();
 }
+/* Mapping: the sticky Screens list fills the space between its top and whichever comes first — the footer or the end of the panel */
+function simMapFitCards(){
+  const ft = document.getElementById('sim-footer');
+  document.querySelectorAll('#sim-body .mp-wrap:not(.ssum-map) .mp-cards, #sim-body .ai2-wrap:not(.is-ro) .ai2-left').forEach(function(c){
+    const w = c.parentNode;
+    const limit = Math.min(ft ? ft.getBoundingClientRect().top : window.innerHeight, w.getBoundingClientRect().bottom);
+    c.style.maxHeight = Math.max(160, Math.floor(limit - c.getBoundingClientRect().top)) + 'px';
+  });
+}
+window.addEventListener('scroll', function(){ if (document.querySelector('#sim-body .mp-cards, #sim-body .ai2-left')) requestAnimationFrame(simMapFitCards); }, { passive: true });
 function simStuckCheck(){
   const card = document.getElementById('sim-card'); if (!card || !card.offsetParent) return;
   const st = document.getElementById('sim-stepper'), ft = document.getElementById('sim-footer');
@@ -9472,6 +9964,29 @@ textarea.is-err:focus,input.is-err:focus{box-shadow:0 0 0 4px rgba(240,68,56,.12
 .sa-hp{background:#EEF4FF !important;color:#444CE7 !important}
 .mp-m-line.is-agent{background:#EEF4FF !important;border-color:#E0EAFF !important}
 .mp-m-line.is-agent .mp-m-role{color:#444CE7 !important}
+
+/* AI Scoring (Audio & Image): column headers stick under the stepper while the page scrolls */
+.ai2-wrap:not(.is-ro) .ai2-psec-h{position:sticky;top:calc(var(--sim-nav-h,64px) + var(--sim-step-h,56px));z-index:12;background:#fff;padding-bottom:12px;margin-bottom:-12px}
+.ai2-wrap:not(.is-ro) .ai2-cfg-h{position:sticky;top:calc(var(--sim-nav-h,64px) + var(--sim-step-h,56px));z-index:12;background:#fff;padding-bottom:16px;margin-bottom:-16px}
+
+/* Mapping: page scrolls as one; Screens / Script headers stick under the stepper (Summary copy keeps its own scroll) */
+.mp-wrap:not(.ssum-map){height:auto !important;min-height:560px;overflow:visible !important;background:linear-gradient(#E4E7EC,#E4E7EC) 271px 0/1px 100% no-repeat,#fff !important}
+.mp-wrap:not(.ssum-map) .mp-cards,.mp-wrap:not(.ssum-map) .mp-thread{overflow:visible}
+.mp-wrap:not(.ssum-map) .mp-lh,.mp-wrap:not(.ssum-map) .mp-rh{position:sticky;top:calc(var(--sim-nav-h,64px) + var(--sim-step-h,56px));z-index:12;background:#fff}
+.mp-wrap:not(.ssum-map) .mp-lh{border-top-left-radius:12px}.mp-wrap:not(.ssum-map) .mp-rh{border-top-right-radius:12px}
+.mp-wrap:not(.ssum-map) .mp-cards{border-bottom-left-radius:12px}.mp-wrap:not(.ssum-map) .mp-thread{border-bottom-right-radius:12px}
+
+.mp-wrap:not(.ssum-map) .mp-cards{position:sticky;top:calc(var(--sim-nav-h,64px) + var(--sim-step-h,56px) + var(--mp-head-h,90px));align-self:start;overflow-y:auto !important;overscroll-behavior:contain}
+
+/* AI Scoring: like Mapping — the assistant list sticks and scrolls on its own, the config panel scrolls with the page */
+.ai2-wrap:not(.is-ro) .ai2-left{position:sticky;top:calc(var(--sim-nav-h,64px) + var(--sim-step-h,56px));align-self:start;overflow-y:auto;overscroll-behavior:contain;z-index:11}
+.ai2-wrap:not(.is-ro) .ai2-left .ai2-psec-h{position:static;margin-bottom:0;padding-bottom:0}
+
+/* the top divider lives on the sticky parts so it stays visible while scrolling */
+.ai2-wrap:not(.is-ro) .ai2-left{border-top:1px solid #E4E7EC}
+.ai2-wrap:not(.is-ro) .ai2-left>.ai2-psec:first-child{border-top:none}
+.ai2-wrap:not(.is-ro) .ai2-rtop:has(+ .ai2-cfg-h){display:none}
+.ai2-wrap:not(.is-ro) .ai2-cfg-h{border-top:1px solid #E4E7EC}
 .hse-open .sp-strip{display:none !important}
 .sp-strip{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:250;display:flex;align-items:center;gap:8px;background:#1F2A37;border-radius:999px;height:44px;box-sizing:border-box;padding:0 6px 0 4px;box-shadow:0 12px 32px rgba(16,24,40,.28);font-size:14px;white-space:nowrap;max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none}
 .sp-strip::-webkit-scrollbar{display:none}
@@ -9839,7 +10354,7 @@ function simPublish(){ skillFinish(skillUpsert('Published', true), 'published su
   <!-- Backdrop -->
   <div class="absolute inset-0 bg-gray-900/50"></div>
   <!-- Panel -->
-  <div class="relative bg-white rounded-2xl shadow-2xl flex flex-col"
+  <div id="trm-panel" class="relative bg-white rounded-2xl shadow-2xl flex flex-col"
        style="width:100%;max-width:680px;max-height:86vh;margin:0 16px">
 
     <!-- Header -->
