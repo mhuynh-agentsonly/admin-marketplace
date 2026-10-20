@@ -475,7 +475,7 @@
   }
 
 /* ── List category multi-select combobox ── */
-#list-cat-trigger, #list-proctor-trigger {
+#list-cat-trigger, #list-proctor-trigger, #list-method-trigger {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -493,6 +493,9 @@
 #list-cat-trigger:focus,
 #list-cat-trigger:focus-visible,
 #list-proctor-trigger:focus,
+#list-method-trigger:focus,
+#list-method-trigger:focus-visible,
+#list-method-trigger[aria-expanded="true"],
 #list-proctor-trigger:focus-visible,
 #list-cat-trigger[aria-expanded="true"], #list-proctor-trigger[aria-expanded="true"] {
   border-color: #5FCEB1 !important;
@@ -500,7 +503,8 @@
   box-shadow: 0 0 0 3px #c5fcee !important;
 }
 #list-cat-trigger:hover:not([aria-expanded="true"]),
-#list-proctor-trigger:hover:not([aria-expanded="true"]) { border-color: #9CA3AF; }
+#list-proctor-trigger:hover:not([aria-expanded="true"]),
+#list-method-trigger:hover:not([aria-expanded="true"]) { border-color: #9CA3AF; }
 
 .list-cat-pill {
   display: inline-flex;
@@ -532,7 +536,7 @@
 }
 .list-cat-pill-x:hover { color: #030712; }
 
-#list-cat-dropdown, #list-proctor-dropdown {
+#list-cat-dropdown, #list-proctor-dropdown, #list-method-dropdown {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
@@ -1052,6 +1056,21 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   transform:translate(-50%,-50%); width:8px; height:8px;
   background:#007460; border-radius:50%;
 }
+
+/* ── Skills test library table: one-line cells, horizontal scroll, sticky Name + actions ── */
+#admin-skills-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
+#admin-skills-table th, #admin-skills-table td { white-space: nowrap; }
+#admin-skills-table th:first-child, #admin-skills-table td:first-child { position: sticky; left: 0; z-index: 2; }
+#admin-skills-table th:last-child, #admin-skills-table td:last-child { position: sticky; right: 0; z-index: 2; }
+#admin-skills-table thead th:first-child, #admin-skills-table thead th:last-child { background: #F9FAFB; }
+#admin-skills-table tbody td:first-child, #admin-skills-table tbody td:last-child { background: #fff; }
+#admin-skills-table tbody tr:hover td:first-child, #admin-skills-table tbody tr:hover td:last-child { background: #F9FAFB; }
+#admin-skills-table tbody td { border-bottom: 1px solid #F3F4F6; }
+#admin-skills-table thead th { border-bottom: 1px solid #E5E7EB; }
+#admin-skills-scroll.is-scrolled-x #admin-skills-table th:first-child,
+#admin-skills-scroll.is-scrolled-x #admin-skills-table td:first-child { box-shadow: 6px 0 8px -6px rgba(16,24,40,.14); }
+#admin-skills-scroll:not(.is-end-x) #admin-skills-table th:last-child,
+#admin-skills-scroll:not(.is-end-x) #admin-skills-table td:last-child { box-shadow: -6px 0 8px -6px rgba(16,24,40,.14); }
 </style>
 </head>
 <body class="min-h-screen">
@@ -1407,8 +1426,27 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-        <!-- Filters: Proctored + Category -->
+        <!-- Filters: Test method + Proctored + Category -->
         <div class="flex items-center gap-2">
+          <div class="relative" id="list-method-wrap">
+            <button type="button" id="list-method-trigger"
+              aria-haspopup="listbox" aria-expanded="false" aria-controls="list-method-dropdown"
+              onclick="event.stopPropagation(); toggleListMethodFilter()">
+              <span id="list-method-pills" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px"><span style="color:#030712;font-size:14px;font-family:var(--font-sans)">All test methods</span></span>
+              <svg id="list-method-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform 0.15s;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div id="list-method-dropdown" role="listbox" aria-label="Filter by test method" aria-multiselectable="true" hidden style="min-width:240px">
+              <div id="list-method-options" style="padding:4px 0"></div>
+              <div id="list-method-footer" style="display:none;border-top:1px solid #E5E7EB;padding:8px 16px">
+                <button type="button" onclick="event.stopPropagation(); clearListMethodFilters()"
+                  class="w-full text-sm font-medium text-center"
+                  style="color:#007460;background:transparent;border:none;cursor:pointer;font-family:var(--font-sans)">
+                  Clear selection
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
           <div class="relative" id="list-proctor-wrap">
             <button type="button" id="list-proctor-trigger"
               aria-haspopup="listbox" aria-expanded="false" aria-controls="list-proctor-dropdown"
@@ -1443,11 +1481,12 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
       </div>
 
       <!-- Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+      <div class="overflow-x-auto" id="admin-skills-scroll" onscroll="this.classList.toggle('is-scrolled-x', this.scrollLeft > 0); this.classList.toggle('is-end-x', this.scrollLeft + this.clientWidth >= this.scrollWidth - 1)">
+        <table class="text-sm" id="admin-skills-table">
           <thead class="bg-gray-50 text-left">
             <tr class="border-b border-border">
               <th class="px-4 py-3 text-xs font-medium text-gray-500">Name</th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500">Test method</th>
               <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:190px">Format</th>
               <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:100px">Proctored</th>
               <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:180px">Category</th>
@@ -2814,11 +2853,14 @@ const adminSkills = (function seed() {
     { id: 'sales-fundamentals',         name: 'Sales Fundamentals',         category: 'Sales',             typeformUrl: 'https://agentsonly.typeform.com/to/sales-fund',   threshold: 80, duration: 25, status: 'Published', createdAt: '2026-04-15T09:00:00', proctored: false },
     { id: 'technical-support-tier2',    name: 'Technical Support Tier 2',   category: 'Technical support', typeformUrl: 'https://agentsonly.typeform.com/to/tech-sup-t2',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2026-05-16T11:30:00', proctored: true  },
     { id: 'ai-evaluation',              name: 'AI Evaluation',              category: 'AI/ML',             typeformUrl: 'https://agentsonly.typeform.com/to/ai-eval',      threshold: 80, duration: 40, status: 'Published', createdAt: '2026-05-15T08:00:00', proctored: true  },
+    { id: 'hotel-training',             name: 'Hotel Training',             category: 'Customer service',  engine: 'sim', simMode: 'audio_image', format: 'Interactive simulation', threshold: 80, duration: 15, status: 'Published', createdAt: '2026-05-12T09:30:00', proctored: false },
+    { id: 'apple-order-entry',          name: 'Apple Order Entry',          category: 'Sales',             engine: 'sim', simMode: 'audio',       format: 'Interactive simulation', threshold: 80, duration: 10, status: 'Published', createdAt: '2026-05-11T14:15:00', proctored: false },
+    { id: 'hotel-booking-annotation',   name: 'Hotel Booking Annotation',   category: 'Operations',        engine: 'sim', simMode: 'image',       format: 'Interactive simulation', threshold: 80, duration: 10, status: 'Published', createdAt: '2026-05-09T16:40:00', proctored: false },
     { id: 'content-moderation',         name: 'Content Moderation',         category: 'Data labeling',     typeformUrl: 'https://agentsonly.typeform.com/to/content-mod',  threshold: 80, duration: 20, status: 'Published', createdAt: '2026-04-04T10:00:00', proctored: false },
   ];
 })();
 
-const adminSkillsState = { nameSearch: '', categoryFilters: new Set(), procFilter: 'All', editingId: null, page: 1, perPage: 10, sortDir: 'desc' };
+const adminSkillsState = { nameSearch: '', categoryFilters: new Set(), methodFilters: new Set(), procFilter: 'All', editingId: null, page: 1, perPage: 10, sortDir: 'desc' };
 
 function renderListCategoryFilter() {
   const optionsEl = document.getElementById('list-cat-options');
@@ -2915,6 +2957,7 @@ function toggleListProcFilter() {
   const isOpen = !menu.hidden;
   closeAllRowMenus();
   closeListCatFilter();
+  closeListMethodFilter();
   if (isOpen) { closeListProcFilter(); return; }
   menu.hidden = false;
   trigger.setAttribute('aria-expanded', 'true');
@@ -2961,6 +3004,74 @@ function updateListProcTrigger() {
   }
 }
 
+// ── Test method filter (multi-select, mirrors the category filter) ──
+const LIST_METHOD_OPTIONS = ['Typeform', 'Audio simulation', 'Image simulation', 'Audio & Image simulation'];
+function skillMethodLabel(s) {
+  if (s.engine !== 'sim') return 'Typeform';
+  return ({ audio_image: 'Audio & Image simulation', image: 'Image simulation', audio: 'Audio simulation' })[s.simMode] || 'Simulation';
+}
+function toggleListMethodFilter() {
+  const menu = document.getElementById('list-method-dropdown');
+  const trigger = document.getElementById('list-method-trigger');
+  if (!menu || !trigger) return;
+  const isOpen = !menu.hidden;
+  closeAllRowMenus(); closeListCatFilter(); closeListProcFilter();
+  if (isOpen) { closeListMethodFilter(); return; }
+  menu.hidden = false;
+  trigger.setAttribute('aria-expanded', 'true');
+  const chev = document.getElementById('list-method-chevron'); if (chev) chev.style.transform = 'rotate(180deg)';
+  renderListMethodFilter();
+}
+function closeListMethodFilter() {
+  const menu = document.getElementById('list-method-dropdown');
+  const trigger = document.getElementById('list-method-trigger');
+  const chev = document.getElementById('list-method-chevron');
+  if (menu) menu.hidden = true;
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  if (chev) chev.style.transform = '';
+}
+function renderListMethodFilter() {
+  const optionsEl = document.getElementById('list-method-options');
+  const footerEl = document.getElementById('list-method-footer');
+  if (!optionsEl) return;
+  const sel = adminSkillsState.methodFilters;
+  const checkSvg = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const isAll = sel.size === 0;
+  optionsEl.innerHTML = `<button type="button" role="option" class="list-cat-item" aria-selected="${isAll}" onclick="event.stopPropagation(); clearListMethodFilters(true)"><span>All</span>${isAll ? checkSvg : ''}</button>` +
+    LIST_METHOD_OPTIONS.map(v => {
+      const on = sel.has(v);
+      return `<button type="button" role="option" class="list-cat-item" aria-selected="${on}" onclick="event.stopPropagation(); toggleListMethodValue('${v}')"><span>${v}</span>${on ? checkSvg : ''}</button>`;
+    }).join('');
+  if (footerEl) footerEl.style.display = sel.size ? '' : 'none';
+}
+function listMethodRefresh() {
+  adminSkillsState.page = 1;
+  renderListMethodFilter();
+  updateListMethodTrigger();
+  renderAdminSkillsList();
+}
+function toggleListMethodValue(v) {
+  const sel = adminSkillsState.methodFilters;
+  if (sel.has(v)) sel.delete(v); else sel.add(v);
+  listMethodRefresh();
+}
+function removeListMethodFilter(v) { adminSkillsState.methodFilters.delete(v); listMethodRefresh(); }
+function clearListMethodFilters(keepOpen) {
+  adminSkillsState.methodFilters.clear();
+  listMethodRefresh();
+  if (!keepOpen) closeListMethodFilter();
+}
+function updateListMethodTrigger() {
+  const pillsEl = document.getElementById('list-method-pills');
+  if (!pillsEl) return;
+  const sel = [...adminSkillsState.methodFilters];
+  if (!sel.length) { pillsEl.innerHTML = `<span style="color:#030712;font-size:14px;font-family:var(--font-sans)">All test methods</span>`; return; }
+  const extra = sel.length - 2;
+  pillsEl.innerHTML = sel.slice(0, 2).map(v =>
+    `<span class="list-cat-pill">${v}<button type="button" class="list-cat-pill-x" onclick="event.stopPropagation(); removeListMethodFilter('${v}')">×</button></span>`
+  ).join('') + (extra > 0 ? `<span class="list-cat-pill">+${extra} more</span>` : '');
+}
+
 function setListProcFilter(value) {
   adminSkillsState.procFilter = value || 'All';
   adminSkillsState.page = 1;
@@ -2989,6 +3100,7 @@ function renderAdminSkillsList() {
   if (!tbody || !empty) return;
   updateListCatTrigger();
   updateListProcTrigger();
+  updateListMethodTrigger();
 
   const q = adminSkillsState.nameSearch;
   const selCats = adminSkillsState.categoryFilters;
@@ -2996,7 +3108,8 @@ function renderAdminSkillsList() {
   let filtered = adminSkills.filter(s =>
     (!q || s.name.toLowerCase().includes(q)) &&
     (selCats.size === 0 || selCats.has(s.category)) &&
-    (selProc === 'All' || (selProc === 'Proctored' ? s.proctored === true : s.proctored !== true))
+    (selProc === 'All' || (selProc === 'Proctored' ? s.proctored === true : s.proctored !== true)) &&
+    (adminSkillsState.methodFilters.size === 0 || adminSkillsState.methodFilters.has(skillMethodLabel(s)))
   );
 
   // Sort by createdAt
@@ -3056,7 +3169,8 @@ function renderAdminSkillsList() {
     return `
 	      <tr class="hover:bg-gray-50" style="height:64px;border-bottom:1px solid #F3F4F6">
 	        <td class="px-4 py-3 font-medium text-gray-900 text-sm">${s.name}</td>
-	        <td class="px-4 py-3 text-gray-600 text-sm">${format}</td>
+	        <td class="px-4 py-3 text-gray-600 text-sm">${skillMethodLabel(s)}</td>
+        <td class="px-4 py-3 text-gray-600 text-sm">${format}</td>
 	        <td class="px-4 py-3 text-gray-600 text-sm">${proctored}</td>
 	        <td class="px-4 py-3 text-gray-600 text-sm">${s.category}</td>
         <td class="px-4 py-3"><span class="${badgeClass}">${s.status}</span></td>
@@ -3077,7 +3191,16 @@ function renderAdminSkillsList() {
         </td>
       </tr>`;
   }).join('');
+  requestAnimationFrame(syncAdminSkillsScroll);
 }
+
+function syncAdminSkillsScroll() {
+  const el = document.getElementById('admin-skills-scroll');
+  if (!el) return;
+  el.classList.toggle('is-scrolled-x', el.scrollLeft > 0);
+  el.classList.toggle('is-end-x', el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
+}
+window.addEventListener('resize', syncAdminSkillsScroll);
 
 function renderSkillsPagination(page, totalPages) {
   const nav = document.getElementById('skills-page-nav');
@@ -3118,9 +3241,23 @@ function renderSkillsPagination(page, totalPages) {
 
 /* ---------- Row-action dropdown menu ---------- */
 function closeAllRowMenus() {
-  document.querySelectorAll('.ellipsis-menu').forEach(m => m.hidden = true);
+  document.querySelectorAll('.ellipsis-menu').forEach(m => { m.hidden = true; if (m.parentElement) m.parentElement.style.zIndex = ''; });
   document.querySelectorAll('.ellipsis-trigger').forEach(b => b.setAttribute('aria-expanded', 'false'));
 }
+// Keep an open row menu attached to its ⋯ button while the page (or any container) scrolls
+function positionOpenRowMenu() {
+  const menu = document.querySelector('.ellipsis-menu:not([hidden])');
+  if (!menu) return;
+  const trig = document.querySelector(`.ellipsis-trigger[aria-controls="${menu.id}"]`);
+  if (!trig) return;
+  const r = trig.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > window.innerHeight) { closeAllRowMenus(); return; }
+  menu.style.top = (r.bottom + 4) + 'px';
+  menu.style.right = (window.innerWidth - r.right) + 'px';
+}
+window.addEventListener('scroll', positionOpenRowMenu, true);
+window.addEventListener('resize', positionOpenRowMenu);
+
 function toggleRowMenu(id) {
   const menu = document.getElementById(`admin-row-menu-${id}`);
   if (!menu) return;
@@ -3136,6 +3273,8 @@ function toggleRowMenu(id) {
       menu.style.left = 'auto';
       trig.setAttribute('aria-expanded', 'true');
     }
+    // lift the sticky actions cell above the next rows' sticky cells so they don't cover the menu
+    if (menu.parentElement) menu.parentElement.style.zIndex = '20';
     menu.hidden = false;
   }
 }
@@ -3408,6 +3547,7 @@ function toggleListCatFilter() {
   const isOpen = !menu.hidden;
   closeAllRowMenus();
   closeListProcFilter();
+  closeListMethodFilter();
   if (isOpen) { closeListCatFilter(); return; }
   menu.hidden = false;
   trigger.setAttribute('aria-expanded', 'true');
@@ -3517,6 +3657,7 @@ function boot() {
     closeAllRowMenus();
     if (t && t.closest && !t.closest('#list-cat-wrap')) closeListCatFilter();
     if (t && t.closest && !t.closest('#list-proctor-wrap')) closeListProcFilter();
+    if (t && t.closest && !t.closest('#list-method-wrap')) closeListMethodFilter();
     if (t && t.closest && !t.closest('#ats1-modality-wrap')) ats1CloseModality();
     if (t && t.closest && !t.closest('#ats1-cat-wrap')) ats1CloseCat();
     if (t && t.closest && !t.closest('#ap-cat-wrap')) closeApCatFilter();
@@ -8221,6 +8362,7 @@ function simOpenWith(sim, step){
 /* ---------- view (read-only) ---------- */
 function skillView(id){
   const rec = adminSkills.find(function(x){ return x.id === id; }); if (!rec) return;
+  if (rec.engine === 'sim' && !rec.sim){ showToast('Sample simulation — no saved content to view in this prototype'); return; }
   skillExitView();
   window._editingSkillId = null;
   if (rec.engine === 'sim' && rec.sim){
