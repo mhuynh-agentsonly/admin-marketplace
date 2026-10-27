@@ -5122,8 +5122,8 @@ function openTestReview(testName, agentId) {
   // Stats bar
   const statsBar = document.getElementById('trm-stats-bar');
   if (statsBar) {
-    const badgeBg   = passed ? '#E9FEF9' : '#F3F4F6';
-    const badgeText = passed ? '#007460'  : '#374151';
+    const badgeBg   = passed ? '#E9FEF9' : '#FFFBEB';  /* not passed = DS Badge Warning */
+    const badgeText = passed ? '#007460'  : '#D97706';
     statsBar.innerHTML =
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px">' +
         '<div style="display:flex;align-items:center;gap:16px">' +
@@ -5497,11 +5497,11 @@ function openSimReview(simId, agentId) {
 
   const badge = sim.terminal
     ? '<span style="padding:3px 12px;border-radius:999px;background:#FEE2E2;color:#B91C1C;font-size:12px;font-weight:500;white-space:nowrap">Terminal</span>'
-    : `<span style="padding:3px 12px;border-radius:999px;background:${sim.passed ? '#E9FEF9' : '#F3F4F6'};color:${sim.passed ? '#007460' : '#374151'};font-size:12px;font-weight:500;white-space:nowrap">${sim.passed ? 'Passed' : 'Not passed'}</span>`;
+    : `<span style="padding:3px 12px;border-radius:999px;background:${sim.passed ? '#E9FEF9' : '#FFFBEB'};color:${sim.passed ? '#007460' : '#D97706'};font-size:12px;font-weight:500;white-space:nowrap">${sim.passed ? 'Passed' : 'Not passed'}</span>`;
   const stats = [srvStat('Overall score', sim.score + '%'), srvStat('Completion time', sim.time)];
   if (sim.mode !== 'audio') {
     stats.push(srvStat('Correct actions', '+' + t.plus + ' pts', '#007460'));
-    stats.push(srvStat('Mistakes', (t.minus ? '−' + Math.abs(t.minus) : '0') + ' pts', t.minus ? '#DC2626' : null));
+    stats.push(srvStat('Mistakes', (t.minus ? '−' + Math.abs(t.minus) : '0') + ' pts', t.minus ? '#D97706' : null));  /* warning = mistakes / not passed; red only for terminal */
     stats.push(srvStat('Terminal actions', t.term || '—', t.term ? '#DC2626' : null));
   }
   if (sim.mode === 'audio') stats.push(srvStat('Keyword score', t.kwH + '/' + t.kwT + ' · ' + t.kwPct + '%', null));
