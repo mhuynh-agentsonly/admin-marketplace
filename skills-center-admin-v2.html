@@ -8417,7 +8417,7 @@ function skillDetailsHTML(rec){
     ['Test name', rec.name], ['Status', '<span class="sk-st is-' + (rec.status === 'Published' ? 'pub' : 'draft') + '">' + simEsc(rec.status) + '</span>', true],
     ['Description', rec.description || '—'], ['Data Modality / Task Type', rec.modality || (typeof inferSkillModality === 'function' ? inferSkillModality(rec) : '') || '—'],
     ['Format', rec.format || 'Multiple Choice Questionnaire'], ['Test Method', method],
-    ['Category', rec.category || '—'], ['Proctoring', rec.proctored ? 'Yes, require camera monitoring' : 'No, open environment submission'],
+    ['Category', rec.category || '—'],  /* Proctoring row hidden — proctoring postponed (PO, 2026-10-28) */
     ['Passing threshold', (rec.stepThreshold || rec.threshold || 80) + '%'], ['Estimated duration', (rec.duration || 20) + ' min']
   ];
   if (rec.engine !== 'sim') rows.push(['Typeform form link', rec.typeformUrl ? '<a href="' + simEsc(rec.typeformUrl) + '" target="_blank" rel="noopener">' + simEsc(rec.typeformUrl) + '</a>' : '—', true]);
@@ -10800,5 +10800,30 @@ function simPublish(){ skillFinish(skillUpsert('Published', true), 'published su
   /* Screen flow review rail dot = DS Screen card state: Default gray · Mistakes amber · Terminal red */
   .rv-scr.warn::before{background:#F79009}
 </style>
+
+<style id="noproctor-css">
+  /* PO (Pia, 2026-10-28): AAS ships in Marketplace first without proctoring; "proctoring" returns later as identity
+     verification before every test. All proctoring UI is hidden (code kept). */
+  #list-proctor-wrap,#ap-proctor-wrap,.np-hidden{display:none!important}
+</style>
+<script id="noproctor-js">
+(function(){
+  function hideGroups(){
+    document.querySelectorAll('p,div').forEach(function(el){
+      if(el.children.length===0 && /^Is Proctoring Required/i.test(el.textContent.trim()) && el.parentElement) el.parentElement.classList.add('np-hidden');
+    });
+  }
+  function hideCols(){
+    document.querySelectorAll('table').forEach(function(tb){
+      const ths=[...tb.querySelectorAll('thead th')]; const i=ths.findIndex(function(th){return th.textContent.trim()==='Proctored';}); if(i<0) return;
+      ths[i].classList.add('np-hidden');
+      tb.querySelectorAll('tbody tr').forEach(function(tr){ const c=tr.children[i]; if(c && !c.hasAttribute('colspan')) c.classList.add('np-hidden'); });
+    });
+  }
+  function run(){ try{ hideGroups(); hideCols(); }catch(e){} }
+  try{ if(typeof adminSkillsState!=='undefined') adminSkillsState.procFilter='All'; }catch(e){}
+  run(); let t=0; new MutationObserver(function(){ clearTimeout(t); t=setTimeout(run,30); }).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </body>
 </html>
