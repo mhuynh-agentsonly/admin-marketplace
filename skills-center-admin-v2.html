@@ -1069,8 +1069,8 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
 #admin-skills-table thead th { border-bottom: 1px solid #E5E7EB; }
 #admin-skills-scroll.is-scrolled-x #admin-skills-table th:first-child,
 #admin-skills-scroll.is-scrolled-x #admin-skills-table td:first-child { box-shadow: 6px 0 8px -6px rgba(16,24,40,.14); }
-#admin-skills-scroll:not(.is-end-x) #admin-skills-table th:last-child,
-#admin-skills-scroll:not(.is-end-x) #admin-skills-table td:last-child { box-shadow: -6px 0 8px -6px rgba(16,24,40,.14); }
+#admin-skills-scroll.has-more-x #admin-skills-table th:last-child,
+#admin-skills-scroll.has-more-x #admin-skills-table td:last-child { box-shadow: -6px 0 8px -6px rgba(16,24,40,.14); }
 </style>
 </head>
 <body class="min-h-screen">
@@ -1402,11 +1402,15 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
         <h2 class="text-2xl font-medium">Test library</h2>
         <p class="text-sm text-gray-600 mt-1 max-w-2xl">Configure skill tests. Each test is hosted in Typeform — Marketplace stores the link, threshold, attempt rules, and result history.</p>
       </div>
+      <div class="flex items-center gap-2 shrink-0">
+      <button type="button" onclick="ailGo()"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium h-10 px-4 py-2 shrink-0 border border-[#5FCEB1] bg-white text-[#007460] hover:bg-[#E9FEF9] transition-colors">AI Assistant Library</button>
       <button onclick="skillNew()"
               class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all [background:var(--gradient-primary)] text-white shadow-xs hover:brightness-90 h-10 px-4 py-2 shrink-0">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
         Add skills test
       </button>
+      </div>
     </div>
 
     <!-- Skills test table card -->
@@ -1481,7 +1485,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
       </div>
 
       <!-- Table -->
-      <div class="overflow-x-auto" id="admin-skills-scroll" onscroll="this.classList.toggle('is-scrolled-x', this.scrollLeft > 0); this.classList.toggle('is-end-x', this.scrollLeft + this.clientWidth >= this.scrollWidth - 1)">
+      <div class="overflow-x-auto" id="admin-skills-scroll" onscroll="syncAdminSkillsScroll()">
         <table class="text-sm" id="admin-skills-table">
           <thead class="bg-gray-50 text-left">
             <tr class="border-b border-border">
@@ -1552,6 +1556,62 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
 <!-- ======================================================================
      ADMIN · SKILLS CENTER · CREATE / EDIT FORM (Screen B)
 ====================================================================== -->
+<!-- ================= AI ASSISTANT LIBRARY (Specialists + Evaluators) ================= -->
+<section id="admin-ai-library" class="screen">
+  <nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">
+    <a href="#" onclick="event.preventDefault(); go('admin-skills-center')"
+       class="text-primary-700 hover:text-primary-800 font-medium hover:underline underline-offset-2">Skills Center</a>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="text-foreground font-medium">AI Assistant Library</span>
+  </nav>
+  <div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-medium">AI Assistant Library</h1>
+      <p class="text-sm text-gray-600 mt-1 max-w-2xl">Create and manage the Specialist and Evaluator assistants that score simulations. Every prompt or model change saves a new version; simulations keep the version they were configured with.</p>
+    </div>
+    <button type="button" onclick="ailOpenCreate()"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all [background:var(--gradient-primary)] text-white shadow-xs hover:brightness-90 h-10 px-4 py-2 shrink-0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+      Create assistant
+    </button>
+  </div>
+  <div class="bg-white rounded-lg border border-border">
+    <div class="px-4 pt-4 pb-3 flex items-center justify-between flex-wrap gap-3 border-b border-border">
+      <div class="relative flex items-center" style="width:400px;max-width:100%">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;left:10px;pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="ail-search" type="text" placeholder="Search by assistant name" oninput="AIL_STATE.q = this.value.trim().toLowerCase(); AIL_STATE.page = 1; ailRenderList()"
+          class="border-input w-full rounded-md border bg-transparent py-1.5 text-sm outline-none transition-[color,box-shadow] focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
+          style="padding-left:32px;padding-right:12px;height:34px"/>
+      </div>
+      <div class="ail-seg" role="tablist" aria-label="Filter by role" id="ail-seg">
+        <button type="button" role="tab" data-r="all" aria-selected="true" onclick="ailSetRole('all')">All</button>
+        <button type="button" role="tab" data-r="s" aria-selected="false" onclick="ailSetRole('s')">Specialists</button>
+        <button type="button" role="tab" data-r="e" aria-selected="false" onclick="ailSetRole('e')">Evaluators</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="text-sm w-full" id="ail-table">
+        <thead class="bg-gray-50 text-left">
+          <tr class="border-b border-border">
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Name</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:140px">Role</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:150px">Model</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:90px">Version</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:110px">API key</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:190px">Updated</th>
+            <th class="px-4 py-3" style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody id="ail-rows"></tbody>
+      </table>
+    </div>
+    <div id="ail-empty" class="hidden py-16 flex flex-col items-center justify-center gap-1">
+      <div class="text-sm font-medium text-gray-900">No assistants found</div>
+      <div class="text-sm text-gray-500">Try a different name or role filter.</div>
+    </div>
+  </div>
+</section>
+
 <section id="admin-skills-center-form" class="screen">
   <!-- Breadcrumb -->
   <nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -2838,24 +2898,24 @@ function changeAdminPerPage(n) {
 /* ---------- ADMIN · SKILLS CENTER (list + form) ---------- */
 const adminSkills = (function seed() {
   return [
-    { id: 'coding-fundamentals',        name: 'Coding Fundamentals',        category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/coding-fund',  threshold: 80, duration: 25, status: 'Published', createdAt: '2026-05-15T10:50:00', proctored: false },
-    { id: 'customer-service-basics',    name: 'Customer Service Basics',    category: 'Customer service',  typeformUrl: 'https://agentsonly.typeform.com/to/cust-svc',     threshold: 80, duration: 20, status: 'Draft',     createdAt: '2026-05-10T10:48:00', proctored: false },
-    { id: 'data-labeling-fund',         name: 'Data Labeling Fundamentals', category: 'Data labeling',     typeformUrl: 'https://agentsonly.typeform.com/to/data-label',   threshold: 80, duration: 30, status: 'Published', createdAt: '2026-05-08T08:23:00', proctored: false },
-    { id: 'english-proficiency',        name: 'English Proficiency',        category: 'Language',          typeformUrl: 'https://agentsonly.typeform.com/to/english-prof', threshold: 80, duration: 15, status: 'Published', createdAt: '2026-05-04T05:24:00', proctored: false },
-    { id: 'technical-support-tier1',    name: 'Technical Support Tier 1',   category: 'Technical support', typeformUrl: 'https://agentsonly.typeform.com/to/tech-sup-t1',  threshold: 80, duration: 25, status: 'Published', createdAt: '2026-05-29T06:12:00', proctored: true  },
-    { id: 'python-test',                name: 'Python Test',                category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/python-test',  threshold: 80, duration: 40, status: 'Published', createdAt: '2026-05-27T09:50:00', proctored: true  },
-    { id: 'prompt-eval-script',         name: 'Prompt Evaluation Script',   category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/prompt-eval',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2026-05-25T09:50:00', proctored: true  },
-    { id: 'json-data-annotation',       name: 'JSON Data Annotation',       category: 'Coding',            typeformUrl: 'https://agentsonly.typeform.com/to/json-annot',   threshold: 80, duration: 35, status: 'Published', createdAt: '2026-05-23T09:50:00', proctored: true  },
-    { id: 'general-physicians',         name: 'General Physicians',         category: 'Medical',           typeformUrl: 'https://agentsonly.typeform.com/to/gen-phys',     threshold: 80, duration: 20, status: 'Published', createdAt: '2026-05-21T09:50:00', proctored: true  },
-    { id: 'general-lawyers',            name: 'General Lawyers',            category: 'Lawyers',           typeformUrl: 'https://agentsonly.typeform.com/to/gen-law',      threshold: 80, duration: 20, status: 'Published', createdAt: '2026-05-19T09:50:00', proctored: true  },
-    { id: 'gen-ai-labeling',            name: 'Gen AI Labeling',            category: 'AI/ML',             typeformUrl: 'https://agentsonly.typeform.com/to/gen-ai-lab',   threshold: 80, duration: 35, status: 'Published', createdAt: '2026-05-17T14:00:00', proctored: true  },
-    { id: 'sales-fundamentals',         name: 'Sales Fundamentals',         category: 'Sales',             typeformUrl: 'https://agentsonly.typeform.com/to/sales-fund',   threshold: 80, duration: 25, status: 'Published', createdAt: '2026-04-15T09:00:00', proctored: false },
-    { id: 'technical-support-tier2',    name: 'Technical Support Tier 2',   category: 'Technical support', typeformUrl: 'https://agentsonly.typeform.com/to/tech-sup-t2',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2026-05-16T11:30:00', proctored: true  },
-    { id: 'ai-evaluation',              name: 'AI Evaluation',              category: 'AI/ML',             typeformUrl: 'https://agentsonly.typeform.com/to/ai-eval',      threshold: 80, duration: 40, status: 'Published', createdAt: '2026-05-15T08:00:00', proctored: true  },
+    { id: 'coding-fundamentals',        name: 'Coding Fundamentals',        category: 'Coding',            typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 25, status: 'Published', createdAt: '2026-05-15T10:50:00', proctored: false },
+    { id: 'customer-service-basics',    name: 'Customer Service Basics',    category: 'Customer service',  typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',     threshold: 80, duration: 20, status: 'Draft',     createdAt: '2026-05-10T10:48:00', proctored: false },
+    { id: 'data-labeling-fund',         name: 'Data Labeling Fundamentals', category: 'Data labeling',     typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',   threshold: 80, duration: 30, status: 'Published', createdAt: '2026-05-08T08:23:00', proctored: false },
+    { id: 'english-proficiency',        name: 'English Proficiency',        category: 'Language',          typeformUrl: 'https://form.typeform.com/to/RqQBZmGX', threshold: 80, duration: 15, status: 'Published', createdAt: '2026-05-04T05:24:00', proctored: false },
+    { id: 'technical-support-tier1',    name: 'Technical Support Tier 1',   category: 'Technical support', typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 25, status: 'Published', createdAt: '2026-05-29T06:12:00', proctored: true  },
+    { id: 'python-test',                name: 'Python Test',                category: 'Coding',            typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 40, status: 'Published', createdAt: '2026-05-27T09:50:00', proctored: true  },
+    { id: 'prompt-eval-script',         name: 'Prompt Evaluation Script',   category: 'Coding',            typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2026-05-25T09:50:00', proctored: true  },
+    { id: 'json-data-annotation',       name: 'JSON Data Annotation',       category: 'Coding',            typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',   threshold: 80, duration: 35, status: 'Published', createdAt: '2026-05-23T09:50:00', proctored: true  },
+    { id: 'general-physicians',         name: 'General Physicians',         category: 'Medical',           typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',     threshold: 80, duration: 20, status: 'Published', createdAt: '2026-05-21T09:50:00', proctored: true  },
+    { id: 'general-lawyers',            name: 'General Lawyers',            category: 'Lawyers',           typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',      threshold: 80, duration: 20, status: 'Published', createdAt: '2026-05-19T09:50:00', proctored: true  },
+    { id: 'gen-ai-labeling',            name: 'Gen AI Labeling',            category: 'AI/ML',             typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',   threshold: 80, duration: 35, status: 'Published', createdAt: '2026-05-17T14:00:00', proctored: true  },
+    { id: 'sales-fundamentals',         name: 'Sales Fundamentals',         category: 'Sales',             typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',   threshold: 80, duration: 25, status: 'Published', createdAt: '2026-04-15T09:00:00', proctored: false },
+    { id: 'technical-support-tier2',    name: 'Technical Support Tier 2',   category: 'Technical support', typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 30, status: 'Draft',     createdAt: '2026-05-16T11:30:00', proctored: true  },
+    { id: 'ai-evaluation',              name: 'AI Evaluation',              category: 'AI/ML',             typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',      threshold: 80, duration: 40, status: 'Published', createdAt: '2026-05-15T08:00:00', proctored: true  },
     { id: 'hotel-training',             name: 'Hotel Training',             category: 'Customer service',  engine: 'sim', simMode: 'audio_image', format: 'Interactive simulation', threshold: 80, duration: 15, status: 'Published', createdAt: '2026-05-12T09:30:00', proctored: false },
     { id: 'apple-order-entry',          name: 'Apple Order Entry',          category: 'Sales',             engine: 'sim', simMode: 'audio',       format: 'Interactive simulation', threshold: 80, duration: 10, status: 'Published', createdAt: '2026-05-11T14:15:00', proctored: false },
     { id: 'hotel-booking-annotation',   name: 'Hotel Booking Annotation',   category: 'Operations',        engine: 'sim', simMode: 'image',       format: 'Interactive simulation', threshold: 80, duration: 10, status: 'Published', createdAt: '2026-05-09T16:40:00', proctored: false },
-    { id: 'content-moderation',         name: 'Content Moderation',         category: 'Data labeling',     typeformUrl: 'https://agentsonly.typeform.com/to/content-mod',  threshold: 80, duration: 20, status: 'Published', createdAt: '2026-04-04T10:00:00', proctored: false },
+    { id: 'content-moderation',         name: 'Content Moderation',         category: 'Data labeling',     typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 20, status: 'Published', createdAt: '2026-04-04T10:00:00', proctored: false },
   ];
 })();
 
@@ -3194,10 +3254,18 @@ function renderAdminSkillsList() {
 function syncAdminSkillsScroll() {
   const el = document.getElementById('admin-skills-scroll');
   if (!el) return;
-  el.classList.toggle('is-scrolled-x', el.scrollLeft > 0);
-  el.classList.toggle('is-end-x', el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
+  /* shadows only when the table actually overflows horizontally */
+  const overflow = el.clientWidth > 0 && el.scrollWidth - el.clientWidth > 1;
+  el.classList.toggle('is-scrolled-x', overflow && el.scrollLeft > 0);
+  el.classList.toggle('has-more-x', overflow && el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
 }
 window.addEventListener('resize', syncAdminSkillsScroll);
+/* re-check when the table/container size changes (columns hidden, screen shown, rows re-rendered) */
+if (typeof ResizeObserver !== 'undefined') (function(){
+  const ro = new ResizeObserver(function(){ syncAdminSkillsScroll(); });
+  function watch(){ const el = document.getElementById('admin-skills-scroll'), t = document.getElementById('admin-skills-table'); if (el) ro.observe(el); if (t) ro.observe(t); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+})();
 
 function renderSkillsPagination(page, totalPages) {
   const nav = document.getElementById('skills-page-nav');
@@ -8330,6 +8398,7 @@ function skillEdit(id){
 /* Called from Step 1 "Create test / Continue" for simulations */
 function skillStartSim(){
   const id = window._editingSkillId, rec = id ? adminSkills.find(function(x){ return x.id === id; }) : null;
+  if (rec && rec.engine === 'sim' && !rec.sim && rec.simMode === window._simMode){ const nm = window._simName; skillSeedSimSample(rec); window._simName = nm; }
   if (rec && rec.sim && rec.simMode === window._simMode) simOpenWith(rec.sim, 0); else simStart();
   skillHeadings();
 }
@@ -8359,7 +8428,7 @@ function simOpenWith(sim, step){
 /* ---------- view (read-only) ---------- */
 function skillView(id){
   const rec = adminSkills.find(function(x){ return x.id === id; }); if (!rec) return;
-  if (rec.engine === 'sim' && !rec.sim){ showToast('Sample simulation — no saved content to view in this prototype'); return; }
+  if (rec.engine === 'sim' && !rec.sim) skillSeedSimSample(rec);
   skillExitView();
   window._editingSkillId = null;
   if (rec.engine === 'sim' && rec.sim){
@@ -8374,6 +8443,14 @@ function skillView(id){
     skillTfChrome();
   }
   skillHeadings();
+}
+/* seeded sim records have no saved wizard content → build it once from the hotel booking sample data */
+function skillSeedSimSample(rec){
+  window._simMode = rec.simMode || 'audio_image'; window._simName = rec.name;
+  simStepIndex = 0; simSeedData();
+  simSteps().forEach(function(st){ if (simProtoHas(st)) simProtoFill(st, true); });
+  window._simThreshold = rec.threshold || 80;
+  rec.sim = simSnapshot(); rec.sim.passRate = window._simThreshold; rec.sim.step = 0;
 }
 function skillExitView(){
   const wasSim = !!window._simView;
@@ -8403,6 +8480,7 @@ function skillTfChrome(){
     const tn = [].slice.call(back.childNodes).find(function(n){ return n.nodeType === 3 && n.textContent.trim(); });
     if (tn) tn.textContent = rec ? ' Back to Test library ' : '\n        Back\n      ';
   }
+  if (rec && typeof simEnsureStyles === 'function') simEnsureStyles(); /* .sk-details / .sum-h live in the lazily injected sim CSS */
   let box = document.getElementById('ats2-view-details');
   if (!box){
     box = document.createElement('div'); box.id = 'ats2-view-details';
@@ -9201,7 +9279,7 @@ function ai2ConfigHTML(ro){
       '<span class="ai2-role">' + (spec ? 'Specialist' : 'Evaluator') + '</span></div><div class="ai2-cfg-d">' + simEsc(d.desc) + '</div></div>' +
     (ro ? '' : '<button type="button" class="ai2-remove" onclick="simAi2ConfirmRemove(\'' + kind + '\',' + id + ')">' + AI2_IC.trash20 + 'Remove</button>') + '</div>';
   const prompt = '<div class="ai2-sec"><div class="ai2-sec-l">' + AI2_IC.notes + 'Evaluation Prompt' +
-    (spec ? '<button type="button" class="ai2-link ai2-sec-r" onclick="simAi2OpenSimOutput()">' + AI2_IC.monitor + 'View sim output</button>' : '') + '</div>' + ai2LockedHTML() + '</div>';
+    (spec ? '<button type="button" class="ai2-link ai2-sec-r" onclick="simAi2OpenSimOutput()">' + AI2_IC.monitor + 'View sim output</button>' : '') + '</div>' + ai2PromptHTML(kind, id, ro) + '</div>';
   if (spec) return head + '<div class="ai2-cfg">' + prompt + '</div>';
   return head + '<div class="ai2-cfg">' +
     '<div class="ai2-note"><span class="ai2-note-ic">' + AI2_IC.info20 + '</span><div><b>Receives Specialist outputs</b>This assistant does not see raw sim output directly. It receives the structured output from each Specialist and synthesizes them into a final score and feedback.</div></div>' +
@@ -9261,18 +9339,18 @@ function simAi2Close(){ const m = document.getElementById('ai2-modal'); if (m) m
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && document.getElementById('ai2-modal')) simAi2Close(); });
 
 /* ---------- Manage specialists ---------- */
-function simAi2OpenManage(){
-  AI2_PICK = SIM_AI2.specs.slice();
+function simAi2OpenManage(keep){
+  if (!keep) AI2_PICK = SIM_AI2.specs.slice();
   const opts = ai2SortedSpecs(Object.keys(AI2_SPECS).map(Number)).map(function(id){
     const on = AI2_PICK.indexOf(id) >= 0;
     return '<button type="button" class="ai2-opt' + (on ? ' is-on' : '') + '" data-id="' + id + '" aria-pressed="' + on + '" onclick="simAi2Toggle(' + id + ')">' +
       '<span class="ai2-ck">' + AI2_IC.check + '</span><span class="ai2-opt-info"><span class="ai2-opt-n">' + simEsc(AI2_SPECS[id].name) + '</span><span class="ai2-opt-d">' + simEsc(AI2_SPECS[id].desc) + '</span></span></button>';
   }).join('');
   ai2Modal(ai2ModalHead('Manage Specialists', 'Select one or more specialist assistants (up to ' + AI2_MAX + ')') +
-    '<div class="ai2-m2"><div class="ai2-m2-l">' + opts + '</div>' +
+    '<div class="ai2-m2"><div class="ai2-m2-l"><button type="button" class="ai2-create" onclick="ailOpenCreate(\'s\',\'manage\')">' + AI2_IC.plusC + 'Create specialist</button>' + opts + '</div>' +
       '<div class="ai2-m2-r"><div class="ai2-pv-h"><b>Sim output preview</b><span>Screens, script lines &amp; hotspots this specialist receives</span></div>' +
       '<div class="ai2-pv-b">' + simAi2SimOutputHTML() + '</div></div></div>' +
-    '<div class="ai2-mf"><span class="ai2-mf-note">' + AI2_IC.info + 'Managed in Playground</span><span class="ai2-mf-r"><span class="ai2-max" id="ai2-max" role="alert"></span>' +
+    '<div class="ai2-mf"><span class="ai2-mf-note">' + AI2_IC.info + 'Saved in the AI Assistant Library</span><span class="ai2-mf-r"><span class="ai2-max" id="ai2-max" role="alert"></span>' +
       '<button type="button" class="si-btn-sec" onclick="simAi2Close()">Cancel</button>' +
       '<button type="button" class="sa-btn-primary sa-sm" id="ai2-upd" onclick="simAi2ApplyManage()">Update</button></span></div>', '920px', 'Manage Specialists');
   ai2ManageSync();
@@ -9297,18 +9375,18 @@ function simAi2ApplyManage(){
 }
 
 /* ---------- Select evaluator ---------- */
-function simAi2OpenEval(){
-  AI2_EVPICK = SIM_AI2.ev;
+function simAi2OpenEval(keep){
+  if (!keep) AI2_EVPICK = SIM_AI2.ev;
   const opts = Object.keys(AI2_EVALS).map(Number).map(function(id){
     const on = AI2_EVPICK === id;
     return '<button type="button" class="ai2-opt' + (on ? ' is-on' : '') + '" data-ev="' + id + '" role="radio" aria-checked="' + on + '" onclick="simAi2PickEval(' + id + ')">' +
       '<span class="ai2-rd"></span><span class="ai2-opt-info"><span class="ai2-opt-n">' + simEsc(AI2_EVALS[id].name) + '</span><span class="ai2-opt-d">' + simEsc(AI2_EVALS[id].desc) + '</span></span></button>';
   }).join('');
   ai2Modal(ai2ModalHead('Select Evaluator', 'The evaluator combines specialist outputs into a final score') +
-    '<div class="ai2-m1" role="radiogroup">' + opts + '</div>' +
-    '<div class="ai2-mf"><span class="ai2-mf-note">' + AI2_IC.info + 'Managed in Playground</span><span class="ai2-mf-r">' +
+    '<div class="ai2-m1"><button type="button" class="ai2-create" onclick="ailOpenCreate(\'e\',\'eval\')">' + AI2_IC.plusC + 'Create evaluator</button><div role="radiogroup" style="display:contents">' + opts + '</div></div>' +
+    '<div class="ai2-mf"><span class="ai2-mf-note">' + AI2_IC.info + 'Saved in the AI Assistant Library</span><span class="ai2-mf-r">' +
       '<button type="button" class="si-btn-sec" onclick="simAi2Close()">Cancel</button>' +
-      '<button type="button" class="sa-btn-primary sa-sm" id="ai2-evupd" onclick="simAi2ApplyEval()" disabled>Update</button></span></div>', '520px', 'Select Evaluator');
+      '<button type="button" class="sa-btn-primary sa-sm" id="ai2-evupd" onclick="simAi2ApplyEval()"' + (AI2_EVPICK == null || AI2_EVPICK === SIM_AI2.ev ? ' disabled' : '') + '>Update</button></span></div>', '520px', 'Select Evaluator');
 }
 function simAi2PickEval(id){
   AI2_EVPICK = id;
@@ -10825,5 +10903,623 @@ function simPublish(){ skillFinish(skillUpsert('Published', true), 'published su
   run(); let t=0; new MutationObserver(function(){ clearTimeout(t); t=setTimeout(run,30); }).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+<style id="ail-styles">
+/* ===== AI Assistant Library ===== */
+.ail-seg{display:inline-flex;gap:8px}
+.ail-seg button{height:36px;padding:8px 12px;border:none;background:transparent;border-radius:8px;font-size:14px;line-height:20px;font-weight:500;color:#374151;cursor:pointer;font-family:inherit}
+.ail-seg button:hover{background:#F9FAFB}
+.ail-seg button[aria-selected="true"]{background:#E9FEF9;color:#007460}
+.ail-n{font-weight:500;color:#111827;font-size:14px}
+.ail-d{font-size:12px;color:#6B7280;margin-top:2px;max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ail-badge{display:inline-flex;align-items:center;border-radius:9999px;padding:2px 12px;font-size:14px;line-height:20px;font-weight:500;white-space:nowrap}
+.ail-badge.is-s{background:#F3F4F6;color:#374151}
+.ail-badge.is-e{background:#E9FEF9;color:#007460}
+.ail-key{font-size:14px;color:#4B5563}
+#ail-rows tr{height:64px;border-bottom:1px solid #F3F4F6}
+#ail-rows tr:hover{background:#F9FAFB}
+#ail-rows tr:last-child{border-bottom:none}
+.ail-rowlink{background:none;border:none;padding:0;text-align:left;cursor:pointer;font-family:inherit}
+.ail-rowlink:hover .ail-n{text-decoration:underline;text-underline-offset:2px}
+
+/* modal shell (stacks above ai2-modal) */
+.ail-bd{position:fixed;inset:0;z-index:330;background:rgba(16,24,40,.55);display:flex;align-items:center;justify-content:center;padding:24px;animation:simHseIn .18s ease-out}
+.ail-m{background:#fff;border-radius:14px;width:640px;max-width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 48px -12px rgba(16,24,40,.25)}
+.ail-mh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid #E4E7EC;flex-shrink:0}
+.ail-mt{font-size:16px;font-weight:600;color:#101828}
+.ail-ms{font-size:13px;color:#667085;margin-top:2px;line-height:1.45}
+.ail-mb{padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+.ail-mf{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid #E4E7EC;flex-shrink:0}
+.ail-mf .si-btn-sec{padding:0 16px}.ail-mf .sa-btn-primary{height:40px;padding:0 18px;font-size:14px}
+
+/* form */
+.ail-f{display:flex;flex-direction:column;gap:6px}
+.ail-lrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ail-l{font-size:12px;font-weight:500;color:#111827}
+.ail-l .req{color:#D92D20;margin-left:2px}
+.ail-help{font-size:12px;color:#6B7280;line-height:1.45}
+.ail-in{width:100%;border:1px solid #E5E7EB;border-radius:6px;padding:8px 12px;font-size:14px;line-height:1.5;color:#111827;background:#fff;font-family:inherit;outline:none;transition:border-color .12s,box-shadow .12s}
+.ail-in:focus{border-color:#5FCEB1;box-shadow:var(--focus-ring-shadow-sm,0 0 0 3px rgba(0,116,96,.12))}
+.ail-in.is-err{border-color:#F04438}
+.ail-in.is-err:focus{box-shadow:0 0 0 3px rgba(240,68,56,.12)}
+textarea.ail-in{resize:none;overflow:hidden;min-height:38px}
+textarea.ail-in.ail-prompt-in{resize:vertical;overflow-y:auto;min-height:144px}
+/* API key: view state ↔ edit state */
+.ail-kv{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #E5E7EB;border-radius:6px;background:#F9FAFB;padding:0 12px;height:38px;flex:1;min-width:0;box-sizing:border-box}
+.ail-kedit{height:38px;flex-shrink:0}.ail-kedit:hover{background:#F3F4F6}
+.ail-kv-l{display:flex;align-items:center;gap:8px;min-width:0}
+.ail-kv-l svg{color:#6B7280;flex-shrink:0}
+.ail-kv-k{font-size:14px;color:#101828}
+.ail-kv-s{font-size:12px;color:#6B7280}
+.ail-krow{display:flex;gap:8px;align-items:flex-start}
+.ail-krow .ail-pw{flex:1;min-width:0}
+.ail-btn2{height:38px;padding:0 14px;border:1px solid #5FCEB1;background:#fff;color:#007460;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+.ail-btn2:hover:not(:disabled){background:#E9FEF9}
+.ail-btn2:disabled{opacity:.45;cursor:not-allowed}
+.ail-btn2.is-ok,.ail-btn2.is-ok:disabled{opacity:1;cursor:default;background:#E9FEF9;border-color:#A9EFD8}
+.ail-btn2.sm{height:30px;padding:0 12px;font-size:13px}
+.ail-gbtn{height:38px;padding:0 14px;border:1px solid #D0D5DD;background:#fff;color:#374151;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ail-gbtn:hover{background:#F9FAFB}
+.ail-spin{width:14px;height:14px;border:2px solid #A9EFD8;border-top-color:#007460;border-radius:50%;animation:ailSpin .8s linear infinite}
+@keyframes ailSpin{to{transform:rotate(360deg)}}
+.ail-kfoot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+/* pagination */
+.ail-pag{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-top:1px solid var(--border,#E5E7EB)}
+.ail-pag-nav{display:flex;align-items:center;gap:4px}
+.ail-pb{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:6px;font-size:14px;color:#4B5563;background:transparent;border:none;cursor:pointer;font-family:inherit}
+.ail-pb:hover:not(:disabled){background:#F3F4F6}.ail-pb:disabled{opacity:.4;cursor:not-allowed}
+.ail-pb.is-on{background:#E6F7F4;color:#007460;border:1.5px solid #5FCEB1;font-weight:500}
+.ail-pag select{height:32px;padding:0 28px 0 10px;border:1px solid #E5E7EB;border-radius:6px;font-size:14px;background:#fff;cursor:pointer;font-family:inherit}
+.ail-pag-info{font-size:13px;color:#6B7280;margin-left:8px}
+/* stacked over the Manage / Select modal: no second dim layer, no re-animation */
+.ail-bd.is-stacked{background:transparent;animation:none}
+select.ail-in{appearance:none;-webkit-appearance:none;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
+.ail-cnt{font-size:12px;color:#6B7280;text-align:right}
+.ail-cnt.is-err{color:#D92D20}
+.ail-err{font-size:12px;color:#D92D20;text-align:left}
+.ail-ok{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#007460;font-weight:500}
+.ail-vlink{font-size:13px;font-weight:500;color:#007460;background:none;border:none;padding:0;cursor:pointer;font-family:inherit}
+.ail-vlink:hover{text-decoration:underline}.ail-vlink:disabled{color:#98A2B3;cursor:not-allowed;text-decoration:none}
+.ail-roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.ail-role{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;text-align:left;height:100%;padding:12px 16px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .12s,background .12s}
+.ail-role:hover{border-color:#5FCEB1}
+.ail-role.is-on{border-color:#5FCEB1;background:#E9FEF9}
+.ail-role:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(95,206,177,.30)}
+.ail-role-h{display:flex;align-items:flex-start;gap:8px;width:100%}
+.ail-role-ic{display:flex;align-items:center;padding:6px;border-radius:9999px;background:#F3F4F6;color:#4B5563;mix-blend-mode:multiply;flex-shrink:0}
+.ail-role.is-on .ail-role-ic{background:#E9FEF9;color:#007460}
+.ail-role-t{font-size:14px;line-height:20px;font-weight:500;color:#030712}
+.ail-role.is-on .ail-role-t{color:#007460}
+.ail-role-d{font-size:13px;line-height:18px;color:#4B5563}
+.ail-role-d b{font-weight:700}
+.ail-fixed{display:flex;align-items:center;gap:8px;font-size:12px;color:#6B7280}
+.ail-note{display:flex;gap:10px;align-items:flex-start;background:#F9FAFB;border:1px solid #E4E7EC;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.5;color:#475467}
+.ail-note svg{color:#667085;flex-shrink:0;margin-top:1px}
+.ail-code{background:#F9FAFB;border:1px solid #E4E7EC;border-radius:8px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;color:#344054;white-space:pre}
+.ail-pw{position:relative}
+.ail-pw .ail-in{padding-right:40px}
+.ail-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);z-index:2;pointer-events:auto;width:28px;height:28px;border:none;background:transparent;color:#6B7280;border-radius:6px;cursor:pointer;display:grid;place-items:center}
+.ail-eye svg{pointer-events:none}
+/* hide the browser's own password-reveal / autofill icons so only our eye shows */
+#ail-key::-ms-reveal,#ail-key::-ms-clear{display:none}
+#ail-key::-webkit-credentials-auto-fill-button,#ail-key::-webkit-contacts-auto-fill-button,#ail-key::-webkit-strong-password-auto-fill-button{visibility:hidden;display:none!important;pointer-events:none;width:0;margin:0}
+.ail-eye:hover{background:#F3F4F6}
+
+/* view */
+.ail-vtop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ail-stat{border:1px solid #E4E7EC;border-radius:10px;padding:10px 12px}
+.ail-stat-l{font-size:12px;color:#667085}
+.ail-stat-v{font-size:14px;font-weight:400;color:#101828;margin-top:2px}
+.ail-vh{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ail-vh-t{font-size:14px;font-weight:600;color:#101828}
+.ail-vh-s{font-size:12px;color:#667085}
+/* version timeline — reuses the Screen Flow "Rail" (Figma 491:20689): 8px dot + 1px line, gap 4, top 6 */
+.ail-tl{display:flex;flex-direction:column}
+.ail-ti{display:flex;gap:12px}
+.ail-rail{width:8px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:6px}
+.ail-rail i{width:8px;height:8px;border-radius:999px;background:#D0D5DD;flex-shrink:0}
+.ail-rail b{flex:1;width:1px;min-height:1px;background:#E5E7EB}
+.ail-ti.is-cur .ail-rail i{background:#5FCEB1}
+.ail-ti-c{flex:1;min-width:0;padding-bottom:20px}
+.ail-ti.is-last .ail-ti-c{padding-bottom:4px}
+.ail-ti-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ail-ver-v{font-size:14px;font-weight:600;color:#101828}
+.ail-cur{font-size:12px;font-weight:500;color:#007460;background:#E9FEF9;border-radius:9999px;padding:1px 8px}
+.ail-chg{font-size:13px;color:#344054}
+.ail-ti-m{font-size:12px;color:#667085;margin-top:3px}
+.ail-ti-m b{font-weight:500;color:#475467}
+.ail-ver-p{margin-top:8px;font-size:13px;line-height:1.55;color:#344054;background:#F9FAFB;border:1px solid #F2F4F7;border-radius:8px;padding:10px 12px;white-space:pre-wrap}
+.ail-ver-p .is-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ail-glink{margin-top:6px;font-size:12px;font-weight:500;color:#4B5563;background:none;border:none;padding:0;cursor:pointer;font-family:inherit}
+.ail-glink:hover{color:#111827;text-decoration:underline;text-underline-offset:2px}
+/* ghost gray button (DS Button Ghost Gray, 210:4299 / hover 210:4302) */
+.ail-ghost{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:none;background:transparent;border-radius:8px;font-size:14px;font-weight:500;line-height:20px;color:#030712;font-family:inherit;cursor:pointer;flex-shrink:0}
+.ail-ghost:hover{background:#F3F4F6}
+.ail-ghost svg{width:16px;height:16px}
+/* Marketplace dropdown (same look as Step 1 Data Modality / Category) */
+.ail-dd{position:relative}
+.ail-dd-t{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;cursor:pointer}
+.ail-dd-t[aria-expanded="true"],.ail-dd-t:focus-visible{border-color:#5FCEB1;box-shadow:0 0 0 4px rgba(95,206,177,.30);outline:none}
+.ail-dd-t svg{flex-shrink:0;color:#6B7280;transition:transform .15s}
+.ail-dd-t[aria-expanded="true"] svg{transform:rotate(180deg)}
+.ail-dd-m{position:absolute;top:calc(100% + 4px);left:0;width:100%;background:#fff;border:1px solid #E5E7EB;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:40;padding:4px 0;max-height:220px;overflow-y:auto}
+.ail-dd-o{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:7px 12px;font-size:13.5px;color:#111827;cursor:pointer;background:none;border:none;font-family:inherit;text-align:left}
+.ail-dd-o:hover,.ail-dd-o.is-kb{background:#F3F4F6}
+.ail-dd-o.is-sel{background:#ECFDF5;color:#007460;font-weight:500}
+
+/* wizard additions */
+.ai2-ptxt{font-size:14px;line-height:20px;color:#344054;white-space:pre-wrap;max-height:240px;overflow-y:auto}
+.ai2-prompt .ai2-prompt-f{justify-content:space-between;align-items:center}
+.ai2-vchip{font-size:12px;color:#667085}
+.ai2-vchip b{font-weight:600;color:#344054}
+.ai2-create{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px 14px;border:1px dashed #A9EFD8;border-radius:10px;background:#fff;color:#007460;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;flex-shrink:0}
+.ai2-create:hover{background:#F0FDF9}
+.ai2-m1 .ai2-create{margin-bottom:2px}
+.ai2-new{font-size:11px;font-weight:600;color:#007460;background:#E9FEF9;border-radius:9999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+</style>
+<script>
+/* ================================================================
+   AI ASSISTANT LIBRARY — shared store for Specialists (AI2_SPECS)
+   and Evaluators (AI2_EVALS). The sim wizard AI Scoring step reads
+   the same objects, so anything created/edited here shows there.
+================================================================ */
+const AIL_MODELS = ['GPT-5.4 mini', 'GPT-5.4', 'GPT-5.4 nano'];
+const AIL_DEFAULT_KEY4 = 'gwoA'; /* key pre-filled on Create = the one already used by the library's assistants */
+const AIL_ME = 'Sarah Davis'; /* signed-in admin (SD avatar) */
+const AIL_AUTHORS = ['Sarah Davis', 'Kevin Tran', 'Linh Pham'];
+const AIL_NAME_MAX = 60, AIL_DESC_MAX = 100;
+const AIL_STATE = { q: '', role: 'all', page: 1, per: 10 };
+function ailPage(p){ AIL_STATE.page = p; ailRenderList(); }
+function ailRenderPag(pg, pages, total, start){
+  let box = document.getElementById('ail-pag');
+  if (!box){
+    const empty = document.getElementById('ail-empty'); if (!empty) return;
+    box = document.createElement('div'); box.id = 'ail-pag'; box.className = 'ail-pag';
+    empty.parentNode.insertBefore(box, empty.nextSibling);
+  }
+  box.hidden = total <= 10;
+  if (box.hidden) return;
+  const nums = [];
+  for (let i = 1; i <= pages; i++){
+    if (pages > 7 && i > 1 && i < pages && Math.abs(i - pg) > 1){ if (nums[nums.length - 1] !== '…') nums.push('…'); continue; }
+    nums.push(i);
+  }
+  const chev = function(d){ return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="' + (d < 0 ? '15 18 9 12 15 6' : '9 18 15 12 9 6') + '"/></svg>'; };
+  box.innerHTML = '<div class="ail-pag-nav">' +
+      '<button type="button" class="ail-pb" aria-label="Previous page" onclick="ailPage(' + (pg - 1) + ')"' + (pg === 1 ? ' disabled' : '') + '>' + chev(-1) + '</button>' +
+      nums.map(function(n){ return n === '…' ? '<span class="px-1 text-gray-400 text-sm">…</span>' : '<button type="button" class="ail-pb' + (n === pg ? ' is-on' : '') + '"' + (n === pg ? ' aria-current="page"' : '') + ' onclick="ailPage(' + n + ')">' + n + '</button>'; }).join('') +
+      '<button type="button" class="ail-pb" aria-label="Next page" onclick="ailPage(' + (pg + 1) + ')"' + (pg === pages ? ' disabled' : '') + '>' + chev(1) + '</button>' +
+      '</div>' +
+    '<select aria-label="Rows per page" onchange="AIL_STATE.per = parseInt(this.value); AIL_STATE.page = 1; ailRenderList();">' +
+      [10, 20, 50].map(function(n){ return '<option value="' + n + '"' + (n === AIL_STATE.per ? ' selected' : '') + '>' + n + '/page</option>'; }).join('') + '</select>';
+}
+let AIL_SEQ = 100, AIL_F = null;
+
+(function ailSeed(){
+  const P = {
+    1: 'You score the agent’s conversation quality. Check that the agent greets the customer, keeps a professional and welcoming tone, speaks clearly and confirms what the customer asked for. Return a score 0–100 and one sentence of feedback.',
+    2: 'You check that the agent follows the required steps in order and stays compliant. Flag any skipped verification, wrong order of steps or missing confirmation. Return a score 0–100 and one sentence of feedback.',
+    3: 'You score how accurately the agent used the tool. Compare each click and entry with the expected hotspot for that screen. Wrong clicks lower the score; terminal actions score 0. Return a score 0–100 and one sentence of feedback.',
+    4: 'You check that the agent said the required keywords from the script, in context. List any keyword the agent missed. Return a score 0–100 and one sentence of feedback.',
+    5: 'You score how efficiently the agent completed the task. Compare completion time and number of turns with the expected flow. Return a score 0–100 and one sentence of feedback.',
+    6: 'You score empathy and rapport. Check that the agent acknowledges the customer’s situation and keeps a calm, friendly tone. Return a score 0–100 and one sentence of feedback.',
+    7: 'You check that the agent handles personal data safely. The agent must not read back full card numbers or share data with the wrong person. Any breach is a critical fail. Return a score 0–100 and one sentence of feedback.',
+    8: 'You check whether the agent noticed and offered relevant upgrades or offers without being pushy. Return a score 0–100 and one sentence of feedback.',
+    9: 'You verify that what the agent told the customer is factually correct for this scenario (prices, dates, policies). Return a score 0–100 and one sentence of feedback.',
+    10: 'You score how simple and inclusive the agent’s language is. Penalise jargon and unclear phrasing. Return a score 0–100 and one sentence of feedback.',
+    20: 'You combine the specialist scores into one final result. Weight all specialists equally. If any specialist reports a critical fail, set pass to false. Write a short summary the agent will see, starting with what went well.',
+    21: 'You combine the specialist scores into one final result. Give compliance and data privacy double weight. If any specialist reports a critical fail, set pass to false. Write a short summary the agent will see.'
+  };
+  const hist = { 1: 3, 3: 2, 7: 2, 20: 2 };
+  let t = Date.parse('2026-11-04T15:30:00');
+  function seedOne(id, rec){
+    const n = hist[id] || 1, vs = [];
+    for (let v = 1; v <= n; v++){
+      const at = new Date(t - (n - v) * 3600 * 1000 * 26).toISOString();
+      vs.push({ v: v, model: 'GPT-5.4 mini', prompt: v === n ? P[id] : P[id].replace(/ Return a score.*$/, ' Return a score 0–100.'), by: AIL_AUTHORS[(id + v) % AIL_AUTHORS.length], at: at, change: v === 1 ? 'Created' : 'Prompt updated' });
+    }
+    rec.model = 'GPT-5.4 mini'; rec.key4 = 'gwoA'; rec.versions = vs; rec.updated = vs[vs.length - 1].at;
+    t -= 3600 * 1000 * 5;
+  }
+  AI2_SPECS[1].desc = 'Soft skills, tone and clarity in every interaction'; /* library descriptions max 100 chars */
+  Object.keys(AI2_SPECS).forEach(function(id){ seedOne(Number(id), AI2_SPECS[id]); });
+  Object.keys(AI2_EVALS).forEach(function(id){ seedOne(Number(id), AI2_EVALS[id]); });
+  /* match Figma: Master Evaluator last updated 11/04 9:00 AM; Booking Accuracy Specialist created today (newest row) */
+  const me = AI2_EVALS[20];
+  me.versions = [
+    { v: 1, model: 'GPT-5.4 mini', prompt: P[20].replace(/ Write a short summary.*$/, ''), by: 'Kevin Tran', at: new Date('2026-11-01T11:30:00').toISOString(), change: 'Created' },
+    { v: 2, model: 'GPT-5.4 mini', prompt: P[20], by: 'Sarah Davis', at: new Date('2026-11-04T09:00:00').toISOString(), change: 'Prompt updated' }
+  ];
+  me.updated = me.versions[1].at;
+  const bAt = new Date('2026-11-09T14:15:00').toISOString();
+  AI2_SPECS[11] = { name: 'Booking Accuracy Specialist', desc: 'Checks the booking details', model: 'GPT-5.4 mini', key4: 'gwoA', updated: bAt,
+    versions: [{ v: 1, model: 'GPT-5.4 mini', prompt: 'You score whether the agent captured location, dates, guest name and payment correctly, and read them back. Return a score 0–100 and one sentence of feedback.', by: 'Sarah Davis', at: bAt, change: 'Created' }] };
+})();
+
+function ailRec(kind, id){ return kind === 's' ? AI2_SPECS[id] : AI2_EVALS[id]; }
+function ailCur(rec){ return rec.versions[rec.versions.length - 1]; }
+function ailAll(){
+  const out = [];
+  Object.keys(AI2_SPECS).forEach(function(id){ out.push({ kind: 's', id: Number(id), rec: AI2_SPECS[id] }); });
+  Object.keys(AI2_EVALS).forEach(function(id){ out.push({ kind: 'e', id: Number(id), rec: AI2_EVALS[id] }); });
+  return out;
+}
+function ailRoleLabel(k){ return k === 's' ? 'Specialist' : 'Evaluator'; }
+function ailBadge(k){ return '<span class="ail-badge is-' + k + '">' + ailRoleLabel(k) + '</span>'; }
+
+/* ---------- list page ---------- */
+function ailGo(){ go('admin-ai-library'); }
+function ailSetRole(r){
+  AIL_STATE.role = r; AIL_STATE.page = 1;
+  document.querySelectorAll('#ail-seg button').forEach(function(b){ b.setAttribute('aria-selected', String(b.dataset.r === r)); });
+  ailRenderList();
+}
+function ailRenderList(){
+  const tb = document.getElementById('ail-rows'); if (!tb) return;
+  const rows = ailAll().filter(function(a){
+    if (AIL_STATE.role !== 'all' && a.kind !== AIL_STATE.role) return false;
+    return !AIL_STATE.q || a.rec.name.toLowerCase().indexOf(AIL_STATE.q) >= 0;
+  }).sort(function(a, b){ return Date.parse(b.rec.updated) - Date.parse(a.rec.updated); });
+  document.getElementById('ail-empty').classList.toggle('hidden', rows.length > 0);
+  const per = AIL_STATE.per, pages = Math.max(1, Math.ceil(rows.length / per));
+  if (AIL_STATE.page > pages) AIL_STATE.page = pages;
+  const pg = AIL_STATE.page, start = (pg - 1) * per;
+  ailRenderPag(pg, pages, rows.length, start);
+  tb.innerHTML = rows.slice(start, start + per).map(function(a){
+    const r = a.rec, key = a.kind + a.id, cur = ailCur(r);
+    return '<tr>' +
+      '<td class="px-4 py-3"><button type="button" class="ail-rowlink" onclick="ailOpenView(\'' + a.kind + '\',' + a.id + ')"><div class="ail-n">' + simEsc(r.name) + '</div>' + (r.desc ? '<div class="ail-d">' + simEsc(r.desc) + '</div>' : '') + '</button></td>' +
+      '<td class="px-4 py-3">' + ailBadge(a.kind) + '</td>' +
+      '<td class="px-4 py-3 text-gray-600 text-sm">' + simEsc(r.model) + '</td>' +
+      '<td class="px-4 py-3 text-gray-600 text-sm">v' + cur.v + '</td>' +
+      '<td class="px-4 py-3"><span class="ail-key">••••' + simEsc(r.key4) + '</span></td>' +
+      '<td class="px-4 py-3 text-gray-600 text-sm whitespace-nowrap">' + fmtSkillDate(r.updated) + '</td>' +
+      '<td class="px-4 py-3 text-right whitespace-nowrap relative">' +
+        '<button type="button" class="ellipsis-trigger inline-flex items-center justify-center rounded-md text-gray-500 h-8 w-8 hover:bg-gray-100" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-row-menu-ail' + key + '" aria-label="Actions for ' + simEsc(r.name) + '" onclick="event.stopPropagation(); toggleRowMenu(\'ail' + key + '\')">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>' +
+        '<div id="admin-row-menu-ail' + key + '" role="menu" class="ellipsis-menu text-left" hidden>' +
+          '<button type="button" role="menuitem" class="ellipsis-menu-item" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenView(\'' + a.kind + '\',' + a.id + ')">View</button>' +
+          '<button type="button" role="menuitem" class="ellipsis-menu-item" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenEdit(\'' + a.kind + '\',' + a.id + ')">Edit</button>' +
+        '</div></td></tr>';
+  }).join('');
+}
+
+/* ---------- modal shell ---------- */
+function ailModal(inner, width, label){
+  if (typeof simEnsureStyles === 'function') simEnsureStyles(); /* sa-/si-/ai2-/mp- classes are injected lazily */
+  const had = !!document.getElementById('ail-modal');
+  ailClose();
+  const bd = document.createElement('div');
+  bd.id = 'ail-modal'; bd.className = 'ail-bd'; if (had) bd.style.animation = 'none';
+  /* opened from Manage Specialists / Select Evaluator: stack on top of it instead of closing it,
+     so the dim backdrop stays put (no flash) and the picker keeps its state underneath */
+  const host = document.getElementById('ai2-modal');
+  if (host && AIL_F && (AIL_F.from === 'manage' || AIL_F.from === 'eval')){
+    bd.classList.add('is-stacked');
+    const dlg = host.querySelector('.ai2-modal'); if (dlg) dlg.style.visibility = 'hidden';
+  }
+  bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-label="' + simEsc(label) + '" style="width:' + (width || '640px') + '">' + inner + '</div>';
+  bd.addEventListener('mousedown', function(e){ if (e.target === bd) ailCancel(); });
+  document.body.appendChild(bd);
+}
+function ailHead(t, s){
+  return '<div class="ail-mh"><div><div class="ail-mt">' + t + '</div>' + (s ? '<div class="ail-ms">' + s + '</div>' : '') + '</div>' +
+    '<button type="button" class="mp-m-x" onclick="ailCancel()" aria-label="Close">' + AI2_IC.close + '</button></div>';
+}
+function ailClose(){
+  const m = document.getElementById('ail-modal'); if (m) m.remove();
+  const dlg = document.querySelector('#ai2-modal .ai2-modal'); if (dlg) dlg.style.visibility = '';
+}
+/* re-render the picker underneath without replaying its open animation */
+function ailReopenPicker(kind, focusId){
+  if (kind === 's') simAi2OpenManage(true); else simAi2OpenEval(true);
+  const m = document.getElementById('ai2-modal'); if (m) m.style.animation = 'none';
+  const o = focusId != null && document.querySelector('#ai2-modal .ai2-opt[data-' + (kind === 's' ? 'id' : 'ev') + '="' + focusId + '"]');
+  if (o && o.scrollIntoView) o.scrollIntoView({ block: 'nearest' });
+}
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && document.getElementById('ail-modal')){ e.stopImmediatePropagation(); if (typeof ailDdOpen === 'function' && ailDdOpen()){ e.preventDefault(); ailDdToggle(false); return; } ailCancel(); } }, true);
+
+/* ---------- view ---------- */
+function ailOpenView(kind, id){
+  const r = ailRec(kind, id), cur = ailCur(r);
+  /* timeline: newest first. Each version shows the period it was the live one:
+     current = "In use since <date>", older = "In use <from> – <until replaced by vN+1>" */
+  const asc = r.versions, n = asc.length;
+  const item = function(v, idx){
+    const isCur = idx === n - 1, next = asc[idx + 1];
+    return '<div class="ail-ti' + (isCur ? ' is-cur' : '') + (idx === 0 ? ' is-last' : '') + '" role="listitem"><div class="ail-rail" aria-hidden="true"><i></i><b></b></div><div class="ail-ti-c">' +
+      '<div class="ail-ti-h"><span class="ail-ver-v">v' + v.v + '</span>' + (isCur ? '<span class="ail-cur">Current</span>' : '') + '</div>' +
+      '<div class="ail-ti-m">' + fmtSkillDate(v.at) + ' · ' + simEsc(v.by) + ' · ' + simEsc(v.model) + '</div>' +
+      '<div class="ail-ver-p"><div class="is-clamp" id="ail-vp-' + v.v + '">' + simEsc(v.prompt) + '</div></div>' +
+      '<button type="button" class="ail-glink" onclick="ailTogglePrompt(this,' + v.v + ')">View full prompt</button></div></div>';
+  };
+  let vers = '<div class="ail-tl" role="list">';
+  for (let i = n - 1; i >= 0; i--){
+    vers += item(asc[i], i);
+  }
+  vers += '</div>';
+  ailModal(ailHead(simEsc(r.name), simEsc(r.desc || '')) +
+    '<div class="ail-mb"><div class="ail-vtop">' + ailBadge(kind) +
+      '<button type="button" class="ail-btn2" onclick="ailOpenEdit(\'' + kind + '\',' + id + ')">Edit</button></div>' +
+      '<div class="ail-stats">' +
+        '<div class="ail-stat"><div class="ail-stat-l">Model</div><div class="ail-stat-v">' + simEsc(r.model) + '</div></div>' +
+        '<div class="ail-stat"><div class="ail-stat-l">Current version</div><div class="ail-stat-v">v' + cur.v + '</div></div>' +
+        '<div class="ail-stat"><div class="ail-stat-l">API key</div><div class="ail-stat-v ail-key">••••' + simEsc(r.key4) + '</div></div>' +
+        '<div class="ail-stat"><div class="ail-stat-l">Updated</div><div class="ail-stat-v">' + fmtSkillDate(r.updated) + '</div></div></div>' +
+      '<div class="ail-vh"><span class="ail-vh-t">Version history</span></div>' + vers + '</div>', '720px', r.name);
+  AIL_F = { mode: 'view' };
+  /* hide "View full prompt" when the prompt already fits in the 2-line preview */
+  document.querySelectorAll('#ail-modal .ail-ver-p .is-clamp').forEach(function(c){
+    if (c.scrollHeight <= c.clientHeight + 1){ const b = c.parentNode.nextElementSibling; if (b && b.classList.contains('ail-glink')) b.hidden = true; }
+  });
+}
+function ailTogglePrompt(btn, v){
+  const p = document.getElementById('ail-vp-' + v); if (!p) return;
+  const open = p.classList.toggle('is-clamp');
+  btn.textContent = open ? 'View full prompt' : 'Show less';
+}
+
+/* ---------- create / edit form ----------
+   from: 'library' | 'manage' | 'eval' | 'wizard'   (where to return on close) */
+function ailOpenCreate(kind, from){
+  AIL_F = { mode: 'create', from: from || 'library', kind: kind || '', lock: !!kind,
+    name: '', desc: '', model: AIL_MODELS[0], prompt: '', key: '', keyState: 'idle', keyEdit: false, baseKey4: AIL_DEFAULT_KEY4, touched: {}, showFmt: false };
+  ailRenderForm();
+}
+function ailOpenEdit(kind, id, from){
+  const r = ailRec(kind, id), cur = ailCur(r);
+  AIL_F = { mode: 'edit', from: from || 'library', kind: kind, id: id, lock: true,
+    name: r.name, desc: r.desc || '', model: r.model, prompt: cur.prompt, key: '', keyState: 'idle', keyEdit: false, touched: {}, showFmt: false,
+    orig: { name: r.name, desc: r.desc || '', model: r.model, prompt: cur.prompt } };
+  ailRenderForm();
+}
+function ailDupName(){
+  const n = AIL_F.name.trim().toLowerCase(); if (!n) return false;
+  return ailAll().some(function(a){ return a.rec.name.trim().toLowerCase() === n && !(AIL_F.mode === 'edit' && a.kind === AIL_F.kind && a.id === AIL_F.id); });
+}
+function ailKeyOk(k){ return /^sk-[A-Za-z0-9_\-]{16,}$/.test(k.trim()); }
+function ailErrors(){
+  const f = AIL_F, e = {};
+  if (!f.kind) e.role = 'Select a role.';
+  if (!f.name.trim()) e.name = 'This field is required.';
+  else if (ailDupName()) e.name = 'This name is already used by another assistant.';
+  if (f.name.length > AIL_NAME_MAX) e.nameLen = true;
+  if (f.desc.length > AIL_DESC_MAX) e.descLen = true;
+  if (!f.prompt.trim()) e.prompt = 'This field is required.';
+  /* key: view state (edit, unchanged) has no errors; edit state needs a verified key */
+  if (f.keyEdit){
+    if (!f.key.trim()) e.key = 'This field is required.';
+    else if (f.keyState === 'bad') e.key = 'This API key couldn’t be verified. Check the key and try again.';
+    else if (f.keyState !== 'ok') e.key = 'Verify the API key to save it.';
+  }
+  return e;
+}
+function ailChanged(){
+  const f = AIL_F; if (f.mode !== 'edit') return true;
+  const o = f.orig;
+  return f.name !== o.name || f.desc !== o.desc || f.model !== o.model || f.prompt !== o.prompt || (f.keyEdit && f.keyState === 'ok');
+}
+function ailEsc(s){ return simEsc(s); }
+function ailRenderForm(){
+  const f = AIL_F, ed = f.mode === 'edit';
+  /* DS "Test Generation Method card" (7196:2456): icon chip + title + description, Default / Hovered / Selected */
+  const roleIc = { s: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+                   e: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>' };
+  const roleCard = function(k, d){
+    const on = f.kind === k;
+    return '<button type="button" class="ail-role' + (on ? ' is-on' : '') + '" role="radio" aria-checked="' + on + '" onclick="ailPickRole(\'' + k + '\')">' +
+      '<span class="ail-role-t">' + ailRoleLabel(k) + '</span>' +
+      '<span class="ail-role-d">' + d + '</span></button>';
+  };
+  const roleBlock = f.lock
+    ? '<div class="ail-f"><div class="ail-l">Role</div><div>' + ailBadge(f.kind) + '</div>' + (ed ? '<div class="ail-help">Role can’t be changed after the assistant is created.</div>' : '') + '</div>'
+    : '<div class="ail-f"><div class="ail-l">Role</div><div class="ail-roles" role="radiogroup">' +
+        roleCard('s', 'Scores <b>one part</b> of the simulation, e.g. accuracy, tone or compliance.') +
+        roleCard('e', '<b>Combines specialist scores</b> into the final score and agent feedback.') + '</div><div class="ail-err" id="ail-e-role" hidden></div></div>';
+  const promptHelp = f.kind === 'e'
+    ? '<div class="ail-note">' + AI2_IC.info + '<div>An evaluator doesn’t see the raw sim output. It receives each specialist’s score and feedback and returns the final result. <button type="button" class="ail-vlink" style="font-size:12px" onclick="ailToggleFmt()">' + (f.showFmt ? 'Hide' : 'View') + ' required output format</button></div></div>' +
+      (f.showFmt ? '<div class="ail-code">' + simEsc(AI2_OUT_FORMAT) + '</div>' : '')
+    : '';
+  const html = ailHead(ed ? 'Edit ' + ailEsc(f.orig.name) : 'Create ' + (f.lock ? ailRoleLabel(f.kind).toLowerCase() : 'assistant'),
+      ed ? 'Changing the name, description, model or prompt saves a new version. Simulations keep their pinned version.' : 'It’s saved to the AI Assistant Library so any simulation can use it.') +
+    '<div class="ail-mb">' + roleBlock +
+      '<div class="ail-f"><label class="ail-l" for="ail-name">Name</label>' +
+        '<input id="ail-name" class="ail-in" type="text" autocomplete="off" placeholder="e.g. Booking Accuracy Specialist" value="' + ailEsc(f.name) + '" oninput="ailIn(\'name\',this.value)" onblur="ailTouch(\'name\')"/>' +
+        '<div class="ail-lrow"><div class="ail-err" id="ail-e-name" hidden></div><div class="ail-cnt" id="ail-c-name" style="margin-left:auto"></div></div></div>' +
+      '<div class="ail-f"><label class="ail-l" for="ail-desc">Description (Optional)</label>' +
+        '<textarea id="ail-desc" class="ail-in" rows="1" placeholder="What this assistant checks" oninput="ailIn(\'desc\',this.value); ailAuto(this,38)">' + ailEsc(f.desc) + '</textarea>' +
+        '<div class="ail-cnt" id="ail-c-desc"></div></div>' +
+      '<div class="ail-f"><label class="ail-l" for="ail-model">Model</label>' +
+        '<div class="ail-dd" id="ail-model-dd"><button type="button" id="ail-model" class="ail-in ail-dd-t" aria-haspopup="listbox" aria-expanded="false" onclick="ailDdToggle()" onkeydown="ailDdKey(event)"><span id="ail-model-lbl">' + simEsc(f.model) + '</span>' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>' +
+          '<div class="ail-dd-m" id="ail-model-menu" role="listbox" aria-label="Model" hidden></div></div></div>' +
+      '<div class="ail-f"><label class="ail-l" for="ail-prompt">Prompt</label>' + promptHelp +
+        '<textarea id="ail-prompt" class="ail-in ail-prompt-in" placeholder="' + (f.kind === 'e' ? 'e.g. Combine the specialist scores into one final result…' : 'e.g. You score whether the agent captured the guest’s name, dates and payment correctly…') + '" oninput="ailIn(\'prompt\',this.value); ailAuto(this,144)" onblur="ailTouch(\'prompt\')" onmouseup="ailManual(this)">' + ailEsc(f.prompt) + '</textarea>' +
+        '<div class="ail-err" id="ail-e-prompt" hidden></div></div>' +
+      '<div class="ail-f" id="ail-kfield">' + ailKeyHTML() + '</div>' +
+    '</div>' +
+    '<div class="ail-mf"><button type="button" class="si-btn-sec" onclick="ailCancel()">Cancel</button>' +
+      '<button type="button" class="sa-btn-primary sa-sm" id="ail-save" onclick="ailSave()">' + (ed ? 'Save changes' : 'Create ' + (f.lock ? ailRoleLabel(f.kind).toLowerCase() : 'assistant')) + '</button></div>';
+  ailModal(html, '640px', ed ? 'Edit assistant' : 'Create assistant');
+  ['ail-desc'].forEach(function(i){ const t = document.getElementById(i); if (t) ailAuto(t, 38); });
+  const p = document.getElementById('ail-prompt'); if (p) ailAuto(p, 144);
+  ailSync();
+  /* no autofocus: an auto-focused empty Name would be marked as touched ("required") the moment the admin clicks a role card or any other field */
+}
+/* OpenAI API key
+   - View state (edit mode default): read-only ••••last4 + "Edit". Nothing to validate.
+   - Edit state (create default, or after "Edit"): paste key → Verify (required to save).
+     In edit mode, "Cancel" returns to the view state and keeps the current key. */
+const AIL_KEY_IC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M17 6l3 3M14 9l2 2"/></svg>';
+function ailKeyHTML(){
+  const f = AIL_F, ed = f.mode === 'edit', key4 = ed ? ailRec(f.kind, f.id).key4 : f.baseKey4;
+  const label = '<div class="ail-lrow"><label class="ail-l" for="ail-key">OpenAI API key</label></div>';
+  if (!f.keyEdit){
+    return label + '<div class="ail-krow"><div class="ail-kv"><span class="ail-kv-l">' + AIL_KEY_IC + '<span class="ail-kv-k">••••••••••••' + simEsc(key4) + '</span><span class="ail-kv-s">' + (ed ? 'Current key' : 'Default key') + '</span></span></div>' +
+      '<button type="button" class="ail-ghost ail-kedit" onclick="ailKeyEdit(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit</button></div>' +
+      '<div class="ail-help">Encrypted on the server. Only the last 4 characters are shown.</div>';
+  }
+  const st = f.keyState;
+  const vbtn = st === 'checking' ? '<button type="button" class="ail-btn2" disabled><span class="ail-spin"></span>Verifying</button>'
+    : st === 'ok' ? '<button type="button" class="ail-btn2 is-ok" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</button>'
+    : '<button type="button" class="ail-btn2" id="ail-vbtn" onmousedown="event.preventDefault()" onclick="ailVerify()"' + (f.key.trim() ? '' : ' disabled') + '>Verify</button>';
+  return label +
+    '<div class="ail-krow"><div class="ail-pw"><input id="ail-key" class="ail-in" type="' + (f.keyShow ? 'text' : 'password') + '" autocomplete="off" placeholder="Paste your OpenAI API key (sk-…)" value="' + ailEsc(f.key) + '" oninput="ailKeyIn(this.value)" onblur="ailTouch(\'key\')"' + (st === 'checking' ? ' readonly' : '') + '/>' +
+      '<button type="button" class="ail-eye" aria-label="' + (f.keyShow ? 'Hide key' : 'Show key') + '" aria-pressed="' + !!f.keyShow + '" onmousedown="event.preventDefault()" onclick="ailEye(this)">' + (f.keyShow ? AIL_EYE_OFF : AIL_EYE_ON) + '</button></div>' + vbtn +
+      '<button type="button" class="ail-gbtn" onmousedown="event.preventDefault()" onclick="ailKeyEdit(false)">' + (ed ? 'Keep current key' : 'Use default key') + '</button></div>' +
+    '<div class="ail-err" id="ail-e-key" hidden></div>' +
+    '<div class="ail-kfoot"><div class="ail-help">' + (st === 'ok' ? 'Key verified. It will be saved when you ' + (ed ? 'save changes' : 'create the assistant') + '.' : 'Encrypted on the server. Only the last 4 characters are shown after saving.') + '</div></div>';
+}
+function ailKeyRender(){
+  const box = document.getElementById('ail-kfield'); if (!box) return;
+  const had = document.activeElement && document.activeElement.id === 'ail-key';
+  box.innerHTML = ailKeyHTML(); ailSync();
+  if (had){ const i = document.getElementById('ail-key'); if (i){ i.focus(); const L = i.value.length; try { i.setSelectionRange(L, L); } catch(e){} } }
+}
+function ailKeyEdit(on){
+  AIL_F.keyEdit = on; AIL_F.key = ''; AIL_F.keyState = 'idle'; AIL_F.touched.key = false;
+  ailKeyRender();
+  if (on){ const i = document.getElementById('ail-key'); if (i) i.focus(); }
+}
+/* Model dropdown — Marketplace style menu instead of the native <select> */
+let AIL_DD_KB = -1;
+function ailDdOpen(){ const m = document.getElementById('ail-model-menu'); return m && !m.hidden; }
+function ailDdRender(){
+  const m = document.getElementById('ail-model-menu'); if (!m) return;
+  const chk = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+  m.innerHTML = AIL_MODELS.map(function(x, i){ const on = x === AIL_F.model;
+    return '<button type="button" class="ail-dd-o' + (on ? ' is-sel' : '') + (i === AIL_DD_KB ? ' is-kb' : '') + '" role="option" aria-selected="' + on + '" onmousedown="event.preventDefault()" onclick="ailDdPick(' + i + ')"><span>' + simEsc(x) + '</span>' + (on ? chk : '') + '</button>'; }).join('');
+}
+function ailDdToggle(force){
+  const m = document.getElementById('ail-model-menu'), t = document.getElementById('ail-model'); if (!m || !t) return;
+  const open = force != null ? force : m.hidden;
+  AIL_DD_KB = open ? AIL_MODELS.indexOf(AIL_F.model) : -1;
+  if (open) ailDdRender();
+  m.hidden = !open; t.setAttribute('aria-expanded', String(open));
+}
+function ailDdPick(i){
+  AIL_F.model = AIL_MODELS[i];
+  const l = document.getElementById('ail-model-lbl'); if (l) l.textContent = AIL_F.model;
+  ailDdToggle(false); ailSync();
+  const t = document.getElementById('ail-model'); if (t) t.focus();
+}
+function ailDdKey(e){
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    if (!ailDdOpen()){ ailDdToggle(true); return; }
+    AIL_DD_KB = (AIL_DD_KB + (e.key === 'ArrowDown' ? 1 : -1) + AIL_MODELS.length) % AIL_MODELS.length; ailDdRender();
+  } else if ((e.key === 'Enter' || e.key === ' ') && ailDdOpen() && AIL_DD_KB >= 0){ e.preventDefault(); ailDdPick(AIL_DD_KB); }
+  else if (e.key === 'Escape' && ailDdOpen()){ e.preventDefault(); e.stopPropagation(); ailDdToggle(false); }
+  else if (e.key === 'Tab' && ailDdOpen()) ailDdToggle(false);
+}
+document.addEventListener('mousedown', function(e){ if (ailDdOpen() && !e.target.closest('#ail-model-dd')) ailDdToggle(false); }, true);
+function ailPickRole(k){ AIL_F.kind = k; AIL_F.touched.role = true; ailKeepRender(); }
+function ailToggleFmt(){ AIL_F.showFmt = !AIL_F.showFmt; ailKeepRender(); }
+function ailKeepRender(){
+  const b = document.querySelector('#ail-modal .ail-mb'), st = b ? b.scrollTop : 0;
+  ailRenderForm();
+  const b2 = document.querySelector('#ail-modal .ail-mb'); if (b2) b2.scrollTop = st;
+}
+/* auto-expand that respects a manual drag-resize (manual height becomes the new minimum) */
+function ailAuto(el, min){
+  const floor = Math.max(min, Number(el.dataset.manual || 0));
+  el.style.height = 'auto';
+  el.style.height = Math.max(floor, el.scrollHeight + 2) + 'px';
+  el.dataset.auto = el.offsetHeight;
+}
+function ailManual(el){ if (Math.abs(el.offsetHeight - Number(el.dataset.auto || 0)) > 2){ el.dataset.manual = el.offsetHeight; el.dataset.auto = el.offsetHeight; } }
+function ailIn(k, v){ AIL_F[k] = v; if (k === 'name' && AIL_F.name.trim()) AIL_F.touched.name = true; ailSync(); }
+function ailTouch(k){ AIL_F.touched[k] = true; ailSync(); }
+function ailKeyIn(v){
+  const prev = AIL_F.keyState; AIL_F.key = v; AIL_F.keyState = 'idle';
+  if (prev !== 'idle'){ ailKeyRender(); return; }
+  const b = document.getElementById('ail-vbtn'); if (b) b.disabled = !v.trim();
+  ailSync();
+}
+const AIL_EYE_ON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const AIL_EYE_OFF = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+/* show/hide the pasted key; state survives re-renders (verify, typing after a failed check) */
+function ailEye(btn){
+  const i = document.getElementById('ail-key'); if (!i || !AIL_F) return;
+  AIL_F.keyShow = !AIL_F.keyShow;
+  i.type = AIL_F.keyShow ? 'text' : 'password';
+  btn.innerHTML = AIL_F.keyShow ? AIL_EYE_OFF : AIL_EYE_ON;
+  btn.setAttribute('aria-label', AIL_F.keyShow ? 'Hide key' : 'Show key'); btn.setAttribute('aria-pressed', String(AIL_F.keyShow));
+}
+function ailVerify(){
+  if (!AIL_F.key.trim()) return;
+  AIL_F.keyState = 'checking'; AIL_F.touched.key = true; ailKeyRender();
+  setTimeout(function(){ if (!AIL_F || AIL_F.keyState !== 'checking') return; AIL_F.keyState = ailKeyOk(AIL_F.key) ? 'ok' : 'bad'; ailKeyRender(); }, 900);
+}
+function ailSync(){
+  const f = AIL_F; if (!f || f.mode === 'view') return;
+  const e = ailErrors(), t = f.touched;
+  const show = function(id, msg){ const el = document.getElementById(id); if (!el) return; el.hidden = !msg; el.textContent = msg || ''; };
+  show('ail-e-role', t.role || t.submit ? e.role : '');
+  show('ail-e-name', (t.name || t.submit) ? e.name : '');
+  show('ail-e-prompt', (t.prompt || t.submit) ? e.prompt : '');
+  /* key: show "required" once touched and a failed verification; the unverified state is cued by the Verify button only */
+  const keyErr = !!e.key && ((t.key || t.submit) && !f.key.trim() || f.keyState === 'bad');
+  show('ail-e-key', keyErr ? e.key : '');
+  const nIn = document.getElementById('ail-name'); if (nIn) nIn.classList.toggle('is-err', !!(((t.name || t.submit) && e.name) || e.nameLen));
+  const pIn = document.getElementById('ail-prompt'); if (pIn) pIn.classList.toggle('is-err', !!((t.prompt || t.submit) && e.prompt));
+  const kIn = document.getElementById('ail-key'); if (kIn) kIn.classList.toggle('is-err', keyErr);
+  const dIn = document.getElementById('ail-desc'); if (dIn) dIn.classList.toggle('is-err', !!e.descLen);
+  const cn = document.getElementById('ail-c-name'); if (cn){ cn.textContent = f.name.length + '/' + AIL_NAME_MAX; cn.classList.toggle('is-err', !!e.nameLen); }
+  const cd = document.getElementById('ail-c-desc'); if (cd){ cd.textContent = f.desc.length + '/' + AIL_DESC_MAX; cd.classList.toggle('is-err', !!e.descLen); }
+  const sv = document.getElementById('ail-save'); if (sv) sv.disabled = Object.keys(e).length > 0 || !ailChanged();
+}
+function ailCancel(){
+  ailClose(); AIL_F = null; /* a stacked picker underneath is simply revealed again, unchanged */
+}
+function ailSave(){
+  const f = AIL_F; f.touched.submit = true;
+  if (Object.keys(ailErrors()).length || !ailChanged()){ ailSync(); return; }
+  const now = new Date().toISOString();
+  let rec, id = f.id, msg;
+  if (f.mode === 'create'){
+    id = ++AIL_SEQ;
+    rec = { name: f.name.trim(), desc: f.desc.trim(), model: f.model, key4: f.keyEdit && f.key.trim() ? f.key.trim().slice(-4) : f.baseKey4, updated: now,
+      versions: [{ v: 1, model: f.model, prompt: f.prompt.trim(), by: AIL_ME, at: now, change: 'Created' }], isNew: true };
+    (f.kind === 's' ? AI2_SPECS : AI2_EVALS)[id] = rec;
+    msg = 'Successfully created “' + rec.name + '”';
+  } else {
+    rec = ailRec(f.kind, id);
+    const o = f.orig, chg = [];
+    if (f.name.trim() !== o.name) chg.push('Name'); if (f.desc.trim() !== o.desc) chg.push('Description');
+    if (f.model !== o.model) chg.push('Model'); if (f.prompt.trim() !== o.prompt) chg.push('Prompt');
+    rec.name = f.name.trim(); rec.desc = f.desc.trim(); rec.model = f.model;
+    if (f.key.trim()) rec.key4 = f.key.trim().slice(-4);
+    if (chg.length) rec.versions.push({ v: ailCur(rec).v + 1, model: f.model, prompt: f.prompt.trim(), by: AIL_ME, at: now, change: chg.join(', ') + ' updated' });
+    rec.updated = now;
+    msg = 'Successfully updated “' + rec.name + '”';
+  }
+  const from = f.from, kind = f.kind;
+  ailClose(); AIL_F = null;
+  ailRenderList();
+  if (from === 'manage'){ if (AI2_PICK.indexOf(id) < 0 && AI2_PICK.length < AI2_MAX) AI2_PICK.push(id); ailReopenPicker('s', id); }
+  else if (from === 'eval'){ AI2_EVPICK = id; ailReopenPicker('e', id); }
+  else if (from === 'wizard'){ simAi2Refresh(); }
+  showToast(msg);
+}
+
+/* nav highlight + list render on entry */
+if (typeof SCREEN_TO_NAV !== 'undefined') SCREEN_TO_NAV['admin-ai-library'] = { key: 'skills-center-admin' };
+(function(){
+  const _go = window.go;
+  window.go = function(s){ _go(s); if (s === 'admin-ai-library') ailRenderList(); };
+})();
+</script>
+
+<script>
+/* wizard: real prompt from the library (replaces the locked "Managed in OpenAI Playground" block) */
+function ai2PromptHTML(kind, id, ro){
+  const r = ailRec(kind, id), cur = ailCur(r);
+  return '<div class="ai2-prompt"><div class="ai2-ptxt">' + simEsc(cur.prompt) + '</div>' +
+    '<div class="ai2-prompt-f"><span class="ai2-vchip"><b>v' + cur.v + '</b> · ' + simEsc(r.model) + '</span>' +
+    (ro ? '' : '<button type="button" class="ai2-link" onclick="ailOpenEdit(\'' + kind + '\',' + id + ',\'wizard\')">Edit in library' + AI2_IC.ext20 + '</button>') + '</div></div>';
+}
+</script>
+
 </body>
 </html>
