@@ -1597,7 +1597,6 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
             <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:140px">Role</th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:150px">Model</th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:90px">Version</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:110px">API key</th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:190px">Updated</th>
             <th class="px-4 py-3" style="width:60px"></th>
           </tr>
@@ -9365,7 +9364,9 @@ function simAi2Toggle(id){
 function ai2ManageSync(){
   const n = AI2_PICK.length, over = n > AI2_MAX;
   const h = document.getElementById('ai2-max'); if (h) h.textContent = over ? n + ' selected — reduce to ' + AI2_MAX + ' or fewer to update' : '';
-  const b = document.getElementById('ai2-upd'); if (b) b.disabled = over;
+  const same = n === SIM_AI2.specs.length && AI2_PICK.every(function(id){ return SIM_AI2.specs.indexOf(id) >= 0; });
+  const md = document.querySelector('#ai2-modal .ai2-modal'); if (md) md.classList.toggle('has-err', over);
+  const b = document.getElementById('ai2-upd'); if (b) b.disabled = over || same; /* Figma W2: Update stays disabled until the selection changes */
 }
 function simAi2ApplyManage(){
   if (AI2_PICK.length > AI2_MAX) return;
@@ -10129,24 +10130,25 @@ textarea.is-err:focus,input.is-err:focus{box-shadow:0 0 0 4px rgba(240,68,56,.12
 .ai2-modal:has(.ai2-cf){background:transparent;box-shadow:none;overflow:visible}
 .ai2-modal .si-cf-act{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.ai2-modal .si-cf-act button{padding:0 16px}
 .ai2-m2{flex:1;min-height:0;display:flex}
-.ai2-m2-l{width:340px;flex-shrink:0;border-right:1px solid #E4E7EC;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.ai2-m2-l{width:320px;flex-shrink:0;border-right:1px solid #E4E7EC;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
 .ai2-m2-r{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0}
-.ai2-m1{padding:16px 20px;display:flex;flex-direction:column;gap:8px}
-.ai2-opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:13px 14px;border:1px solid #E4E7EC;border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .12s,background .12s}
+.ai2-m1{padding:16px 24px;display:flex;flex-direction:column;gap:8px}
+.ai2-opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px;border:1px solid #E4E7EC;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .12s,background .12s}
 .ai2-opt:hover{border-color:#A9EFD8;background:#F9FAFB}
-.ai2-opt.is-on{border-color:#5FCEB1;background:#F9FAFB}
+.ai2-opt.is-on{border-color:#5FCEB1;background:#E9FEF9}
+.ai2-m1 .ai2-opt{border-radius:12px;padding:16px}
 .ai2-opt-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.ai2-opt-n{font-size:14px;font-weight:600;color:#101828}
+.ai2-opt-n{font-size:14px;font-weight:500;color:#101828}
 .ai2-opt-d{font-size:12px;color:#667085;line-height:1.45}
-.ai2-ck{width:20px;height:20px;border-radius:6px;border:1.5px solid #D0D5DD;background:#fff;display:grid;place-items:center;flex-shrink:0}
+.ai2-ck{width:16px;height:16px;margin-top:2px;border-radius:4px;border:1.5px solid #D0D5DD;background:#fff;display:grid;place-items:center;flex-shrink:0}
 .ai2-ck svg{opacity:0}
 .ai2-opt.is-on .ai2-ck{background:#007460;border-color:#007460}.ai2-opt.is-on .ai2-ck svg{opacity:1}
-.ai2-rd{width:20px;height:20px;border-radius:50%;border:1.5px solid #D0D5DD;background:#fff;display:grid;place-items:center;flex-shrink:0}
+.ai2-rd{width:16px;height:16px;margin-top:2px;border-radius:50%;border:1.5px solid #D0D5DD;background:#fff;display:grid;place-items:center;flex-shrink:0}
 .ai2-rd::after{content:'';width:8px;height:8px;border-radius:50%;background:#007460;opacity:0}
 .ai2-opt.is-on .ai2-rd{border-color:#007460}.ai2-opt.is-on .ai2-rd::after{opacity:1}
-.ai2-pv-h{display:flex;align-items:baseline;gap:8px;padding:12px 18px;border-bottom:1px solid #E4E7EC;background:#F9FAFB;flex-shrink:0}
-.ai2-pv-h b{font-size:13px;font-weight:600;color:#344054}.ai2-pv-h span{font-size:12px;color:#98A2B3}
-.ai2-pv-b{flex:1;min-height:0;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px;background:#fff}
+.ai2-pv-h{display:flex;flex-direction:column;gap:2px;padding:16px 16px 12px;flex-shrink:0;background:#fff}
+.ai2-pv-h b{font-size:14px;font-weight:500;color:#101828}.ai2-pv-h span{font-size:12px;color:#6B7280}
+.ai2-pv-b{flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#F9FAFB}
 .ai2-pv-solo{padding:20px 24px;gap:14px}
 .ai2-sc{border:1px solid #E4E7EC;border-radius:10px;background:#fff;flex-shrink:0}
 .ai2-sc-h{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F9FAFB;border-bottom:1px solid #EAECF0;border-radius:10px 10px 0 0}
@@ -10165,11 +10167,13 @@ textarea.is-err:focus,input.is-err:focus{box-shadow:0 0 0 4px rgba(240,68,56,.12
 .ai2-res-g>div{border:1px solid #E4E7EC;border-radius:8px;padding:7px 10px;display:flex;flex-direction:column;gap:1px}
 .ai2-res-g span{font-size:11px;color:#667085}.ai2-res-g b{font-size:14px;font-weight:600;color:#101828}
 .ai2-res-g b.is-ok{color:#00896B}.ai2-res-g b.is-bad{color:#D92D20}
-.ai2-mf{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #E4E7EC;flex-shrink:0}
-.ai2-mf-note{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#98A2B3}
-.ai2-mf-r{display:inline-flex;align-items:center;gap:8px}
+.ai2-mf{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #E4E7EC;flex-shrink:0}
+.ai2-mf-note{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#98A2B3;height:40px}
+.ai2-mf-r{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;column-gap:8px;row-gap:6px}
 .ai2-mf .si-btn-sec{padding:0 16px}.ai2-mf .sa-btn-primary{height:40px;padding:0 18px}
-.ai2-max{font-size:12px;color:#D92D20}
+.ai2-max{font-size:12px;line-height:16px;color:#D92D20;order:3;flex-basis:100%;text-align:right}.ai2-max:empty{display:none}
+/* error line appears only when needed: the dialog grows downward by that line (top kept in place), so Cancel/Update never move */
+.ai2-modal.has-err{max-height:calc(88vh + 22px);transform:translateY(11px)}
 
 /* focus: replace forms-plugin blue with Marketplace teal everywhere */
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea,select):focus{border-color:#5FCEB1 !important;--tw-ring-color:rgba(95,206,177,.25) !important;--tw-ring-offset-shadow:0 0 #0000 !important;--tw-ring-shadow:0 0 0 4px rgba(95,206,177,.25) !important;outline:none !important}
@@ -11006,10 +11010,10 @@ select.ail-in{appearance:none;-webkit-appearance:none;padding-right:34px;backgro
 
 /* view */
 .ail-vtop{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.ail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .ail-stat{border:1px solid #E4E7EC;border-radius:10px;padding:10px 12px}
 .ail-stat-l{font-size:12px;color:#667085}
-.ail-stat-v{font-size:14px;font-weight:400;color:#101828;margin-top:2px}
+.ail-stat-v{font-size:14px;font-weight:500;color:#101828;margin-top:2px}
 .ail-vh{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .ail-vh-t{font-size:14px;font-weight:600;color:#101828}
 .ail-vh-s{font-size:12px;color:#667085}
@@ -11052,7 +11056,7 @@ select.ail-in{appearance:none;-webkit-appearance:none;padding-right:34px;backgro
 .ai2-prompt .ai2-prompt-f{justify-content:space-between;align-items:center}
 .ai2-vchip{font-size:12px;color:#667085}
 .ai2-vchip b{font-weight:600;color:#344054}
-.ai2-create{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px 14px;border:1px dashed #A9EFD8;border-radius:10px;background:#fff;color:#007460;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;flex-shrink:0}
+.ai2-create{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px 14px;border:1px dashed #5FCEB1;border-radius:12px;background:#fff;color:#007460;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;flex-shrink:0}
 .ai2-create:hover{background:#F0FDF9}
 .ai2-m1 .ai2-create{margin-bottom:2px}
 .ai2-new{font-size:11px;font-weight:600;color:#007460;background:#E9FEF9;border-radius:9999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
@@ -11172,7 +11176,6 @@ function ailRenderList(){
       '<td class="px-4 py-3">' + ailBadge(a.kind) + '</td>' +
       '<td class="px-4 py-3 text-gray-600 text-sm">' + simEsc(r.model) + '</td>' +
       '<td class="px-4 py-3 text-gray-600 text-sm">v' + cur.v + '</td>' +
-      '<td class="px-4 py-3"><span class="ail-key">••••' + simEsc(r.key4) + '</span></td>' +
       '<td class="px-4 py-3 text-gray-600 text-sm whitespace-nowrap">' + fmtSkillDate(r.updated) + '</td>' +
       '<td class="px-4 py-3 text-right whitespace-nowrap relative">' +
         '<button type="button" class="ellipsis-trigger inline-flex items-center justify-center rounded-md text-gray-500 h-8 w-8 hover:bg-gray-100" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-row-menu-ail' + key + '" aria-label="Actions for ' + simEsc(r.name) + '" onclick="event.stopPropagation(); toggleRowMenu(\'ail' + key + '\')">' +
@@ -11244,7 +11247,6 @@ function ailOpenView(kind, id){
       '<div class="ail-stats">' +
         '<div class="ail-stat"><div class="ail-stat-l">Model</div><div class="ail-stat-v">' + simEsc(r.model) + '</div></div>' +
         '<div class="ail-stat"><div class="ail-stat-l">Current version</div><div class="ail-stat-v">v' + cur.v + '</div></div>' +
-        '<div class="ail-stat"><div class="ail-stat-l">API key</div><div class="ail-stat-v ail-key">••••' + simEsc(r.key4) + '</div></div>' +
         '<div class="ail-stat"><div class="ail-stat-l">Updated</div><div class="ail-stat-v">' + fmtSkillDate(r.updated) + '</div></div></div>' +
       '<div class="ail-vh"><span class="ail-vh-t">Version history</span></div>' + vers + '</div>', '720px', r.name);
   AIL_F = { mode: 'view' };
@@ -11336,7 +11338,6 @@ function ailRenderForm(){
       '<div class="ail-f"><label class="ail-l" for="ail-prompt">Prompt</label>' + promptHelp +
         '<textarea id="ail-prompt" class="ail-in ail-prompt-in" placeholder="' + (f.kind === 'e' ? 'e.g. Combine the specialist scores into one final result…' : 'e.g. You score whether the agent captured the guest’s name, dates and payment correctly…') + '" oninput="ailIn(\'prompt\',this.value); ailAuto(this,144)" onblur="ailTouch(\'prompt\')" onmouseup="ailManual(this)">' + ailEsc(f.prompt) + '</textarea>' +
         '<div class="ail-err" id="ail-e-prompt" hidden></div></div>' +
-      '<div class="ail-f" id="ail-kfield">' + ailKeyHTML() + '</div>' +
     '</div>' +
     '<div class="ail-mf"><button type="button" class="si-btn-sec" onclick="ailCancel()">Cancel</button>' +
       '<button type="button" class="sa-btn-primary sa-sm" id="ail-save" onclick="ailSave()">' + (ed ? 'Save changes' : 'Create ' + (f.lock ? ailRoleLabel(f.kind).toLowerCase() : 'assistant')) + '</button></div>';
