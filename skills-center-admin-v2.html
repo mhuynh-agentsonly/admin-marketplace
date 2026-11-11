@@ -376,6 +376,8 @@
   }
   .ellipsis-menu-item[disabled] { opacity: 0.5; cursor: not-allowed; }
   .ellipsis-menu-item.danger { color: var(--destructive); }
+  .ellipsis-menu-item svg { width: 16px; height: 16px; flex-shrink: 0; color: #6B7280; }
+  .ellipsis-menu-item.danger svg { color: currentColor; }
   .ellipsis-trigger[aria-expanded="true"] { background: var(--secondary); color: var(--secondary-foreground); }
 
   /* DS Checkbox */
@@ -1400,7 +1402,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
     <div class="flex items-start justify-between gap-4 mb-8 flex-wrap">
       <div>
         <h2 class="text-2xl font-medium">Test library</h2>
-        <p class="text-sm text-gray-600 mt-1 max-w-2xl">Configure skill tests. Each test is hosted in Typeform — Marketplace stores the link, threshold, attempt rules, and result history.</p>
+        <p class="text-sm text-gray-600 mt-1 max-w-2xl">Configure skills tests: Typeform quizzes for theoretical knowledge, simulations for operational skills.</p>
       </div>
       <div class="flex items-center gap-2 shrink-0">
       <button type="button" onclick="ailGo()"
@@ -1430,7 +1432,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-        <!-- Filters: Test method + Proctored + Category -->
+        <!-- Filters: Test method + Category (no proctoring in Marketplace — moved to agent/admin portal) -->
         <div class="flex items-center gap-2">
           <div class="relative" id="list-method-wrap">
             <button type="button" id="list-method-trigger"
@@ -1448,18 +1450,6 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
                   Clear selection
                 </button>
               </div>
-            </div>
-          </div>
-          <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
-          <div class="relative" id="list-proctor-wrap">
-            <button type="button" id="list-proctor-trigger"
-              aria-haspopup="listbox" aria-expanded="false" aria-controls="list-proctor-dropdown"
-              onclick="event.stopPropagation(); toggleListProcFilter()">
-              <span id="list-proctor-label" style="color:#030712;font-size:14px;font-family:var(--font-sans)">All proctoring</span>
-              <svg id="list-proctor-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform 0.15s;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div id="list-proctor-dropdown" role="listbox" aria-label="Filter by proctoring" hidden>
-              <div id="list-proctor-options" style="padding:4px 0"></div>
             </div>
           </div>
           <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
@@ -1489,13 +1479,12 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
         <table class="text-sm" id="admin-skills-table">
           <thead class="bg-gray-50 text-left">
             <tr class="border-b border-border">
-              <th class="px-4 py-3 text-xs font-medium text-gray-500">Name</th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500" style="min-width:300px;width:320px;max-width:320px">Name</th>
               <th class="px-4 py-3 text-xs font-medium text-gray-500">Test method</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:100px">Proctored</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:180px">Category</th>
+              <th class="px-4 py-3 text-xs font-medium text-gray-500" style="max-width:180px">Category</th>
               <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:130px">Status</th>
               <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:110px">Threshold</th>
-              <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:200px">
+              <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:1%;white-space:nowrap">
                 <button type="button" onclick="adminSkillsState.sortDir = adminSkillsState.sortDir === 'desc' ? 'asc' : 'desc'; adminSkillsState.page = 1; renderAdminSkillsList();"
                   class="inline-flex items-center gap-1 hover:text-gray-700">
                   Created
@@ -1622,7 +1611,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
 
   <div class="mb-6">
     <h1 id="admin-form-title" class="text-2xl font-medium">Add Skills Test</h1>
-    <p class="text-sm text-gray-600 mt-1 max-w-2xl">Marketplace tracks the test metadata, attempt rules, and the link to the Typeform that hosts the questions.</p>
+    <p class="text-sm text-gray-600 mt-1 max-w-2xl">Set up the test details, then choose how agents are assessed: a Typeform quiz or an interactive simulation.</p>
   </div>
 
   <form id="admin-skill-form" onsubmit="return false;" class="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 max-w-3xl flex flex-col gap-5">
@@ -1741,10 +1730,17 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   </nav>
   <div class="mb-6">
     <h1 class="text-2xl font-medium">Add Skills Test</h1>
-    <p class="text-sm text-gray-500 mt-1 max-w-2xl">Marketplace tracks the test metadata, attempt rules, and the link to the Typeform that hosts the questions.</p>
+    <p class="text-sm text-gray-500 mt-1 max-w-2xl">Set up the test details, then choose how agents are assessed: a Typeform quiz or an interactive simulation.</p>
   </div>
 
   <div class="bg-white rounded-xl border border-border shadow-sm p-7 max-w-3xl flex flex-col gap-6">
+
+    <!-- Offline test – edit note (same as Admin Portal's offline-sim note; Figma B1) -->
+    <style>#ats1-offline-note[hidden]{display:none!important}</style>
+<div id="ats1-offline-note" hidden class="flex gap-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] px-4 py-3">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <p class="text-sm font-medium text-[#111827]">Editing this test only affects agents who take it after it’s published again. Agents who have already completed it won’t be affected by changes to the questions or scoring.</p>
+    </div>
 
     <!-- Test name -->
     <div>
@@ -1764,22 +1760,6 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
       <div class="text-right text-xs mt-1 text-muted-foreground"><span id="ats1-desc-ct">0/100</span></div>
     </div>
 
-    <!-- Proctoring -->
-    <div>
-      <p class="text-sm font-medium text-foreground mb-3">Is Proctoring Required for this Exam?</p>
-      <div class="flex flex-col gap-2.5">
-        <label class="proc-radio flex items-center gap-2.5 cursor-pointer text-sm text-foreground">
-          <input type="radio" name="ats1-proctor" value="yes" class="proc-input"/>
-          <span class="proc-dot"></span>
-          Yes, require camera monitoring
-        </label>
-        <label class="proc-radio flex items-center gap-2.5 cursor-pointer text-sm text-foreground">
-          <input type="radio" name="ats1-proctor" value="no" checked class="proc-input"/>
-          <span class="proc-dot"></span>
-          No, open environment submission
-        </label>
-      </div>
-    </div>
 
     <!-- Data Modality / Task Type -->
     <div>
@@ -1893,12 +1873,12 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
     <div class="grid grid-cols-2 gap-x-6">
       <div>
         <label for="ats1-threshold" class="block text-sm font-medium text-foreground mb-1.5">Passing threshold (%)</label>
-        <input id="ats1-threshold" type="number" min="0" max="100" value="80" oninput="ats1Field(this)" onblur="ats1Touch(this)" data-req="Passing threshold" aria-required="true"
+        <input id="ats1-threshold" type="number" min="1" max="100" inputmode="numeric" value="80" oninput="ats1Field(this)" onblur="ats1Touch(this)" data-req="Passing threshold" aria-required="true"
                class="border-input flex h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"/>
       </div>
       <div>
         <label for="ats1-duration" class="block text-sm font-medium text-foreground mb-1.5">Estimated duration (min)</label>
-        <input id="ats1-duration" type="number" min="1" value="20" oninput="ats1Field(this)" onblur="ats1Touch(this)" data-req="Estimated duration" aria-required="true"
+        <input id="ats1-duration" type="number" min="1" inputmode="numeric" value="20" oninput="ats1Field(this)" onblur="ats1Touch(this)" data-req="Estimated duration" aria-required="true"
                class="border-input flex h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"/>
       </div>
     </div>
@@ -1933,7 +1913,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   </nav>
   <div class="mb-6">
     <h1 class="text-2xl font-medium">Add Skills Test</h1>
-    <p class="text-sm text-gray-500 mt-1 max-w-2xl">Marketplace tracks the test metadata, attempt rules, and the link to the Typeform that hosts the questions.</p>
+    <p class="text-sm text-gray-500 mt-1 max-w-2xl">Set up the test details, then choose how agents are assessed: a Typeform quiz or an interactive simulation.</p>
   </div>
 
   <!-- LMS embed state -->
@@ -2032,7 +2012,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   </div>
   <div id="sim-card" style="width:100%;max-width:960px;padding:24px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.10);border-radius:16px">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px">
-      <h2 id="sim-title-name" style="font-size:18px;line-height:28px;font-weight:500;color:#030712">Untitled simulation</h2>
+      <h2 id="sim-title-name" style="font-size:18px;line-height:28px;font-weight:500;color:#030712">Untitled test</h2>
       <span id="sim-mode-badge" style="font-size:14px;line-height:20px;font-weight:500;color:#374151;background:#F3F4F6;border-radius:999px;padding:4px 16px">Audio + Image</span>
     </div>
     <div id="sim-stepper" style="display:flex;align-items:center"></div>
@@ -2895,6 +2875,10 @@ function changeAdminPerPage(n) {
 }
 
 /* ---------- ADMIN · SKILLS CENTER (list + form) ---------- */
+/* row ⋯ menu icons (Figma: DS _Dropdown Menu Item, left icon; Lucide eye / pencil / trash-2 / archive / send / user-plus) */
+/* Status labels follow Admin Portal Training: Active / Draft / Offline (internal value stays "Published") */
+function skillStatusLabel(st){ return st === 'Published' ? 'Active' : st; }
+var MENU_IC = {"eye": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>", "pencil": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21.17 6.81a1 1 0 0 0-3.99-3.98L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z\"/><path d=\"m15 5 4 4\"/></svg>", "trash": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 6h18\"/><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"/><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"/><line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\"/><line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\"/></svg>", "archive": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\"/><path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\"/><path d=\"M10 12h4\"/></svg>", "send": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.03.94l7.93 3.18a2 2 0 0 1 1.11 1.11z\"/><path d=\"m21.85 2.15-10.94 10.94\"/></svg>", "userPlus": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><line x1=\"19\" x2=\"19\" y1=\"8\" y2=\"14\"/><line x1=\"22\" x2=\"16\" y1=\"11\" y2=\"11\"/></svg>", "rocket": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z\"/><path d=\"m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z\"/><path d=\"M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0\"/><path d=\"M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5\"/></svg>"};
 const adminSkills = (function seed() {
   return [
     { id: 'coding-fundamentals',        name: 'Coding Fundamentals',        category: 'Coding',            typeformUrl: 'https://form.typeform.com/to/RqQBZmGX',  threshold: 80, duration: 25, status: 'Published', createdAt: '2026-05-15T10:50:00', proctored: false },
@@ -3202,6 +3186,7 @@ function renderAdminSkillsList() {
   }
 
   const STATUS_BADGE_ADMIN = {
+    'Offline':   'inline-flex items-center rounded-full px-4 py-1 text-sm leading-5 font-medium whitespace-nowrap bg-[#F3F4F6] text-[#374151]',
     'Draft':     'inline-flex items-center rounded-full px-4 py-1 text-sm leading-5 font-medium whitespace-nowrap bg-[#F3F4F6] text-[#374151]',
     'Published': 'inline-flex items-center rounded-full px-4 py-1 text-sm leading-5 font-medium whitespace-nowrap bg-[#E9FEF9] text-[#007460]',
   };
@@ -3213,31 +3198,32 @@ function renderAdminSkillsList() {
 
     const menuItems = isPublished
       ? `<button type="button" role="menuitem" class="ellipsis-menu-item"
-             onclick="event.stopPropagation(); closeAllRowMenus(); skillView('${s.id}');">View</button>
+             onclick="event.stopPropagation(); closeAllRowMenus(); skillView('${s.id}');">${MENU_IC.eye}View</button>
          <button type="button" role="menuitem" class="ellipsis-menu-item"
-             onclick="event.stopPropagation(); closeAllRowMenus(); openTakeOfflineModal('${s.id}');">Take offline</button>`
+             onclick="event.stopPropagation(); closeAllRowMenus(); invOpen('${s.id}');">${MENU_IC.userPlus}Invite agents</button>
+         <button type="button" role="menuitem" class="ellipsis-menu-item"
+             onclick="event.stopPropagation(); closeAllRowMenus(); openTakeOfflineModal('${s.id}');">${MENU_IC.archive}Take offline</button>`
       : `<button type="button" role="menuitem" class="ellipsis-menu-item"
-             onclick="event.stopPropagation(); closeAllRowMenus(); skillEdit('${s.id}');">Edit</button>
+             onclick="event.stopPropagation(); closeAllRowMenus(); skillEdit('${s.id}');">${MENU_IC.pencil}Edit</button>
          <button type="button" role="menuitem" class="ellipsis-menu-item"
-             onclick="event.stopPropagation(); toggleAdminSkillStatus('${s.id}', 'Published'); closeAllRowMenus();">Publish</button>
+             onclick="event.stopPropagation(); toggleAdminSkillStatus('${s.id}', 'Published'); closeAllRowMenus();">${MENU_IC.rocket}Publish</button>
          <button type="button" role="menuitem" class="ellipsis-menu-item danger"
-             onclick="event.stopPropagation(); deleteAdminSkill('${s.id}'); closeAllRowMenus();">Delete</button>`;
+             onclick="event.stopPropagation(); deleteAdminSkill('${s.id}'); closeAllRowMenus();">${MENU_IC.trash}Delete</button>`;
 
     return `
 	      <tr class="hover:bg-gray-50" style="height:64px;border-bottom:1px solid #F3F4F6">
-	        <td class="px-4 py-3 font-medium text-gray-900 text-sm">${s.name}</td>
+	        <td class="px-4 py-3 font-medium text-sm ${s.name ? 'text-gray-900' : 'text-gray-400'}" style="max-width:320px"><div class="truncate" title="${s.name || 'Untitled test'}">${s.name || 'Untitled test'}</div></td>
 	        <td class="px-4 py-3 text-gray-600 text-sm">${skillMethodLabel(s)}</td>
-	        <td class="px-4 py-3 text-gray-600 text-sm">${proctored}</td>
-	        <td class="px-4 py-3 text-gray-600 text-sm">${s.category}</td>
-        <td class="px-4 py-3"><span class="${badgeClass}">${s.status}</span></td>
-        <td class="px-4 py-3 text-gray-600 text-sm">${s.threshold}%</td>
+		        <td class="px-4 py-3 text-sm ${s.category ? 'text-gray-600' : 'text-gray-400'}">${s.category || '—'}</td>
+        <td class="px-4 py-3"><span class="${badgeClass}">${skillStatusLabel(s.status)}</span></td>
+        <td class="px-4 py-3 text-sm ${s.threshold == null || s.threshold === '' ? 'text-gray-400' : 'text-gray-600'}">${s.threshold == null || s.threshold === '' ? '—' : s.threshold + '%'}</td>
         <td class="px-4 py-3 text-gray-600 text-sm whitespace-nowrap">${fmtSkillDate(s.createdAt)}</td>
         <td class="px-4 py-3 text-right whitespace-nowrap relative">
           <button type="button"
                   class="ellipsis-trigger inline-flex items-center justify-center rounded-md text-gray-500 h-8 w-8 hover:bg-gray-100"
                   aria-haspopup="menu" aria-expanded="false"
                   aria-controls="admin-row-menu-${s.id}"
-                  aria-label="Actions for ${s.name}"
+                  aria-label="Actions for ${s.name || 'Untitled test'}"
                   onclick="event.stopPropagation(); toggleRowMenu('${s.id}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </button>
@@ -3390,9 +3376,9 @@ function confirmTakeOffline() {
   if (!modal || !modal._targetId) return;
   const s = adminSkills.find(x => x.id === modal._targetId);
   const name = s ? s.name : 'Skills Test';
-  if (s) { s.status = 'Draft'; renderAdminSkillsList(); }
+  if (s) { s.status = 'Offline'; renderAdminSkillsList(); } /* Offline: like Draft → Edit, Publish, Delete (same as Admin Portal Training) */
   closeTakeOfflineModal();
-  showToast(`Successfully took offline "${name}" Skills Test`);
+  showToast(`Successfully took offline “${name}” Skills Test`);
 }
 
 function deleteAdminSkill(id) {
@@ -4504,18 +4490,6 @@ function renderAgentProfile(agent) {
                   </div>
                 </div>
                 <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
-                <div style="position:relative" id="ap-proctor-wrap">
-                  <button type="button" id="ap-proctor-trigger"
-                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ap-proctor-dropdown"
-                    onclick="event.stopPropagation(); toggleApProcFilter()">
-                    <span id="ap-proctor-label" style="color:#030712;font-size:14px;font-family:var(--font-sans)">All proctoring</span>
-                    <svg id="ap-proctor-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform 0.15s;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
-                  <div id="ap-proctor-dropdown" role="listbox" aria-label="Filter by proctoring" hidden>
-                    <div id="ap-proctor-options" style="padding:4px 0"></div>
-                  </div>
-                </div>
-                <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
                 <div style="display:flex;align-items:center;gap:8px">
                 <div style="position:relative" id="ap-cat-wrap">
                   <button type="button" id="ap-cat-trigger"
@@ -4545,7 +4519,6 @@ function renderAgentProfile(agent) {
                 <tr style="background:#F9FAFB;border-bottom:1px solid #E5E7EB">
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Name</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Test method</th>
-                  <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280;width:96px">Proctored</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Category</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Status</th>
                   <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:#6B7280">Result</th>
@@ -4920,7 +4893,7 @@ function renderSkillsTestRows(tests, filter, search, catFilter, page) {
   const pageRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   if (!pageRows.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="padding:28px;text-align:center;font-size:14px;color:#6B7280">No tests found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:28px;text-align:center;font-size:14px;color:#6B7280">No tests found</td></tr>`;
     renderApPagination(0, 1, 1);
     return;
   }
@@ -4943,7 +4916,6 @@ function renderSkillsTestRows(tests, filter, search, catFilter, page) {
     return `<tr style="${trStyle}" ${trAttrs}>
       <td style="padding:13px 16px;font-size:14px;color:#030712;font-weight:500;${tdBorder}">${nameCell}</td>
       <td style="padding:13px 16px;font-size:14px;color:#374151;white-space:nowrap;${tdBorder}">${methodLabel}</td>
-      <td style="padding:13px 16px;font-size:14px;color:#374151;${tdBorder}">${t.proctored ? 'Yes' : 'No'}</td>
       <td style="padding:13px 16px;font-size:14px;color:#374151;${tdBorder}">${t.category}</td>
       <td style="padding:13px 16px;${tdBorder}">
         <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:${passed?'#E9FEF9':'#F3F4F6'};color:${passed?'#007460':'#374151'};font-size:12px;font-weight:500">
@@ -6136,7 +6108,7 @@ function submitAddTestModal(status) {
     existing.proctored = proctor;
     closeAddTestModal();
     renderAdminSkillsList();
-    showToast('Successfully updated "' + name + '" Skills Test', 'success');
+    showToast('Successfully updated “' + name + '” Skills Test', 'success');
     return;
   }
   adminSkills.unshift({
@@ -6148,8 +6120,8 @@ function submitAddTestModal(status) {
   adminSkillsState.page = 1;
   renderAdminSkillsList();
   const msg = status === 'Draft'
-    ? 'Successfully saved "' + name + '" Skills Test'
-    : 'Successfully published "' + name + '" Skills Test';
+    ? 'Successfully saved “' + name + '” Skills Test'
+    : 'Successfully published “' + name + '” Skills Test';
   showToast(msg, status === 'Draft' ? 'draft' : 'success');
 }
 
@@ -6936,7 +6908,7 @@ function simStart(){
   simStepIndex = 0;
   simSeedData();
   go('add-sim');
-  const t = document.getElementById('sim-title-name'); if (t) t.textContent = window._simName || 'Untitled simulation';
+  const t = document.getElementById('sim-title-name'); if (t) t.textContent = window._simName || 'Untitled test';
   const badge = document.getElementById('sim-mode-badge'); if (badge) badge.textContent = SIM_MODE_LABEL[simMode()];
   const sub = document.getElementById('sim-subtitle'); if (sub) sub.textContent = SIM_MODE_DESC[simMode()] + ' to assess operational skills.';
   simGoStep(0);
@@ -7867,9 +7839,8 @@ function simProtoRender(){
 const ATS1_TOUCHED = {};
 function ats1FieldErr(el){
   const v = (el.value || '').trim(), id = el.id;
-  if (!v) return (el.getAttribute('data-req') || 'This field') + ' is required.';
-  if (id === 'ats1-threshold'){ const n = Number(v); if (isNaN(n) || n < 0 || n > 100) return 'Enter a value between 0 and 100.'; }
-  if (id === 'ats1-duration'){ const n = Number(v); if (isNaN(n) || n < 1 || Math.floor(n) !== n) return 'Enter a whole number of minutes (1 or more).'; }
+  if (!v) return 'This field is required.'; /* Figma B1/B4 copy */
+  /* threshold: input is limited to 0–100, so no range error (Figma B5 note) */ if (id === 'ats1-duration'){ const n = Number(v); /* duration: limited in the input (whole numbers from 1, no max), so no range error (Mai, 11 Nov) */ }
   return '';
 }
 function ats1SetErr(anchor, ctrl, msg){
@@ -8318,7 +8289,7 @@ function skillStep1(){
     name: v('ats1-name'), description: v('ats1-desc'), format: v('ats1-format'),
     modality: ats1ModalityVal || '', category: ats1CatVal || '',
     proctored: pr ? pr.value === 'yes' : false,
-    stepThreshold: parseInt(v('ats1-threshold'), 10) || 80, duration: parseInt(v('ats1-duration'), 10) || 20,
+    stepThreshold: v('ats1-threshold') === '' ? null : parseInt(v('ats1-threshold'), 10), duration: v('ats1-duration') === '' ? null : parseInt(v('ats1-duration'), 10),
     engine: ats1Engine === 'sim' ? 'sim' : 'typeform', simMode: ats1SimMode || 'audio', typeformUrl: v('ats1-typeform-url')
   };
 }
@@ -8332,9 +8303,7 @@ function skillUpsert(status, fromWizard){
   const passRate = isSim && fromWizard ? simPassVal() : '';
   const rec = Object.assign({}, prev || {}, f, {
     id: prev ? prev.id : (isSim ? 'sim-' : 'ats-') + Date.now(),
-    name: f.name || 'Untitled test',
-    category: f.category || 'Customer service',
-    format: f.format || (isSim ? 'Interactive simulation' : 'Multiple Choice Questionnaire'),
+    name: f.name, category: f.category, format: f.format, /* empty fields stay empty (Mai 11 Nov): table shows 'Untitled test' / '—' */
     threshold: isSim && fromWizard && passRate !== '' ? Number(passRate) : (isSim && prev && prev.sim ? prev.threshold : f.stepThreshold),
     status: status,
     createdAt: prev ? prev.createdAt : new Date().toISOString(),
@@ -8344,11 +8313,19 @@ function skillUpsert(status, fromWizard){
   window._editingSkillId = null;
   return rec;
 }
-function skillFinish(rec, verb){
-  skillExitView();
-  go('admin-skills-center'); renderAdminSkillsList();
-  if (typeof showToast === 'function') showToast('“' + rec.name + '” ' + verb);
+function skillFinish(rec, verb){ skillExitView(); go('admin-skills-center'); renderAdminSkillsList(); if (typeof showToast === 'function') showToast(/publish/.test(verb) ? 'Successfully published “' + (rec.name || 'Untitled test') + '” Skills Test' : 'Successfully saved “' + (rec.name || 'Untitled test') + '” Skills Test'); }
+/* Request in progress (Figma S12a/S12b, 11 Nov): clicked button shows a spinner, other footer buttons are disabled until the request finishes */
+function skillWithLoading(btn, fn){
+  if (!btn){ fn(); return; } if (btn.dataset.loading) return;
+  const sec = btn.closest('section') || document;
+  const others = [].slice.call(sec.querySelectorAll('button')).filter(function(b){ return b !== btn && b.offsetParent && /^(Back|Back to Test library|Save as draft|Publish|Next|Save & Next)$/.test(b.textContent.trim()); });
+  const html = btn.innerHTML; btn.dataset.loading = '1'; btn.disabled = true; btn.style.cursor = 'progress';
+  btn.innerHTML = '<svg class="sk-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>' + html;
+  others.forEach(function(b){ b.dataset.prevDis = b.disabled ? '1' : ''; b.disabled = true; b.dataset.prevOp = b.style.opacity; b.style.opacity = '0.5'; });
+  if (!document.getElementById('sk-spin-css')){ const st = document.createElement('style'); st.id = 'sk-spin-css'; st.textContent = '@keyframes skspin{to{transform:rotate(360deg)}}.sk-spin{animation:skspin .8s linear infinite;flex-shrink:0}'; document.head.appendChild(st); }
+  setTimeout(function(){ btn.innerHTML = html; btn.disabled = false; btn.style.cursor = ''; delete btn.dataset.loading; others.forEach(function(b){ b.disabled = b.dataset.prevDis === '1'; b.style.opacity = b.dataset.prevOp || ''; }); fn(); }, 900);
 }
+
 
 /* ---------- headings ---------- */
 function skillSetHeading(sectionId, text){
@@ -8371,6 +8348,7 @@ function skillHeadings(){
 /* ---------- new / edit ---------- */
 function skillNew(){
   window._editingSkillId = null; skillExitView();
+  { const on = document.getElementById('ats1-offline-note'); if (on) on.hidden = true; }
   go('add-test-step1');
   atsProtoReset();
   skillHeadings();
@@ -8382,16 +8360,17 @@ function skillEdit(id){
   go('add-test-step1');
   ats1SetText('ats1-name', rec.name || '', 60);
   ats1SetText('ats1-desc', rec.description || '', 100);
-  ats1SetText('ats1-format', rec.format || 'Multiple Choice Questionnaire', 60);
-  ats1SetSelect('modality', rec.modality || (typeof inferSkillModality === 'function' ? (inferSkillModality(rec) || '') : ''));
+  ats1SetText('ats1-format', rec.format !== undefined ? (rec.format || '') : 'Multiple Choice Questionnaire', 60);
+  ats1SetSelect('modality', rec.modality !== undefined ? (rec.modality || '') : (typeof inferSkillModality === 'function' ? (inferSkillModality(rec) || '') : ''));
   ats1SetSelect('cat', rec.category || '');
   document.querySelectorAll('input[name="ats1-proctor"]').forEach(function(r){ r.checked = rec.proctored ? r.value === 'yes' : r.value === 'no'; });
-  const th = document.getElementById('ats1-threshold'); if (th) th.value = rec.stepThreshold || rec.threshold || 80;
-  const du = document.getElementById('ats1-duration'); if (du) du.value = rec.duration || 20;
+  const th = document.getElementById('ats1-threshold'); if (th) th.value = rec.stepThreshold !== undefined ? (rec.stepThreshold == null ? '' : rec.stepThreshold) : (rec.threshold || 80);
+  const du = document.getElementById('ats1-duration'); if (du) du.value = rec.duration === null ? '' : (rec.duration || 20);
   ats1SelectEngine(rec.engine === 'sim' ? 'sim' : 'typeform');
   if (rec.engine === 'sim') ats1PickSimMode(rec.simMode || 'audio');
   const u = document.getElementById('ats1-typeform-url'); if (u){ u.value = rec.typeformUrl || ''; ats1ValidateTypeform(); }
   ats1ClearErrors(); ats1Update(); skillHeadings();
+  const on = document.getElementById('ats1-offline-note'); if (on) on.hidden = rec.status !== 'Offline';
   window.scrollTo({ top: 0 });
 }
 /* Called from Step 1 "Create test / Continue" for simulations */
@@ -8418,7 +8397,7 @@ function simOpenWith(sim, step){
   SIM_TOUCHED = {};
   simSyncScreens();
   go('add-sim');
-  const t = document.getElementById('sim-title-name'); if (t) t.textContent = window._simName || 'Untitled simulation';
+  const t = document.getElementById('sim-title-name'); if (t) t.textContent = window._simName || 'Untitled test';
   const badge = document.getElementById('sim-mode-badge'); if (badge) badge.textContent = SIM_MODE_LABEL[simMode()];
   const sub = document.getElementById('sim-subtitle'); if (sub) sub.textContent = SIM_MODE_DESC[simMode()] + ' to assess operational skills.';
   simGoStep(step || 0);
@@ -8491,7 +8470,7 @@ function skillTfChrome(){
 function skillDetailsHTML(rec){
   const method = rec.engine === 'sim' ? (SIM_MODE_LABEL[rec.simMode] || 'Simulation') : 'Typeform';
   const rows = [
-    ['Test name', rec.name], ['Status', '<span class="sk-st is-' + (rec.status === 'Published' ? 'pub' : 'draft') + '">' + simEsc(rec.status) + '</span>', true],
+    ['Test name', rec.name], ['Status', '<span class="sk-st is-' + (rec.status === 'Published' ? 'pub' : 'draft') + '">' + simEsc(skillStatusLabel(rec.status)) + '</span>', true],
     ['Description', rec.description || '—'], ['Data Modality / Task Type', rec.modality || (typeof inferSkillModality === 'function' ? inferSkillModality(rec) : '') || '—'],
     ['Format', rec.format || 'Multiple Choice Questionnaire'], ['Test Method', method],
     ['Category', rec.category || '—'],  /* Proctoring row hidden — proctoring postponed (PO, 2026-10-28) */
@@ -8779,7 +8758,7 @@ window.addEventListener('message', function(e){
 /* ---------------- Summary ---------------- */
 function simBodySummary(){
   const counts = simMappedCounts();
-  const rows = [['Title', window._simName || 'Untitled simulation'],['Mode', SIM_MODE_LABEL[simMode()]],['Category', window._simCat || 'Customer service']];
+  const rows = [['Title', window._simName || 'Untitled test'],['Mode', SIM_MODE_LABEL[simMode()]],['Category', window._simCat || 'Customer service']];
   if (simMode() !== 'audio') rows.push(['Screens', SIM_SCREENS.length + ' screens, ' + SIM_SCREENS.reduce(function(a,s){return a+s.hotspots.length;},0) + ' hotspots']);
   if (simMode() !== 'image') rows.push(['Script', SIM_SCRIPT.length + ' lines']);
   if (simMode() === 'audio_image') rows.push(['Mapping', Object.keys(counts).filter(function(k){return counts[k]>0;}).length + ' of ' + SIM_SCREENS.length + ' screens mapped']);
@@ -8905,10 +8884,8 @@ function simAPromptHTML(){
               '<div class="sa-acc-hr"></div><div class="sa-acc-sub">Scoring Rules</div>' + simARef('Click Score Pass Rate', 'Default Threshold: 75%');
   const coach = SIM_REF_COACH.map(function(n){ return simARef(n, ''); }).join('');
   const hasErr = !!SIM_A.error;
-  return simAAccordion('alg', 'Project Algorithms', alg) +
-    simAAccordion('met', 'Project Metrics', met) +
-    simAAccordion('coach', 'Coaching Behaviors', coach) +
-    '<div class="sa-prompt">' +
+  /* Project Algorithms / Project Metrics / Coaching Behaviors reference accordions removed — Marketplace has no projects (PO Pia, 11 Nov) */
+  return '<div class="sa-prompt">' +
       '<div class="sa-ex-l">' + SA_IC.sparkle + 'Example Prompt:</div>' +
       '<div class="sa-ex-t">“Generate a script for customer support on booking a flight ticket on pacific airlines”</div>' +
       '<textarea id="sa-prompt" class="sa-ta' + (hasErr ? ' is-err' : '') + '" placeholder="Generate a script…" aria-label="Script prompt" oninput="simAPromptInput(this)">' + simEsc(SIM_A.prompt) + '</textarea>' +
@@ -9166,11 +9143,11 @@ function simBodyAIScoringAudio(){
   const ex = SIM_AIS.showExample;
   const pr = SIM_AIS.passRate; const prNum = Number(pr);
   const prErr = pr === '' || isNaN(prNum) || prNum < 0 || prNum > 100;
-  const badges = ['🎯 Say what to focus on (e.g., script adherence)','🗣 Define the tone (e.g., casual, encouraging)','💬 Include inline and overall feedback','👤 Address the agent by name if possible']
+  const badges = ['🎯 Say what to focus on (e.g., script adherence)','🗣 Define the tone (e.g., casual, encouraging)','✅ Describe what a strong response includes','👤 Address the agent by name if possible']
     .map(function(b){ return '<span class="ais-badge">' + b + '</span>'; }).join('');
   return simHead('AI Scoring', '') +
     '<div class="ais-panel">' +
-      '<div class="ais-intro">Configure the prompts for both:<ul><li><b>In-line feedback</b> (which appears immediately after the agent’s response during the simulation)</li><li><b>Overall performance assessment</b> (which appears in the test result page)</li></ul></div>' +
+      '<div class="ais-intro">Write the prompt the AI uses to assess the agent’s overall performance. The assessment appears on the test result page.</div>' +
       '<textarea id="ais-prompt" class="ais-ta" aria-label="AI scoring prompt" oninput="simAisInput(this)">' + simEsc(SIM_AIS.prompt) + '</textarea>' +
       '<div class="ais-good">A good prompt should:</div>' +
       '<div class="ais-badges">' + badges + '</div>' +
@@ -9340,7 +9317,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && docu
 /* ---------- Manage specialists ---------- */
 function simAi2OpenManage(keep){
   if (!keep) AI2_PICK = SIM_AI2.specs.slice();
-  const opts = ai2SortedSpecs(Object.keys(AI2_SPECS).map(Number)).map(function(id){
+  const opts = ai2SortedSpecs(Object.keys(AI2_SPECS).map(Number).filter(function(id){ return !AI2_SPECS[id].deleted || AI2_PICK.indexOf(id) >= 0; })).map(function(id){
     const on = AI2_PICK.indexOf(id) >= 0;
     return '<button type="button" class="ai2-opt' + (on ? ' is-on' : '') + '" data-id="' + id + '" aria-pressed="' + on + '" onclick="simAi2Toggle(' + id + ')">' +
       '<span class="ai2-ck">' + AI2_IC.check + '</span><span class="ai2-opt-info"><span class="ai2-opt-n">' + simEsc(AI2_SPECS[id].name) + '</span><span class="ai2-opt-d">' + simEsc(AI2_SPECS[id].desc) + '</span></span></button>';
@@ -9378,7 +9355,7 @@ function simAi2ApplyManage(){
 /* ---------- Select evaluator ---------- */
 function simAi2OpenEval(keep){
   if (!keep) AI2_EVPICK = SIM_AI2.ev;
-  const opts = Object.keys(AI2_EVALS).map(Number).map(function(id){
+  const opts = Object.keys(AI2_EVALS).map(Number).filter(function(id){ return !AI2_EVALS[id].deleted || AI2_EVPICK === id; }).map(function(id){
     const on = AI2_EVPICK === id;
     return '<button type="button" class="ai2-opt' + (on ? ' is-on' : '') + '" data-ev="' + id + '" role="radio" aria-checked="' + on + '" onclick="simAi2PickEval(' + id + ')">' +
       '<span class="ai2-rd"></span><span class="ai2-opt-info"><span class="ai2-opt-n">' + simEsc(AI2_EVALS[id].name) + '</span><span class="ai2-opt-d">' + simEsc(AI2_EVALS[id].desc) + '</span></span></button>';
@@ -10240,8 +10217,8 @@ textarea.is-err:focus,input.is-err:focus{box-shadow:0 0 0 4px rgba(240,68,56,.12
 
 
 /* ---------------- save / publish ---------------- */
-function simSaveDraft(){ skillFinish(skillUpsert('Draft', true), 'saved as draft'); }
-function simPublish(){ skillFinish(skillUpsert('Published', true), 'published successfully'); }
+function simSaveDraft(){ skillWithLoading(document.querySelector('#add-sim button[onclick="simSaveDraft()"]'), function(){ skillFinish(skillUpsert('Draft', true), 'saved as draft'); }); }
+function simPublish(){ skillWithLoading(document.getElementById('sim-primary'), function(){ skillFinish(skillUpsert('Published', true), 'published successfully'); }); }
 
 
 </script>
@@ -10405,20 +10382,6 @@ function simPublish(){ skillFinish(skillUpsert('Published', true), 'published su
         <p id="atm-name-err" class="hidden text-xs text-red-600 mt-1">Test name is required.</p>
       </div>
 
-      <!-- Proctoring — 2 rows -->
-      <div>
-        <div class="text-xs font-medium text-foreground mb-2">Is Proctoring Required for this Exam?</div>
-        <div class="flex flex-col gap-2">
-          <label class="atm-proctor-option flex items-center gap-2 cursor-pointer text-sm text-gray-700 select-none">
-            <input type="radio" name="atm-proctor" value="yes">
-            Yes, require camera monitoring
-          </label>
-          <label class="atm-proctor-option flex items-center gap-2 cursor-pointer text-sm text-gray-700 select-none">
-            <input type="radio" name="atm-proctor" value="no" checked>
-            No, open environment submission
-          </label>
-        </div>
-      </div>
 
       <!-- Data Modality / Task Type -->
       <div>
@@ -11144,8 +11107,8 @@ function ailRec(kind, id){ return kind === 's' ? AI2_SPECS[id] : AI2_EVALS[id]; 
 function ailCur(rec){ return rec.versions[rec.versions.length - 1]; }
 function ailAll(){
   const out = [];
-  Object.keys(AI2_SPECS).forEach(function(id){ out.push({ kind: 's', id: Number(id), rec: AI2_SPECS[id] }); });
-  Object.keys(AI2_EVALS).forEach(function(id){ out.push({ kind: 'e', id: Number(id), rec: AI2_EVALS[id] }); });
+  Object.keys(AI2_SPECS).forEach(function(id){ if (!AI2_SPECS[id].deleted) out.push({ kind: 's', id: Number(id), rec: AI2_SPECS[id] }); });
+  Object.keys(AI2_EVALS).forEach(function(id){ if (!AI2_EVALS[id].deleted) out.push({ kind: 'e', id: Number(id), rec: AI2_EVALS[id] }); });
   return out;
 }
 function ailRoleLabel(k){ return k === 's' ? 'Specialist' : 'Evaluator'; }
@@ -11181,8 +11144,9 @@ function ailRenderList(){
         '<button type="button" class="ellipsis-trigger inline-flex items-center justify-center rounded-md text-gray-500 h-8 w-8 hover:bg-gray-100" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-row-menu-ail' + key + '" aria-label="Actions for ' + simEsc(r.name) + '" onclick="event.stopPropagation(); toggleRowMenu(\'ail' + key + '\')">' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>' +
         '<div id="admin-row-menu-ail' + key + '" role="menu" class="ellipsis-menu text-left" hidden>' +
-          '<button type="button" role="menuitem" class="ellipsis-menu-item" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenView(\'' + a.kind + '\',' + a.id + ')">View</button>' +
-          '<button type="button" role="menuitem" class="ellipsis-menu-item" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenEdit(\'' + a.kind + '\',' + a.id + ')">Edit</button>' +
+          '<button type="button" role="menuitem" class="ellipsis-menu-item" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenView(\'' + a.kind + '\',' + a.id + ')">' + MENU_IC.eye + 'View</button>' +
+          '<button type="button" role="menuitem" class="ellipsis-menu-item" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenEdit(\'' + a.kind + '\',' + a.id + ')">' + MENU_IC.pencil + 'Edit</button>' +
+          '<button type="button" role="menuitem" class="ellipsis-menu-item danger" onclick="event.stopPropagation(); closeAllRowMenus(); ailOpenDelete(\'' + a.kind + '\',' + a.id + ')">' + MENU_IC.trash + 'Delete</button>' +
         '</div></td></tr>';
   }).join('');
 }
@@ -11522,5 +11486,328 @@ function ai2PromptHTML(kind, id, ro){
 }
 </script>
 
+<style id="del-inv-styles">
+/* ---- Confirm dialog (DS Dialog MP · Destructive stacked left aligned) ---- */
+.cf-m{background:#fff;border-radius:16px;width:400px;max-width:100%;padding:24px;box-shadow:0 20px 24px -4px rgba(16,24,40,.08),0 8px 8px -4px rgba(16,24,40,.03);position:relative}
+.cf-x{position:absolute;top:16px;right:16px;width:28px;height:28px;border:none;background:none;border-radius:6px;color:#6B7280;cursor:pointer;display:grid;place-items:center}
+.cf-x:hover{background:#F3F4F6}
+.cf-ic{width:48px;height:48px;border-radius:999px;background:#FEF3F2;color:#D92D20;display:grid;place-items:center;margin-bottom:16px}
+.cf-ic.is-brand{background:#E9FEF9;color:#007460}
+.cf-t{font-size:16px;font-weight:500;color:#111827;line-height:24px}
+.cf-d{font-size:14px;color:#4B5563;line-height:20px;margin-top:4px}
+.cf-act{display:flex;gap:12px;margin-top:24px}
+.cf-btn{flex:1;height:44px;border-radius:999px;font-size:16px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid #D0D5DD;background:#fff;color:#111827}
+.cf-btn:hover{background:#F9FAFB}
+.cf-btn.is-danger{background:#FEF3F2;border-color:#FDA29B;color:#D92D20}
+.cf-btn.is-danger:hover{background:#FEE4E2}
+.cf-btn.is-primary{border:none;color:#fff;background:linear-gradient(90deg,#007A5E 0%,#1C4FA0 100%)}
+.cf-btn.is-primary:disabled{opacity:.45;cursor:not-allowed}
+.cf-btn:disabled{cursor:not-allowed}
+/* ---- Invite agents ---- */
+.inv-m{width:560px}
+.inv-dz{margin-top:20px;border:1px solid #E5E7EB;border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .12s,background .12s}
+.inv-dz:hover,.inv-dz.is-over{border-color:#5FCEB1;background:#F0FDF9}
+.inv-dz-ic{width:36px;height:36px;margin:0 auto 12px;border:1px solid #E5E7EB;border-radius:8px;display:grid;place-items:center;color:#374151;background:#fff}
+.inv-dz-t{font-size:14px;color:#4B5563}.inv-dz-t b{color:#007460;font-weight:500}
+.inv-dz-h{font-size:12px;color:#6B7280;margin-top:4px}
+.inv-file{margin-top:20px;border:1px solid #E5E7EB;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start}
+.inv-file.is-err{border-color:#F04438}
+.inv-file + .inv-file,.inv-dz + .inv-file{margin-top:16px}
+.inv-fic{width:32px;height:40px;flex-shrink:0;display:grid;place-items:center}
+.inv-fb{flex:1;min-width:0}
+.inv-fn{font-size:14px;font-weight:500;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inv-fs{font-size:14px;color:#6B7280;margin-top:2px}
+.inv-fe{font-size:14px;color:#6B7280;margin-top:2px}
+.inv-bar{height:8px;border-radius:999px;background:#F3F4F6;margin-top:8px;overflow:hidden}.inv-bar i{display:block;height:100%;background:#5046E6;border-radius:999px;transition:width .12s linear}
+.inv-rm{font-size:14px;font-weight:500;color:#111827;background:none;border:none;padding:0;margin-top:8px;cursor:pointer;font-family:inherit}
+.inv-rm:hover{text-decoration:underline}
+.inv-del{width:28px;height:28px;border:none;background:none;border-radius:6px;color:#374151;cursor:pointer;display:grid;place-items:center;flex-shrink:0}
+.inv-del:hover{background:#F3F4F6}
+.inv-tpl{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-size:14px;font-weight:500;color:#007460;background:none;border:none;padding:0;cursor:pointer;font-family:inherit}
+.inv-tpl:hover{text-decoration:underline}
+.inv-alert{margin-top:20px;border:1px solid #FDA29B;background:#FEF3F2;border-radius:8px;padding:12px 16px;display:flex;gap:12px}
+.inv-alert svg{color:#D92D20;flex-shrink:0;margin-top:2px}
+.inv-alert b{display:block;font-size:14px;font-weight:500;color:#111827}
+.inv-alert span{display:block;font-size:13px;color:#4B5563;margin-top:2px}
+.inv-tbl{margin-top:16px;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;max-height:300px;overflow-y:auto}
+.inv-tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.inv-tbl th{background:#F9FAFB;text-align:left;font-size:12px;font-weight:500;color:#4B5563;padding:10px 12px;position:sticky;top:0}
+.inv-tbl td{padding:10px 12px;border-top:1px solid #F3F4F6;color:#111827}
+.inv-tbl td:first-child,.inv-tbl th:first-child{width:52px}
+.inv-st{display:inline-flex;align-items:center;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;white-space:nowrap}
+.inv-st.ok{background:#F3F4F6;color:#374151}.inv-st.bad{background:#FEF3F2;color:#D92D20}
+.toast.has-desc{align-items:flex-start}.toast .toast-desc{display:block;font-size:13px;font-weight:400;color:#4B5563;margin-top:2px}
+</style>
+<script>
+/* ================================================================
+   AI Assistant Library — Delete (Pia, 11 Nov: same as production Admin Portal:
+   confirm → permanent delete → success toast; no archive).
+   Deleted assistants disappear from the library and the pickers. Simulations that
+   already use one keep their reference (open PO question — what should happen).
+================================================================ */
+const CF_IC = { trash: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
+  x: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  userPlus: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+  upload: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  download: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  bin: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  alert: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  csv: '<svg width="32" height="40" viewBox="0 0 32 40" fill="none" aria-hidden="true"><path d="M4 0.75h16.7L31.25 11.3V36A3.25 3.25 0 0 1 28 39.25H4A3.25 3.25 0 0 1 .75 36V4A3.25 3.25 0 0 1 4 .75Z" fill="#fff" stroke="#D0D5DD" stroke-width="1.5"/><path d="M20.5 1v7.5A3 3 0 0 0 23.5 11.5H31" stroke="#D0D5DD" stroke-width="1.5"/><rect x="7" y="19" width="18" height="12" rx="2" stroke="#079455" stroke-width="1.6"/><line x1="7" y1="23" x2="25" y2="23" stroke="#079455" stroke-width="1.6"/><line x1="13" y1="23" x2="13" y2="31" stroke="#079455" stroke-width="1.6"/></svg>'
+};
+function cfModal(inner, cls){
+  if (typeof simEnsureStyles === 'function') simEnsureStyles();
+  cfClose();
+  const bd = document.createElement('div'); bd.id = 'cf-modal'; bd.className = 'ail-bd';
+  bd.innerHTML = '<div class="cf-m ' + (cls || '') + '" role="dialog" aria-modal="true">' + inner + '</div>';
+  bd.addEventListener('mousedown', function(e){ if (e.target === bd) cfClose(); });
+  document.body.appendChild(bd);
+}
+function cfClose(){ const m = document.getElementById('cf-modal'); if (m) m.remove(); }
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && document.getElementById('cf-modal')) cfClose(); });
+
+function ailOpenDelete(kind, id){
+  const r = ailRec(kind, id); if (!r) return;
+  cfModal('<button type="button" class="cf-x" aria-label="Close" onclick="cfClose()">' + CF_IC.x + '</button>' +
+    '<div class="cf-ic">' + CF_IC.trash + '</div>' +
+    '<div class="cf-t">Delete assistant?</div>' +
+    '<div class="cf-d">Are you sure you want to delete “' + simEsc(r.name) + '”? This action can’t be undone.</div>' +
+    '<div class="cf-act"><button type="button" class="cf-btn" onclick="cfClose()">Cancel</button>' +
+    '<button type="button" class="cf-btn is-danger" onclick="ailConfirmDelete(\'' + kind + '\',' + id + ')">Delete</button></div>');
+}
+function ailConfirmDelete(kind, id){
+  const r = ailRec(kind, id); if (!r) return;
+  r.deleted = true;
+  cfClose(); ailRenderList();
+  showToast('Successfully deleted “' + r.name + '”');
+}
+
+/* ================================================================
+   Skills test library — Invite agents (Figma 982:117063, page "V2 - Invite /Enroll agents")
+   S2 row ⋯ › Invite agents → S3 upload CSV → S4 uploading → S5 ready ("N agents found") → Send invites → S6 toast
+   S4a wrong type / > 2 MB · S5a row check (missing / invalid email, no Marketplace account, already invited)
+================================================================ */
+const INV_MAX = 2 * 1024 * 1024;
+const INV_NO_ACCOUNT = ['willie.jennings@example.com'];           /* mock: emails with no Marketplace account */
+const INV_SENT = { 'Coding Fundamentals': ['ruth.padilla@example.com'] }; /* mock: already invited, per test */
+let INV = null;
+function invOpen(testId){
+  const t = (typeof adminSkills !== 'undefined') ? adminSkills.find(function(x){ return x.id === testId; }) : null;
+  INV = { test: t ? t.name : 'this test', state: 'empty', file: null, rows: [], ok: 0, prog: 0 };
+  invRender();
+}
+function invHead(desc){
+  return '<button type="button" class="cf-x" aria-label="Close" onclick="invClose()">' + CF_IC.x + '</button>' +
+    '<div class="cf-ic is-brand">' + CF_IC.userPlus + '</div><div class="cf-t">Invite agents</div><div class="cf-d">' + desc + '</div>';
+}
+function invKB(b){ return Math.max(1, Math.round(b / 1024)) + ' KB'; }
+function invRender(){
+  const v = INV; if (!v) return;
+  const intro = 'Invite agents to take ' + simEsc(v.test) + '. Upload a CSV with one agent email per row — each agent gets an email invite and the test appears in their Skills Center.';
+  const dz = '<div class="inv-dz" id="inv-dz" role="button" tabindex="0" onclick="invPick()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();invPick();}" ondragover="event.preventDefault();this.classList.add(\'is-over\')" ondragleave="this.classList.remove(\'is-over\')" ondrop="invDrop(event)">' +
+    '<div class="inv-dz-ic">' + CF_IC.upload + '</div><div class="inv-dz-t"><b>Click to upload</b> or drag and drop</div><div class="inv-dz-h">CSV only · one email per row · max. 2 MB</div></div>';
+  const tpl = '<button type="button" class="inv-tpl" onclick="invTemplate()">' + CF_IC.download + 'Download CSV template</button>';
+  let body = '', act = '';
+  if (v.state === 'rows'){
+    const bad = v.rows.filter(function(r){ return r.status !== 'Ready'; }).length;
+    body = invHead('We checked ' + simEsc(v.file.name) + ' and found issues in ' + bad + ' row' + (bad === 1 ? '' : 's') + '. No invites were sent — fix ' + (bad === 1 ? 'this row' : 'these rows') + ' in your CSV and upload it again.') +
+      '<div class="inv-alert" role="alert">' + CF_IC.alert + '<div><b>' + bad + ' of ' + v.rows.length + ' rows need attention</b><span>Each row needs a valid email of an agent with a Marketplace account who hasn’t been invited to this test yet.</span></div></div>' +
+      '<div class="inv-tbl"><table><thead><tr><th>Row</th><th>Agent email</th><th>Status</th></tr></thead><tbody>' +
+      v.rows.map(function(r){ return '<tr><td>' + r.row + '</td><td>' + (r.email ? simEsc(r.email) : '—') + '</td><td><span class="inv-st ' + (r.status === 'Ready' ? 'ok' : 'bad') + '">' + r.status + '</span></td></tr>'; }).join('') +
+      '</tbody></table></div>';
+    act = '<button type="button" class="cf-btn" onclick="invClose()">Cancel</button><button type="button" class="cf-btn is-primary" onclick="invReset(true)">Upload new file</button>';
+  } else {
+    body = invHead(intro);
+    if (v.state === 'empty') body += dz;
+    else if (v.state === 'invalid') body += dz + '<div class="inv-file is-err"><div class="inv-fic">' + CF_IC.csv + '</div><div class="inv-fb"><div class="inv-fn">' + simEsc(v.file.name) + '</div><div class="inv-fe">' + v.err + '</div><button type="button" class="inv-rm" onclick="invReset()">Remove file</button></div></div>';
+    else {
+      const sub = v.state === 'uploading' ? invKB(v.file.size * v.prog) + ' of ' + invKB(v.file.size) : invKB(v.file.size) + ' · ' + v.ok + ' agent' + (v.ok === 1 ? '' : 's') + ' found';
+      body += '<div class="inv-file"><div class="inv-fic">' + CF_IC.csv + '</div><div class="inv-fb"><div class="inv-fn">' + simEsc(v.file.name) + '</div><div class="inv-fs" id="inv-fs">' + sub + '</div>' +
+        (v.state === 'uploading' ? '<div class="inv-bar"><i id="inv-bar" style="width:' + Math.round(v.prog * 100) + '%"></i></div>' : '') + '</div>' +
+        '<button type="button" class="inv-del" aria-label="Remove file" onclick="invReset()">' + CF_IC.bin + '</button></div>';
+    }
+    body += tpl;
+    act = '<button type="button" class="cf-btn" onclick="invClose()">Cancel</button><button type="button" class="cf-btn is-primary" onclick="invSend()"' + (v.state === 'ready' ? '' : ' disabled') + '>Send invites</button>';
+  }
+  const had = !!document.getElementById('cf-modal');
+  cfModal(body + '<div class="cf-act">' + act + '</div>', 'inv-m');
+  if (had){ const m = document.getElementById('cf-modal'); if (m) m.style.animation = 'none'; }
+}
+function invClose(){ INV = null; cfClose(); }
+function invPick(){
+  const i = document.createElement('input'); i.type = 'file'; i.accept = '.csv,text/csv';
+  i.onchange = function(){ if (i.files && i.files[0]) invFile(i.files[0]); };
+  i.click();
+}
+function invDrop(e){ e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) invFile(f); }
+function invReset(pick){ if (!INV) return; INV.state = 'empty'; INV.file = null; INV.rows = []; invRender(); if (pick) invPick(); }
+function invFile(f){
+  const v = INV; if (!v) return;
+  v.file = { name: f.name, size: f.size };
+  if (!/\.csv$/i.test(f.name) || f.size > INV_MAX){ v.state = 'invalid'; v.err = 'Upload failed. Only .csv files up to 2 MB are supported.'; invRender(); return; }
+  v.state = 'uploading'; v.prog = 0; invRender();
+  const reader = new FileReader();
+  reader.onload = function(){
+    const text = String(reader.result || '');
+    const tick = function(){
+      if (INV !== v || v.state !== 'uploading') return;
+      v.prog = Math.min(1, v.prog + 0.2);
+      const bar = document.getElementById('inv-bar'), fs = document.getElementById('inv-fs');
+      if (bar) bar.style.width = Math.round(v.prog * 100) + '%';
+      if (fs) fs.textContent = invKB(v.file.size * v.prog) + ' of ' + invKB(v.file.size);
+      if (v.prog < 1) setTimeout(tick, 180); else invCheck(text);
+    };
+    setTimeout(tick, 180);
+  };
+  reader.readAsText(f);
+}
+function invCheck(text){
+  const v = INV; if (!v) return;
+  const lines = text.replace(/\r/g, '').split('\n');
+  let start = 0; if (lines.length && /e-?mail/i.test(lines[0])) start = 1;   /* header row */
+  const sent = INV_SENT[v.test] || [], seen = {};
+  const rows = [];
+  for (let i = start; i < lines.length; i++){
+    const raw = lines[i]; if (!raw.trim() && i === lines.length - 1) continue;   /* trailing newline */
+    const email = (raw.split(',')[0] || '').trim().replace(/^"|"$/g, '');
+    let status = 'Ready';
+    const low = email.toLowerCase();
+    if (!email) status = 'Missing email';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) status = 'Invalid email format';
+    else if (INV_NO_ACCOUNT.indexOf(low) >= 0) status = 'No Marketplace account';
+    else if (sent.indexOf(low) >= 0 || seen[low]) status = 'Already invited';
+    if (email) seen[low] = true;
+    rows.push({ row: i + 1, email: email, status: status });
+  }
+  if (!rows.length){ v.state = 'invalid'; v.err = 'This file has no agent emails. Add one email per row and upload it again.'; invRender(); return; }
+  v.rows = rows; v.ok = rows.filter(function(r){ return r.status === 'Ready'; }).length;
+  v.state = v.ok === rows.length ? 'ready' : 'rows';
+  invRender();
+}
+async function invTemplate(){
+  const csv = 'email\nagent.one@example.com\nagent.two@example.com\n';
+  /* published artifact: the viewer only allows saves through the downloads capability */
+  try {
+    const dl = (window.claude && typeof window.claude.use === 'function') ? await window.claude.use('downloads') : null;
+    if (dl){ try { await dl.save({ filename: 'invite-agents-template.csv', data: csv }); } catch(e){} return; }
+  } catch(e){}
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'invite-agents-template.csv';
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function invSend(){
+  const v = INV; if (!v || v.state !== 'ready') return;
+  const list = INV_SENT[v.test] || (INV_SENT[v.test] = []);
+  v.rows.forEach(function(r){ list.push(r.email.toLowerCase()); });
+  const n = v.ok, test = v.test;
+  invClose();
+  invToast('Invites sent to ' + n + ' agent' + (n === 1 ? '' : 's'), 'They’ll get an email, and ' + test + ' now shows in their Skills Center.');
+}
+function invToast(title, desc){
+  showToast(title);
+  const c = document.getElementById('toast-container'); const t = c && c.lastElementChild; if (!t) return;
+  t.classList.add('has-desc');
+  const m = t.querySelector('.toast-message'); if (m){ const d = document.createElement('span'); d.className = 'toast-desc'; d.textContent = desc; m.appendChild(d); }
+}
+</script>
+
+
+<script id="nov11-leave-draft">
+/* 11 Nov (PO tickets AOP-9579/9589/9600): Save as draft follows the same enabled state as Create test / Save & Next,
+   and leaving the Add Skills Test page or the wizard with unsaved changes asks "Leave without saving?" (Figma U1 / U2). */
+(function(){
+  function setBtn(b, ok){ if (!b) return; b.disabled = !ok; b.style.opacity = ok ? '' : '0.4'; b.style.cursor = ok ? '' : 'not-allowed'; }
+  const _ats1Update = window.ats1Update;
+  window.ats1Update = ats1Update = function(){ _ats1Update.apply(this, arguments);
+    /* Mai 11 Nov: Save as draft is enabled once at least one field on the page has been filled (prefilled defaults don't count) */
+    setBtn(document.querySelector('#add-test-step1 button[onclick="ats1SaveDraft()"]'), !ats1IsEmpty()); };
+  const _simUpdateFooter = window.simUpdateFooter;
+  window.simUpdateFooter = simUpdateFooter = function(){ _simUpdateFooter.apply(this, arguments);
+    const d = document.querySelector('#add-sim button[onclick="simSaveDraft()"]');
+    if (d && !d.dataset.loading) setBtn(d, true); /* Mai 11 Nov: from step 2 onwards Save as draft is always enabled */ };
+  /* per wizard step: is anything entered on this page? */
+  function simPageHasInput(){
+    const step = simSteps()[simStepIndex];
+    if (step === 'Overview') return !!((SIM_OVERVIEW.overview || '').trim() || (SIM_OVERVIEW.instructions || '').trim() || SIM_OVERVIEW.video);
+    if (step === 'Images') return SIM_IMGS.length > 0;
+    if (step === 'Script & Audio') return !!((SIM_A.prompt || '').trim() || SIM_ALINES.length);
+    if (step === 'AI Scoring') return simMode() === 'audio' ? !!(SIM_AIS.prompt || '').trim() : (SIM_AI2.specs.length > 0 || SIM_AI2.ev != null);
+    return true;
+  }
+  document.addEventListener('input', function(e){ if (e.target.closest && e.target.closest('#add-sim')) setTimeout(function(){ try { simUpdateFooter(); } catch(_){} }, 0); });
+
+  /* ---- leave without saving ---- */
+  const FLOW = ['add-test-step1', 'add-test-step2', 'add-sim'];
+  const L = { dirty:false, bypass:false, pending:null };
+  window._leaveState = L;
+  function markDirty(e){ if (window._simView) return; const sec = e.target.closest && e.target.closest('#add-test-step1, #add-test-step2, #add-sim'); if (sec) L.dirty = true; }
+  document.addEventListener('input', markDirty, true);
+  document.addEventListener('change', markDirty, true);
+  document.addEventListener('click', function(e){ const t = e.target.closest && e.target.closest('#add-test-step1 [onclick*="ats1SelectEngine"], #add-test-step1 [onclick*="ats1PickSimMode"], #add-sim .sim-body button, #add-sim #sim-body button'); if (t && !window._simView) L.dirty = true; }, true);
+  const _go = window.go;
+  window.go = go = function(screen){
+    let cur; try { cur = state.current; } catch(_) { cur = null; }
+    if (!L.bypass && L.dirty && FLOW.indexOf(cur) >= 0 && FLOW.indexOf(screen) < 0 && !window._simView){ L.pending = screen; openLeave(cur); return; }
+    if (FLOW.indexOf(screen) < 0){ L.dirty = false; }
+    if (FLOW.indexOf(cur) < 0 && screen === 'add-test-step1'){ L.dirty = false; }
+    L.bypass = false;
+    return _go.apply(this, arguments);
+  };
+  /* prototype fill controls count as edits too */
+  ['atsProtoSet', 'simProtoFillAll', 'ats1SelectEngine', 'ats1PickSimMode'].forEach(function(fn){ const o = window[fn]; if (typeof o !== 'function') return;
+    window[fn] = function(){ if (!window._simView && (fn !== 'atsProtoSet' || arguments[0])) L.dirty = true; return o.apply(this, arguments); };
+    try { eval(fn + ' = window.' + fn); } catch(_){} });
+  /* opening a new or existing test starts clean (its own setup calls the wrapped helpers) */
+  ['skillNew', 'skillEdit', 'skillView', 'skillStartSim'].forEach(function(fn){ const o = window[fn]; if (typeof o !== 'function') return;
+    window[fn] = function(){ const wasDirty = L.dirty; const r = o.apply(this, arguments); L.dirty = (fn === 'skillStartSim') ? wasDirty : false; return r; };
+    try { eval(fn + ' = window.' + fn); } catch(_){} });
+  ['skillFinish', 'skillBackToLibrary'].forEach(function(fn){ const o = window[fn]; if (typeof o !== 'function') return;
+    window[fn] = function(){ L.bypass = true; L.dirty = false; try { return o.apply(this, arguments); } finally { L.bypass = false; } };
+    try { eval(fn + ' = window.' + fn); } catch(_){} });
+  function openLeave(cur){
+    let m = document.getElementById('leave-modal');
+    if (!m){ m = document.createElement('div'); m.id = 'leave-modal';
+      m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','leave-title');
+      m.style.cssText = 'position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.5);padding:32px';
+      m.innerHTML = '<div style="background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.15);width:100%;max-width:512px;padding:24px;font-family:inherit">'
+        + '<h2 id="leave-title" style="font-size:18px;line-height:28px;font-weight:500;color:#111827;margin:0 0 8px">Leave without saving?</h2>'
+        + '<p id="leave-body" style="font-size:14px;line-height:20px;color:#4B5563;margin:0;white-space:pre-line"></p>'
+        + '<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">'
+        + '<button type="button" id="leave-keep" class="inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium border border-[#E5E7EB] bg-white text-[#111827] hover:bg-[#F3F4F6]">Keep editing</button>'
+        + '<button type="button" id="leave-go" class="inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium text-white" style="background:#EF4444">Leave</button></div></div>';
+      document.body.appendChild(m);
+      m.addEventListener('click', function(e){ if (e.target === m) closeLeave(); });
+      document.getElementById('leave-keep').onclick = closeLeave;
+      document.getElementById('leave-go').onclick = function(){ const to = L.pending; closeLeave(); L.dirty = false; L.bypass = true; go(to); };
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && document.getElementById('leave-modal').style.display !== 'none') closeLeave(); });
+    }
+    document.getElementById('leave-body').textContent = 'You have unsaved changes to this ' + (cur === 'add-sim' ? 'simulation' : 'skills test') + '. If you leave now, they’ll be lost.\n\nSave it as a draft first if you want to come back to it later.';
+    m.style.display = 'flex'; setTimeout(function(){ document.getElementById('leave-keep').focus(); }, 0);
+  }
+  function closeLeave(){ const m = document.getElementById('leave-modal'); if (m) m.style.display = 'none'; L.pending = null; }
+})();
+</script>
+
+<script id="nov11-number-inputs">
+/* Mai 11 Nov: Passing threshold only accepts 1–100 (anything else isn't registered); Estimated duration accepts digits only
+   (no "-", "+", "e", "." or other symbols) and ignores 0 / a leading 0 (whole numbers from 1, no maximum, no range error). */
+(function(){
+  const BLOCK = ['-', '+', 'e', 'E', '.', ','];
+  function guard(id, max, min1){
+    const el = document.getElementById(id); if (!el) return;
+    let last = el.value;
+    el.addEventListener('keydown', function(e){ if (BLOCK.indexOf(e.key) >= 0) e.preventDefault(); });
+    el.addEventListener('paste', function(e){ const t = (e.clipboardData || window.clipboardData).getData('text'); if (!/^\d+$/.test(t)) e.preventDefault(); });
+    el.addEventListener('input', function(e){
+      let v = (el.value || '').replace(/\D/g, '');
+      if (min1) v = v.replace(/^0+/, ''); /* threshold: 1–100, a 0 isn't registered (Mai, 11 Nov) */
+      if (max != null && v !== '' && Number(v) > max){ el.value = last; e.stopImmediatePropagation(); if (typeof ats1Field === 'function') ats1Field(el); return; }
+      if (v !== el.value) el.value = v;
+      last = el.value;
+    }, true);
+  }
+  guard('ats1-threshold', 100, true);
+  guard('ats1-duration', null, true);
+})();
+</script>
 </body>
 </html>
