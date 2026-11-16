@@ -1,28 +1,24 @@
-# Agent Marketplace prototypes
+# Admin Marketplace prototypes
 
-Clickable prototypes for the agent side of Marketplace. Every page runs in the browser and has a **Prototype** button (bottom-right) for jumping between screens and states.
+Clickable prototypes for the admin side of Marketplace. Every page runs in the browser and has a **Prototype** button (bottom-right) for jumping between screens and states.
 
 ## Pages
 
 | Page | What it shows | Link |
 | --- | --- | --- |
-| Marketplace Home | Agent home page | https://mhuynh-agentsonly.github.io/agent-marketplace/marketplace-home.html |
-| Onboarding | Agent onboarding; after the last step it opens the AI interview (Hallo embedded) | https://mhuynh-agentsonly.github.io/agent-marketplace/onboarding-v2.html |
-| AI interview (our design) | The Speaking & Writing assessment rebuilt in Marketplace style, with our improvements to Hallo's flow | https://mhuynh-agentsonly.github.io/agent-marketplace/ai-interview.html |
-| AI interview (Hallo embedded) | Hallo's own pages as they are today, embedded in Marketplace. Only the button colour changes to Marketplace green | https://mhuynh-agentsonly.github.io/agent-marketplace/ai-interview-hallo.html |
-| Skills Center | Skills tests for agents | https://mhuynh-agentsonly.github.io/agent-marketplace/skills-center-agent-v2.html |
-| Skills Center + ID verification | Skills tests with the ID check | https://mhuynh-agentsonly.github.io/agent-marketplace/skills-center-agent-idv.html |
+| Skills Center admin (v2) | The current admin prototype: Test Library (Typeform and simulation tests), Add Skills Test, AI Assistant Library, inviting agents, Talent Pool results and the AI Interview tab | https://mhuynh-agentsonly.github.io/admin-marketplace/skills-center-admin-v2.html |
+| Skills Center admin (v1) | The earlier version | https://mhuynh-agentsonly.github.io/admin-marketplace/skills-center-admin-v1.html |
+| Admin demo (v2) | The Add Skills Test demo flow | https://mhuynh-agentsonly.github.io/admin-marketplace/admin-demo-v2.html |
 
-## The two AI interview prototypes
+## AI Interview tab
 
-The main flow uses the **Hallo embedded** version: onboarding, the Home "AI interview" step and the skills-test gate all open `ai-interview-hallo.html`. `ai-interview.html` stays in the repo as our proposal, and the Hallo page uses its Marketplace login screen.
+Open it from the top nav, or go straight to https://mhuynh-agentsonly.github.io/admin-marketplace/skills-center-admin-v2.html#ai-interviews. It shows agents' Hallo AI interview results:
 
-Both show Hallo's English (US) **Speaking & Writing** assessment. They answer different questions:
+- **List:** the same columns as Hallo's dashboard: user, language, date and duration, sent by, status with the integrity flag, and Score I / II / III. Filters for date, status, hire status, language and CEFR level. Agents still taking the test show as "Test in progress".
+- **Detail:** scores with Pass / Below threshold, answers, anti-cheating signals and system diagnostics. Admins approve or reject, and can override Hallo's AI recommendation with a reason. Every decision can be undone and syncs back to Hallo (our assumption until the PO confirms).
 
-- **`ai-interview.html` — what we'd like.** Marketplace's own intro and device check, then Speaking (6 prompts) and Writing (2 prompts) in Marketplace style. No name/email form, an End interview button, warnings that pause instead of restarting, and no forced restart for short answers. Ends on Home, or on the Marketplace login if the agent is signed out.
-- **`ai-interview-hallo.html` — what agents get if we embed Hallo.** A copy of Hallo's pages, including its language pickers, mic check, Ready / Set / Go! countdown, "Press to end early" and the "too short, please restart" path. Marketplace adds only its top nav and the green buttons. Name and email come prefilled and locked. Prototype menu: demo camera & mic, question voice, fast timers, signed-out agent, and a Filipino interface (EN ▾ › Filipino or Tagalog).
+The agent side of these flows lives in [agent-marketplace](https://github.com/mhuynh-agentsonly/agent-marketplace).
 
 ## Files
 
-- `speaking-assessment-720p.mp4` — Hallo's instruction video, used by `ai-interview-hallo.html`. Keep it next to the HTML file.
-- `ai-interview/` — earlier interviewer visual explorations (orbs and 2D).
+- `Admins/` and `videos/` — images and clips used by the prototypes.
