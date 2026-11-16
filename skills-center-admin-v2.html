@@ -11922,6 +11922,32 @@ function invToast(title, desc){
 .aiv-info:hover,.aiv-info:focus-visible{color:#6B7280}
 .aiv-tip{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:300px;background:#111827;color:#fff;font-size:12px;line-height:18px;font-weight:400;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(16,24,40,.18);opacity:0;visibility:hidden;transition:opacity .12s;z-index:20;pointer-events:none;text-align:left}
 .aiv-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#111827}
+.aiv-tip.is-r{left:auto;right:-10px;transform:none;width:280px;text-align:left;white-space:normal} /* opens leftward at the card's right edge */
+.aiv-tip.is-r::after{left:auto;right:12px;transform:none}
+.aiv-pop{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);z-index:60;background:#fff;color:#374151;border:1px solid #E5E7EB;border-radius:8px;box-shadow:0 12px 32px -6px rgba(16,24,40,.18),0 4px 8px -4px rgba(16,24,40,.08);padding:12px 14px;font-size:13px;line-height:18px;font-weight:400;text-align:left;white-space:normal;opacity:0;visibility:hidden;transition:opacity .12s;cursor:default}
+.aiv-pop.is-r{left:auto;right:-12px;transform:none}
+.aiv-pop.is-l{left:-14px;transform:none;width:min(600px,80vw)}
+.aiv-info:hover .aiv-pop,.aiv-info:focus-visible .aiv-pop,.aiv-info:focus-within .aiv-pop{opacity:1;visibility:visible}
+.aiv-pop-t{font-size:13px;font-weight:600;color:#111827;margin-bottom:8px}
+.aiv-pop-p{margin:0 0 12px;color:#4B5563}
+.aiv-pop-tb{border-collapse:collapse;font-size:13px}
+.aiv-pop-tb th{font-weight:500;color:#6B7280;text-align:left;padding:4px 20px 6px 0;border-bottom:1px solid #E5E7EB;white-space:nowrap}
+.aiv-pop-tb td{padding:5px 20px 5px 0;color:#111827;white-space:nowrap;font-variant-numeric:tabular-nums}
+.aiv-pop-tb th:last-child,.aiv-pop-tb td:last-child{padding-right:0}
+.aiv-pop-tb.is-sig{width:100%}
+.aiv-pop-tb.is-sig td{vertical-align:top;padding:8px 16px 8px 0;border-bottom:1px solid #F3F4F6}
+.aiv-pop-tb.is-sig tr:last-child td{border-bottom:none}
+.aiv-pop-tb.is-sig td:last-child{white-space:normal;color:#374151}
+.aiv-lvl{display:inline-flex;width:max-content;line-height:18px;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.aiv-lvl.is-ok{background:#ECFDF3;color:#067647}
+.aiv-lvl.is-mod{background:#FEF7C3;color:#A15C07}
+.aiv-lvl.is-strong{background:#FFF4ED;color:#C4320A}
+.aiv-lvl.is-crit{background:#FEF3F2;color:#B42318}
+button.aiv-info{border:none;background:none;padding:0;cursor:pointer}
+.aiv-crit{display:flex;flex-direction:column;gap:8px}
+.aiv-crit>div{border:1px solid #E5E7EB;border-radius:8px;padding:10px 14px;font-size:14px;line-height:20px;color:#4B5563}
+.aiv-crit b{color:#111827;font-weight:600;margin-right:4px}
+.aiv-crit b::after{content:':'}
 .aiv-info:hover .aiv-tip,.aiv-info:focus-visible .aiv-tip{opacity:1;visibility:visible}
 .aiv-pct{font-size:15px;font-weight:600;color:#111827}
 .aiv-pct.is-struck{color:#9CA3AF;text-decoration:line-through;font-weight:500}
@@ -11953,9 +11979,26 @@ function invToast(title, desc){
 .aiv-q{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:12px 0;border-top:1px solid #F3F4F6;font-size:14px;line-height:21px;color:#374151}
 .aiv-q:first-of-type{border-top:none}
 .aiv-q .n{font-weight:500;color:#111827}
-.aiv-play{flex:none;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid #E5E7EB;border-radius:999px;background:#fff;font-size:13px;font-weight:500;color:#374151;cursor:pointer;font-family:inherit}
-.aiv-play:hover{background:#F9FAFB}
-.aiv-play.on{border-color:#5FCEB1;color:#007460;background:#E9FEF9}
+.aiv-play{flex:none;margin-right:14px}
+.aiv-play svg{width:16px;height:16px}
+.aiv-play.on{background:var(--secondary,#E9FEF9)} /* playing: keep the pressed (hover) fill */
+.aiv-hsc{display:flex;flex-direction:column;align-items:flex-end}
+.aiv-acc.open .aiv-hsc{display:none} /* expanded: the score moves into the body, as in Hallo */
+.aiv-ovs{display:flex;align-items:flex-end;gap:32px;padding-bottom:20px}
+.aiv-ovs .l{flex:1}
+.aiv-ovs .r{text-align:right}
+.aiv-ovs .k{font-size:13px;color:#6B7280;margin-bottom:2px}
+.aiv-ovs .aiv-big{display:inline-flex;align-items:center;gap:6px}
+.aiv-ovs .d{font-size:12px;color:#6B7280;margin-top:8px}
+.aiv-ovs .r .d{margin-top:2px}
+.aiv-sec{border-top:1px solid #E5E7EB;padding:20px 0 4px}
+.aiv-sec:last-child{padding-bottom:0}
+.aiv-sech{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#111827;margin-bottom:12px}
+.aiv-sec .aiv-sk{grid-template-columns:150px minmax(0,1fr) 70px}
+.aiv-sec .aiv-q{border-top:none;padding:8px 0}
+.aiv-qh{display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:#111827;margin-bottom:4px}
+.aiv-tr{display:inline-flex;border:none;background:none;padding:4px;border-radius:6px;color:#6B7280;cursor:pointer}
+.aiv-tr:hover{background:#F3F4F6;color:#111827}
 .aiv-ans{background:#F9FAFB;border:1px solid #F3F4F6;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:14px;line-height:22px;color:#374151;white-space:pre-line}
 .aiv-wc{font-size:12px;color:#6B7280;margin-top:6px}
 .aiv-fb{margin:0;padding-left:20px;font-size:14px;line-height:22px;color:#374151;list-style:disc}
@@ -12035,9 +12078,18 @@ function invToast(title, desc){
 .aiv-rec .lbl{color:#6B7280}
 .aiv-rec .was{color:#9CA3AF;text-decoration:line-through}
 .aiv-rec .sync{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#6B7280}
+.aiv-rec.is-ov{display:block}
+.aiv-ov-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.aiv-ov-l{display:flex;align-items:center;gap:10px}
+.aiv-ov-tag{font-size:12px;font-weight:500;color:#6B7280;background:#F3F4F6;border-radius:999px;padding:2px 8px}
+.aiv-ov-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:6px;font-size:13px;color:#6B7280}
+.aiv-ov-meta b{font-weight:500;color:#374151}
+.aiv-ov-meta .sync::before{content:'·';margin-right:8px;color:#9CA3AF}
+.aiv-ov-why{margin:10px 0 0;padding:2px 0 2px 12px;border-left:2px solid #E5E7EB;font-size:14px;line-height:20px;color:#374151;white-space:pre-wrap}
 .aiv-undo{border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:500;color:#007460;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .aiv-sig-r{color:#B45309}
 .aiv-chg{display:flex;align-items:center;gap:16px;background:#F9FAFB;border:1px solid #F3F4F6;border-radius:12px;padding:14px 16px}
+.aiv-chg .aiv-badge{mix-blend-mode:multiply} /* Mai, 16 Nov: badges read better on the grey strip */
 .aiv-chg .k{font-size:13px;color:#6B7280;margin-bottom:6px}
 .aiv-chg .arr{color:#9CA3AF;margin-top:18px}
 </style>
@@ -12111,7 +12163,33 @@ const AIV_DATA = [
 });
 
 function aivEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-function aivLvl(s){ return s >= 9.4 ? 'C2' : s >= 8.8 ? 'C1' : s >= 7.5 ? 'B2' : s >= 6 ? 'B1' : 'A2'; }
+/* Hallo's CEFR scale (Hallo dashboard tooltip, Mai 16 Nov) */
+const AIV_CEFR = [['A1','0 – 2.6'],['A2','2.7 – 4.4'],['B1','4.5 – 7.1'],['B2','7.2 – 8.6'],['C1','8.7 – 9.3'],['C2','9.4 – 10']];
+function aivLvl(s){ s = Math.round(s * 10) / 10; return s >= 9.4 ? 'C2' : s >= 8.7 ? 'C1' : s >= 7.2 ? 'B2' : s >= 4.5 ? 'B1' : s >= 2.7 ? 'A2' : 'A1'; }
+/* Hallo's proctoring signal levels (Anti-cheating monitor tooltip) */
+const AIV_SIG = [[0,44,'No signals','ok','No significant proctoring signals were detected.'],[45,64,'Moderate signals','mod','Some potential integrity signals were detected. Consider reviewing the flagged events.'],[65,84,'Strong signals','strong','Multiple or more significant potential integrity signals were detected. Manual review is recommended.'],[85,100,'Critical signals','crit','High-severity or multiple potential integrity signals were detected. Careful review is strongly recommended before making a hiring decision.']];
+const AIV_SHIELD = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>';
+function aivSigBadge(row){ return '<span class="aiv-lvl is-' + row[3] + '">' + AIV_SHIELD + row[2] + '</span>'; }
+function aivSigOf(pct){ return AIV_SIG.find(function(x){ return pct >= x[0] && pct <= x[1]; }) || AIV_SIG[0]; }
+/* Hallo's "Evaluated criteria" (Detailed skills ⓘ). Organization and Typing speed aren't in Hallo's list: our wording */
+const AIV_CRIT = { Fluency:'Measures how smoothly and naturally a person can speak in the language without frequent pauses or hesitations.',
+  Grammar:'Assesses the correctness and accuracy of the language structure, including sentence formation, verb conjugation, tense usage, and agreement.',
+  Vocabulary:'Encompasses the range and richness of words and phrases a person can use accurately and appropriately.',
+  Pronunciation:'Evaluates the correctness of pronunciation and assesses the use of appropriate intonation, rhythm, and stress.',
+  Coherence:'Measures how well ideas are organized and connected. It includes logical sequencing of thoughts, cohesion, and clarity of expression.',
+  Organization:'Looks at how the text is structured: a clear opening, paragraphs that each have one purpose, and a fitting close.',
+  'Typing speed':'How quickly the person writes, in words per minute, while keeping the text accurate.' };
+/* light popover on an ⓘ (hover or keyboard focus). side: 'r' opens leftward from the icon */
+function aivPopInfo(id, label, html, side){ return '<span class="aiv-info" tabindex="0" role="button" aria-label="' + label + '" aria-describedby="' + id + '" onclick="event.stopPropagation()">' + AIV_IC.info + '<span class="aiv-pop' + (side ? ' is-' + side : '') + '" role="tooltip" id="' + id + '">' + html + '</span></span>'; }
+function aivCefrInfo(id){ return aivPopInfo(id, 'CEFR scale', '<div class="aiv-pop-t">CEFR scale</div><table class="aiv-pop-tb"><thead><tr><th>CEFR</th><th>Score</th></tr></thead><tbody>' + AIV_CEFR.map(function(c){ return '<tr><td>' + c[0] + '</td><td>' + c[1] + '</td></tr>'; }).join('') + '</tbody></table>', 'r'); }
+function aivCriteria(kind){ const S = aivScores(AIV.cur), list = (kind === 'Speaking' ? S.speak : S.write).map(function(x){ return x[0]; });
+  const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
+  bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-cr-t" style="width:560px">' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-cr-t">Evaluated criteria</div><div class="ail-ms">To evaluate ' + kind.toLowerCase() + ' proficiency accurately, Hallo scores these ' + list.length + ' key criteria.</div></div></div>' +
+    '<div class="ail-mb"><div class="aiv-crit">' + list.map(function(k){ return '<div><b>' + k + '</b><span>' + AIV_CRIT[k] + '</span></div>'; }).join('') + '</div></div>' +
+    '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Close</button></div></div>';
+  bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
+  document.body.appendChild(bd); bd.querySelector('button').focus(); }
 function aivScore(s){ s = Math.max(0, Math.min(10, Math.round(s * 10) / 10)); return '<span>' + aivLvl(s) + '</span> <small>(' + s.toFixed(1) + ')</small>'; }
 /* integrity signals (mock, deterministic per record) — shared by the list's Integrity flag and the detail page */
 function aivSignals(r){ const b = r.base; return { cheat: b < 7 ? 'Medium' : 'Low', eye: (r.id % 3 === 1) || b < 7, ai: b < 7 ? 72 : 10 + (r.id * 13) % 30, tabs: b < 7 ? 2 : (r.id % 4 === 0 ? 1 : 0), fs: 0, shots: 0 }; }
@@ -12137,15 +12215,15 @@ const AIV_MS = [
   { k:'prog', all:'All statuses', opts:[['started','Started'],['completed','Completed']] },
   { k:'hire', all:'All hire statuses', opts:[['pending','Pending review'],['approved','Approved'],['rejected','Rejected']] },
   { k:'lang', all:'All languages', opts:[['English (US)','English (US)'],['English (UK)','English (UK)'],['Spanish (LatAm)','Spanish (LatAm)']] },
-  { k:'cefr', all:'All CEFR levels', opts:[['C2','C2'],['C1','C1'],['B2','B2'],['B1','B1'],['A2','A2']] }];
+  { k:'cefr', all:'All CEFR levels', opts:[['C2','C2'],['C1','C1'],['B2','B2'],['B1','B1'],['A2','A2'],['A1','A1']] }];
 const AIV_CHECK = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function aivMsRender(){ const box = document.getElementById('aiv-filters'); if (!box) return; const open = AIV.msOpen, sx = box.scrollLeft;
   box.innerHTML = AIV_MS.map(function(m){ const sel = AIV.f[m.k], lab = function(v){ return (m.opts.find(function(o){ return o[0] === v; }) || [v, v])[1]; };
     const vals = [...sel], extra = vals.length - 2;
     const pills = m.single ? '<span class="aiv-ms-v">' + (vals.length ? aivEsc(lab(vals[0])) : m.all) + '</span>' : vals.length ? vals.slice(0, 2).map(function(v){ return '<span class="list-cat-pill">' + aivEsc(lab(v)) + '<button type="button" class="list-cat-pill-x" aria-label="Remove ' + aivEsc(lab(v)) + '" onclick="event.stopPropagation();aivMsToggle(\'' + m.k + '\',\'' + v + '\')">×</button></span>'; }).join('') + (extra > 0 ? '<span class="list-cat-pill">+' + extra + ' more</span>' : '') : '<span class="aiv-ms-ph">' + m.all + '</span>';
     const isOpen = open === m.k;
-    return '<div class="aiv-ms" style="position:relative"><button type="button" class="aiv-ms-t" aria-haspopup="listbox" aria-expanded="' + isOpen + '" onclick="event.stopPropagation();aivMsOpen(\'' + m.k + '\')"><span class="aiv-ms-p">' + pills + '</span>' +
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform .15s;margin-left:2px' + (isOpen ? ';transform:rotate(180deg)' : '') + '"><path d="m6 9 6 6 6-6"/></svg></button>' +
+    return '<div class="aiv-ms" style="position:relative"><div role="button" tabindex="0" class="aiv-ms-t" aria-haspopup="listbox" aria-expanded="' + isOpen + '" aria-label="' + m.all.replace(/^(All|Any) /, '').replace(/^./, function(c){ return c.toUpperCase(); }) + ' filter" onclick="event.stopPropagation();aivMsOpen(\'' + m.k + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();aivMsOpen(\'' + m.k + '\')}"><span class="aiv-ms-p">' + pills + '</span>' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform .15s;margin-left:2px' + (isOpen ? ';transform:rotate(180deg)' : '') + '"><path d="m6 9 6 6 6-6"/></svg></div>' +
       (isOpen ? '<div class="aiv-ms-dd" role="listbox"' + (m.single ? '' : ' aria-multiselectable="true"') + ' onclick="event.stopPropagation()"><div style="padding:4px 0">' +
         '<button type="button" role="option" class="list-cat-item" aria-selected="' + !sel.size + '" onclick="aivMsClear(\'' + m.k + '\',' + !m.single + ')"><span>' + (m.single ? m.all : 'All') + '</span>' + (sel.size ? '' : AIV_CHECK) + '</button>' +
         m.opts.map(function(o){ const on = sel.has(o[0]); return '<button type="button" role="option" class="list-cat-item" aria-selected="' + on + '" onclick="' + (m.single ? 'aivMsPick' : 'aivMsToggle') + '(\'' + m.k + '\',\'' + o[0] + '\')"><span>' + aivEsc(o[1]) + '</span>' + (on ? AIV_CHECK : '') + '</button>'; }).join('') + '</div>' +
@@ -12225,6 +12303,7 @@ const AIV_IC = {
   cal:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
   globe:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>',
   doc:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
+  lang:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>',
   copy:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
   info:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
   check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
@@ -12245,6 +12324,18 @@ function aivAcc(id, title, right, body, open){
 }
 function aivSkills(list){ return list.map(function(s){ const v = Math.max(0, Math.min(10, s[1])); return '<div class="aiv-sk"><span>' + s[0] + '</span><div class="aiv-bar"><i style="width:' + (v * 10) + '%"></i></div><b>' + aivLvl(v) + ' (' + v.toFixed(1) + ')</b></div>'; }).join(''); }
 function aivSum(label, score, date){ return '<div class="aiv-sum"><div class="l"><div class="k">' + label + ' · ' + date + '</div><div class="aiv-bar"><i style="width:' + (score * 10) + '%"></i></div></div></div>'; } /* the score itself sits in the section header (visible when collapsed) */
+/* CEFR descriptor under the overall score. Hallo shows "Superior (Estimated)" for C1; the other labels are our guess until we see them in Hallo */
+function aivDesc(v){ return { C2:'Mastery', C1:'Superior', B2:'Advanced', B1:'Intermediate', A2:'Elementary' }[aivLvl(v)] + ' (Estimated)'; }
+function aivLangSec(id, kind, avg, skills, r, day, qHtml, fb){
+  const info = function(tid, txt, right){ return '<span class="aiv-info" tabindex="0" aria-describedby="' + tid + '" onclick="event.stopPropagation()">' + AIV_IC.info + '<span class="aiv-tip' + (right ? ' is-r' : '') + '" role="tooltip" id="' + tid + '">' + txt + '</span></span>'; };
+  const body =
+    '<div class="aiv-ovs"><div class="l"><div class="aiv-bar"><i style="width:' + (avg * 10) + '%"></i></div><div class="d">' + day + '</div></div>' +
+      '<div class="r"><div class="k">Overall score</div><div class="aiv-big">' + aivScore(avg) + aivCefrInfo(id + '-tip') + '</div><div class="d">' + aivDesc(avg) + '</div></div></div>' +
+    '<div class="aiv-sec"><div class="aiv-sech">Detailed skills<button type="button" class="aiv-info" aria-label="Evaluated criteria" onclick="event.stopPropagation();aivCriteria(\'' + kind + '\')">' + AIV_IC.info + '</button></div>' + aivSkills(skills) + '</div>' +
+    '<div class="aiv-sec">' + qHtml + '</div>' +
+    '<div class="aiv-sec"><div class="aiv-sech" style="justify-content:space-between">Personalized feedback<button type="button" class="aiv-tr" aria-label="Translate feedback" title="Translate feedback" onclick="showToast(\'Feedback translated to English\')">' + AIV_IC.lang + '</button></div><ul class="aiv-fb">' + fb.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul></div>';
+  return aivAcc(id, aivEsc(r.lang.split(' (')[0]) + ' · ' + kind, '<span class="aiv-hsc"><span class="aiv-big" style="font-size:16px">' + aivScore(avg) + '</span>' + aivPassTag(avg) + '</span>', body, true);
+}
 function aivRenderDetail(){
   const r = AIV.cur;
   if (r.prog !== 'completed') return aivRenderProgress(r);
@@ -12275,23 +12366,20 @@ function aivRenderDetail(){
     '<div style="margin-top:12px"><textarea class="aiv-ta" id="aiv-cm-in" placeholder="Add a comment for your team" oninput="document.getElementById(\'aiv-cm-btn\').disabled=!this.value.trim()"></textarea>' +
     '<div class="flex justify-end" style="margin-top:8px"><button type="button" id="aiv-cm-btn" disabled class="' + DS.btnBase + ' ' + DS.btnSecondary + ' ' + DS.btnSizeDefault + '" onclick="aivPostComment()">Post comment</button></div></div>', r.comments.length > 0);
   /* overall */
-  h += '<div class="aiv-card"><div class="hd"><h2>Overall language CEFR score (EN)</h2><div class="aiv-big">' + aivScore(overall) + '</div></div></div>';
-  /* speaking */
-  if (speak) h += aivAcc('aiv-speak', 'English (US) · Speaking', '<span class="flex flex-col items-end"><span class="aiv-big" style="font-size:16px">' + aivScore(sAvg) + '</span>' + aivPassTag(sAvg) + '</span>',
-    aivSum('Overall score', sAvg, day) + '<div class="aiv-h3" style="margin-top:0">Detailed skills</div>' + aivSkills(speak) +
-    '<div class="aiv-h3">Speaking questions</div>' + AIV_SPEAK_Q.map(function(q, i){ const on = AIV.playing === 's' + i; return '<div class="aiv-q"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(q) + '</div><button type="button" class="aiv-play' + (on ? ' on' : '') + '" onclick="aivPlay(\'s' + i + '\')" aria-label="' + (on ? 'Pause' : 'Play') + ' response ' + (i + 1) + '">' + (on ? AIV_IC.pause + ' Playing…' : AIV_IC.play + ' Response') + '</button></div>'; }).join('') +
-    '<div class="aiv-h3">Personalized feedback</div><ul class="aiv-fb">' + AIV_SPEAK_FB.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul>', true);
-  /* writing */
-  h += aivAcc('aiv-write', 'English (US) · Writing', '<span class="flex flex-col items-end"><span class="aiv-big" style="font-size:16px">' + aivScore(wAvg) + '</span>' + aivPassTag(wAvg) + '</span>',
-    aivSum('Overall score', wAvg, day) + '<div class="aiv-h3" style="margin-top:0">Detailed skills</div>' + aivSkills(write) +
-    '<div class="aiv-h3">Writing questions</div>' + AIV_WRITE_Q.map(function(w, i){ return '<div class="aiv-q" style="display:block"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(w.q) + '</div><div class="aiv-ans">' + aivEsc(w.a) + '</div><div class="aiv-wc">' + w.w + ' words</div></div>'; }).join('') +
-    '<div class="aiv-h3">Personalized feedback</div><ul class="aiv-fb">' + AIV_WRITE_FB.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul>', true); /* Speaking + Writing both open by default (Mai, 13 Nov) */
+  h += '<div class="aiv-card"><div class="hd"><h2>Overall language CEFR score (EN)</h2><div class="aiv-big" style="display:inline-flex;align-items:center;gap:6px">' + aivScore(overall) + aivCefrInfo('aiv-ov-tip') + '</div></div></div>';
+  /* speaking + writing: Hallo's section layout, Marketplace styling (Mai, 16 Nov). Both open by default (Mai, 13 Nov) */
+  if (speak) h += aivLangSec('aiv-speak', 'Speaking', sAvg, speak, r, day,
+    '<div class="aiv-qh"><span>Speaking assessment questions</span><span>Response</span></div>' + AIV_SPEAK_Q.map(function(q, i){ const on = AIV.playing === 's' + i; return '<div class="aiv-q"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(q) + '</div><button type="button" aria-pressed="' + on + '" class="aiv-play ' + DS.btnBase + ' ' + DS.btnSecondary + ' size-9' + (on ? ' on' : '') + '" onclick="aivPlay(\'s' + i + '\')" aria-label="' + (on ? 'Pause' : 'Play') + ' response ' + (i + 1) + '" title="' + (on ? 'Pause' : 'Play response') + '">' + (on ? AIV_IC.pause : AIV_IC.play) + '</button></div>'; }).join(''),
+    AIV_SPEAK_FB);
+  h += aivLangSec('aiv-write', 'Writing', wAvg, write, r, day,
+    '<div class="aiv-qh"><span>Writing assessment questions</span></div>' + AIV_WRITE_Q.map(function(w, i){ return '<div class="aiv-q" style="display:block"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(w.q) + '</div><div class="aiv-ans">' + aivEsc(w.a) + '</div><div class="aiv-wc">' + w.w + ' words</div></div>'; }).join(''),
+    AIV_WRITE_FB);
   /* integrity */
   const ov = r.override;
   h += '<div class="aiv-card aiv-acc open" id="aiv-integ"><div class="hd aiv-hd2">' +
-    '<div class="flex items-center gap-2"><h2>Anti-cheating monitor</h2><span class="aiv-info" tabindex="0" aria-describedby="aiv-tip-integ">' + AIV_IC.info + '<span class="aiv-tip" role="tooltip" id="aiv-tip-integ">Signals from Hallo’s proctoring: webcam snapshots, AI-content detection and actions reported during the interview. The % is the overall chance of cheating. Use them with the answers; they aren’t a verdict.</span></span></div>' +
+    '<div class="flex items-center gap-2"><h2>Anti-cheating monitor</h2>' + aivPopInfo('aiv-tip-integ', 'Proctoring signal information', '<p class="aiv-pop-p">Proctoring signals are indicators generated during the assessment and are not definitive evidence of misconduct. They give recruiters more context to support informed hiring decisions.</p><div class="aiv-pop-t">Proctoring signal information</div><table class="aiv-pop-tb is-sig"><thead><tr><th>Signal score</th><th>Level</th><th>Guidance</th></tr></thead><tbody>' + AIV_SIG.map(function(x){ return '<tr><td>' + x[0] + '–' + x[1] + '%</td><td>' + aivSigBadge(x) + '</td><td>' + x[4] + '</td></tr>'; }).join('') + '</tbody></table>', 'l') + '</div>' +
     '<div class="flex items-center gap-3">' +
-    '<b class="aiv-pct">' + r.cheatPct + '%</b>' +
+    aivSigBadge(aivSigOf(r.cheatPct)) + '<b class="aiv-pct">' + r.cheatPct + '%</b>' +
     '<button type="button" class="aiv-chev" aria-expanded="true" aria-label="Collapse anti-cheating monitor" onclick="const c=this.closest(\'.aiv-acc\');c.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',c.classList.contains(\'open\'))">' + AIV_IC.chev + '</button></div></div>' +
     '<div class="bd"><ul class="aiv-fb aiv-sigs">' +
       '<li>Probability of cheating (from snapshots): <b>' + cheat + '</b>' + (flag ? ' · <span class="aiv-sig-r">Potential unusual eye movement</span>' : '') + (r.cheatPct >= 60 ? ' · <span class="aiv-sig-r">Potential camera obstruction</span>' : '') + '</li>' +
@@ -12336,17 +12424,18 @@ function aivPassTag(v){ const ok = v >= AIV_PASS; return '<span class="aiv-pass'
 function aivRecBadge(v){ return '<span class="aiv-badge is-' + (v === 'pass' ? 'approved' : 'rejected') + '">' + aivRecLabel(v) + '</span>'; }
 function aivRecRow(r){ const ai = aivAiRec(r), ov = r.override;
   if (!ov) return '<div class="aiv-rec"><span class="lbl">AI recommendation</span>' + aivRecBadge(ai) + '<button type="button" class="aiv-view" onclick="aivOverride()">Override</button></div>';
-  return '<div class="aiv-rec"><span class="lbl">AI recommendation</span><span class="was">' + aivRecLabel(ai) + '</span>' + aivRecBadge(ov.to) +
-    '<span class="text-sm text-gray-600">Overridden by ' + aivEsc(ov.by) + ' · ' + aivDate(ov.at) + '</span><span class="sync">' + AIV_SYNC + 'Synced to Hallo</span>' +
-    '<button type="button" class="aiv-undo" onclick="aivUndoOverride()">Undo override</button>' +
-    '<div class="w-full text-sm text-gray-600"><span class="text-gray-400">Reason:</span> ' + aivEsc(ov.reason) + '</div></div>'; }
+  /* overridden: 1) outcome + action, 2) who/when/sync meta, 3) reason as a quote (Mai, 16 Nov) */
+  return '<div class="aiv-rec is-ov"><div class="aiv-ov-top"><div class="aiv-ov-l"><span class="lbl">Recommendation</span>' + aivRecBadge(ov.to) + '<span class="aiv-ov-tag">Overridden</span></div>' +
+    '<button type="button" class="aiv-view" onclick="aivUndoOverride()">Undo override</button></div>' +
+    '<div class="aiv-ov-meta">Changed from AI’s <b>' + aivRecLabel(ai) + '</b> by ' + aivEsc(ov.by) + ' · ' + aivDate(ov.at) + '<span class="sync">' + AIV_SYNC + 'Synced to Hallo</span></div>' +
+    '<blockquote class="aiv-ov-why">' + aivEsc(ov.reason) + '</blockquote></div>'; }
 function aivOverride(){
   const r = AIV.cur, ai = aivAiRec(r), to = ai === 'pass' ? 'fail' : 'pass'; AIV.ovTo = to;
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-o-t" style="width:560px">' +
     '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Change the recommendation to ' + aivRecLabel(to) + '?</div><div class="ail-ms">Hallo’s AI recommends ' + aivRecLabel(ai) + ' for ' + aivEsc(r.name) + '. Your change also updates Hallo, and you can undo it any time.</div></div></div>' +
     '<div class="ail-mb"><div class="aiv-chg"><div><div class="k">AI recommendation</div>' + aivRecBadge(ai) + '</div><span class="arr" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><div><div class="k">Your recommendation</div>' + aivRecBadge(to) + '</div></div>' +
-      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><div class="text-sm text-gray-500" style="margin-top:-2px">Your team sees this in Comments.</div><textarea class="aiv-ta" id="aiv-o-r" placeholder="' + (to === 'pass' ? 'e.g. Camera flag was a lighting issue; answers were clear and natural' : 'e.g. Answers were read from notes; writing looks AI generated') + '" oninput="aivOvCheck()"></textarea></div></div>' +
+      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" aria-describedby="aiv-o-help" placeholder="' + (to === 'pass' ? 'e.g. Camera flag was a lighting issue; answers were clear and natural' : 'e.g. Answers were read from notes; writing looks AI generated') + '" oninput="aivOvCheck()"></textarea><div class="text-sm text-gray-500" id="aiv-o-help">Your team sees this in Comments.</div></div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Cancel</button>' +
     '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Change to ' + aivRecLabel(to) + '</button></div></div>';
   bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
