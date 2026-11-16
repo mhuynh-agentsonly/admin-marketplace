@@ -2341,7 +2341,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   </div>
   <!-- Section content -->
   <div class="pt-16 pb-16">
-  <div class="flex items-start justify-between gap-4 mb-8 flex-wrap"><div><h2 class="text-2xl font-medium">Interviews</h2><p class="text-sm text-gray-600 mt-1 max-w-2xl">Newest first. Open an interview to see its scores, answers and integrity signals.</p></div></div>
+  <div class="flex items-start justify-between gap-4 mb-8 flex-wrap"><div><h2 class="text-2xl font-medium">Interviews</h2><p class="text-sm text-gray-600 mt-1 max-w-2xl">Newest first. Results come from Hallo AI. Open a completed interview to see its scores, answers and integrity signals.</p></div></div>
   <div class="bg-white rounded-lg border border-border">
     <div class="px-4 pt-4 pb-3 flex items-center justify-between flex-wrap gap-3 border-b border-border">
       <div class="relative flex items-center" style="width:400px;max-width:100%">
@@ -2350,23 +2350,26 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
           class="border-input w-full rounded-md border bg-transparent py-1.5 text-sm outline-none transition-[color,box-shadow] focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
           style="padding-left:32px;padding-right:12px;height:34px"/>
       </div>
-      <div class="ail-seg" role="tablist" aria-label="Filter by status" id="aiv-seg">
-        <button type="button" role="tab" data-s="all" aria-selected="true" onclick="aivSetStatus('all')">All</button>
-        <button type="button" role="tab" data-s="pending" aria-selected="false" onclick="aivSetStatus('pending')">Pending review</button>
-        <button type="button" role="tab" data-s="approved" aria-selected="false" onclick="aivSetStatus('approved')">Approved</button>
-        <button type="button" role="tab" data-s="rejected" aria-selected="false" onclick="aivSetStatus('rejected')">Rejected</button>
+      <div class="aiv-filters" id="aiv-filters">
+        <select class="aiv-sel" aria-label="Date" onchange="AIV.f.date=this.value;AIV.page=1;aivRenderList()"><option value="">Any date</option><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select>
+        <select class="aiv-sel" aria-label="Status" onchange="AIV.f.prog=this.value;AIV.page=1;aivRenderList()"><option value="">All statuses</option><option value="started">Started</option><option value="completed">Completed</option></select>
+        <select class="aiv-sel" aria-label="Hire status" onchange="AIV.status=this.value||'all';AIV.page=1;aivRenderList()"><option value="">All hire statuses</option><option value="pending">Pending review</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
+        <select class="aiv-sel" aria-label="Language" onchange="AIV.f.lang=this.value;AIV.page=1;aivRenderList()"><option value="">All languages</option><option>English (US)</option><option>English (UK)</option><option>Spanish (LatAm)</option></select>
+        <select class="aiv-sel" aria-label="CEFR level" onchange="AIV.f.cefr=this.value;AIV.page=1;aivRenderList()"><option value="">All CEFR levels</option><option>C2</option><option>C1</option><option>B2</option><option>B1</option><option>A2</option></select>
       </div>
     </div>
     <div class="overflow-x-auto">
       <table class="text-sm w-full" id="aiv-table">
         <thead class="bg-gray-50 text-left">
           <tr class="border-b border-border">
-            <th class="px-4 py-3 text-xs font-medium text-gray-500">Name</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:150px">Country</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:190px">Date</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:160px">Status</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:100px">Integrity</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500" style="width:170px">Reviewed by</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">User</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Language</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Date</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Sent by</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Status</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Score I</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Score II</th>
+            <th class="px-4 py-3 text-xs font-medium text-gray-500">Score III</th>
           </tr>
         </thead>
         <tbody id="aiv-rows"></tbody>
@@ -2374,7 +2377,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
     </div>
     <div id="aiv-empty" class="hidden py-16 flex flex-col items-center justify-center gap-1">
       <div class="text-sm font-medium text-gray-900">No interviews found</div>
-      <div class="text-sm text-gray-500">Try a different name, email or status.</div>
+      <div class="text-sm text-gray-500">Try a different name, email or filter.</div>
     </div>
     <div id="aiv-pag" class="ail-pag" hidden></div>
   </div>
@@ -12001,6 +12004,30 @@ function invToast(title, desc){
 .aiv-btn-red{height:40px;padding:0 18px;border:none;border-radius:8px;background:#EF4444;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
 .aiv-btn-red:hover{background:#DC2626}
 .aiv-note{font-size:13px;color:#6B7280;margin-top:10px}
+/* Hallo-aligned list (16 Nov) */
+.aiv-filters{display:flex;flex-wrap:wrap;gap:8px}
+.aiv-sel{height:34px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;padding:0 28px 0 10px;font-size:14px;font-family:inherit;color:#374151;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.aiv-sel:focus{outline:none;border-color:#5FCEB1;box-shadow:0 0 0 3px rgba(95,206,177,.3)}
+#aiv-rows td{vertical-align:middle;white-space:nowrap}
+.aiv-row.is-off{cursor:default}
+.aiv-row.is-off:hover .ail-n{text-decoration:none}
+.aiv-sub{font-size:13px;color:#6B7280;display:flex;align-items:center;gap:4px;margin-top:2px}
+.aiv-sc b{display:block;font-size:14px;font-weight:600;color:#111827;line-height:18px}
+.aiv-sc .v{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:#374151}
+.aiv-sc .k{font-size:12px;color:#6B7280}
+.aiv-pf{display:inline-flex;width:14px;height:14px;border-radius:99px;align-items:center;justify-content:center;flex:none}
+.aiv-pf.ok{background:#10B981}.aiv-pf.no{background:#EF4444}
+.aiv-pf svg{color:#fff}
+.aiv-badge.is-progress{background:#F3F4F6;color:#374151}
+.aiv-st{display:inline-flex;align-items:center;gap:8px}
+.aiv-pass{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#047857}
+.aiv-pass.no{color:#B91C1C}
+.aiv-rec{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #F3F4F6;font-size:14px;color:#374151}
+.aiv-rec .lbl{color:#6B7280}
+.aiv-rec .was{color:#9CA3AF;text-decoration:line-through}
+.aiv-rec .sync{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#6B7280}
+.aiv-undo{border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:500;color:#007460;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.aiv-sig-r{color:#B45309}
 </style>
 <script id="aiv-script">
 /* ======================= AI Interviews (admin) =======================
@@ -12019,7 +12046,8 @@ function invToast(title, desc){
   SCREEN_TO_NAV['admin-ai-interview'] = { key: 'ai-interviews' };
 })();
 
-const AIV = { q:'', status:'all', page:1, per:10, cur:null, playing:null };
+const AIV = { q:'', status:'all', page:1, per:10, cur:null, playing:null, f:{ date:'', prog:'', lang:'', cefr:'' } };
+const AIV_PASS = 7; /* skill threshold (Hallo's Thresholds) */
 const AIV_ME = 'Sarah Davis';
 const AIV_SPEAK_Q = [
   'Describe the music you like to listen to at home, and tell what you do while you listen.',
@@ -12058,9 +12086,14 @@ const AIV_DATA = [
   ['Lucas Ferreira','lucas.ferreira@gmail.com','Brazil','2026-11-12T17:40','rejected','Linh Pham',5.8,'sw'],
   ['Hana Kim','hana.kim@gmail.com','South Korea','2026-11-12T16:05','approved','Linh Pham',9.0,'sw'],
   ['Omar Haddad','omar.haddad@gmail.com','Egypt','2026-11-12T14:22','pending','',8.4,'sw'],
-  ['Sofia Alvarez','sofia.alvarez@gmail.com','Mexico','2026-11-12T11:48','approved','Kevin Tran',8.8,'w']
+  ['Sofia Alvarez','sofia.alvarez@gmail.com','Mexico','2026-11-12T11:48','approved','Kevin Tran',8.8,'w'],
+  ['Jasmine Ocampo','jasmine.ocampo@gmail.com','Philippines','2026-11-13T11:32','pending','',0,'sw','started'],
+  ['Arjun Mehta','arjun.mehta@gmail.com','India','2026-11-13T11:28','pending','',0,'w','started']
 ].map(function(r, i){
-  const rec = { testId:aivMakeId(r[1]), cheatPct: r[6] < 7 ? 72 : 20 + ((i * 17) % 40), id:i+1, name:r[0], email:r[1], country:r[2], date:r[3], status:r[4], reviewer:r[5], base:r[6], type:r[7], comments:[] };
+  const rec = { testId:aivMakeId(r[1]), cheatPct: r[6] < 7 ? 72 : 20 + ((i * 17) % 40), id:i+1, name:r[0], email:r[1], country:r[2], date:r[3], status:r[4], reviewer:r[5], base:r[6], type:r[7], comments:[],
+    prog: r[8] || 'completed', lang: i === 4 ? 'Spanish (LatAm)' : i === 11 ? 'English (UK)' : 'English (US)',
+    sentBy: ['AO Recruitment','Generic Link','AO Recruitment','Kevin Tran','AO Recruitment','Generic Link'][i % 6],
+    dur: r[8] ? '' : (r[7] === 'sw' ? 26 + (i * 7) % 8 : 11 + (i * 3) % 4) + ':' + String((i * 23) % 60).padStart(2, '0') };
   if (r[4] !== 'pending') rec.comments.push({ by:r[5], at:r[3].slice(0,10)+'T15:10', text: r[4]==='approved' ? 'Clear, natural answers. Approved for the talent pool.' : 'Several answers were read from notes, and the writing looks AI generated. Rejected.', status:r[4] });
   return rec;
 });
@@ -12072,7 +12105,7 @@ function aivScore(s){ s = Math.max(0, Math.min(10, Math.round(s * 10) / 10)); re
 function aivSignals(r){ const b = r.base; return { cheat: b < 7 ? 'Medium' : 'Low', eye: (r.id % 3 === 1) || b < 7, ai: b < 7 ? 72 : 10 + (r.id * 13) % 30, tabs: b < 7 ? 2 : (r.id % 4 === 0 ? 1 : 0), fs: 0, shots: 0 }; }
 /* Integrity flag: medium/high cheating risk or any reported action; an Ops override to "No cheating" clears it */
 function aivFlag(r){ const g = aivSignals(r);
-  if (r.override) return r.override.result === 'cheat' ? 'Overridden: cheating' : '';
+  if (r.prog !== 'completed') return '';
   const why = [];
   if (g.cheat !== 'Low') why.push(g.cheat + ' cheating risk');
   if (g.tabs) why.push('Switched tabs ' + g.tabs + '×'); if (g.fs) why.push('Left full screen ' + g.fs + '×'); if (g.shots) why.push('Screenshots ' + g.shots + '×');
@@ -12086,10 +12119,30 @@ function aivDate(iso){ return fmtSkillDate(iso); }
 function aivGoList(){ go('admin-ai-interviews'); aivRenderList(); }
 function aivSetStatus(s){ AIV.status = s; AIV.page = 1; document.querySelectorAll('#aiv-seg button').forEach(function(b){ b.setAttribute('aria-selected', String(b.dataset.s === s)); }); aivRenderList(); }
 function aivPage(p){ AIV.page = p; aivRenderList(); }
+/* scores used by the list and the detail page (same numbers) */
+function aivScores(r){ const b = r.base, j = function(k){ return Math.round((b + ((r.id * 7 + k * 3) % 9 - 4) / 10) * 10) / 10; };
+  const speak = r.type === 'sw' ? [['Fluency', j(1)], ['Vocabulary', j(2)], ['Grammar', j(3)], ['Pronunciation', j(4)], ['Coherence', j(5)]] : null;
+  const write = [['Vocabulary', j(6)], ['Grammar', j(7)], ['Coherence', j(8)], ['Organization', j(9)], ['Typing speed', j(10)]];
+  const avg = function(a){ return Math.round(a.reduce(function(s, x){ return s + x[1]; }, 0) / a.length * 10) / 10; };
+  const sAvg = speak ? avg(speak) : null, wAvg = avg(write), overall = speak ? Math.round((sAvg + wAvg) / 2 * 10) / 10 : wAvg;
+  return { speak:speak, write:write, sAvg:sAvg, wAvg:wAvg, overall:overall }; }
+/* Hallo's AI recommendation: every skill at or above the threshold and a low cheating risk */
+function aivAiRec(r){ const s = aivScores(r); return ((s.sAvg == null || s.sAvg >= AIV_PASS) && s.wAvg >= AIV_PASS && r.cheatPct < 60) ? 'pass' : 'fail'; }
+function aivRec(r){ return r.override ? r.override.to : aivAiRec(r); }
+const AIV_TICK = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const AIV_X = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+function aivPf(v){ return '<span class="aiv-pf ' + (v >= AIV_PASS ? 'ok' : 'no') + '" aria-label="' + (v >= AIV_PASS ? 'Pass' : 'Below threshold') + '">' + (v >= AIV_PASS ? AIV_TICK : AIV_X) + '</span>'; }
+function aivScCell(v, label, pf){ return '<td class="px-4 py-3 aiv-sc">' + (v == null ? '<span class="text-gray-400">—</span>' : '<b>' + aivLvl(v) + '</b><span class="v">' + v.toFixed(1) + (pf ? aivPf(v) : '') + '</span><div class="k">' + label + '</div>') + '</td>'; }
+const AIV_CLOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
 function aivRenderList(){
   const tb = document.getElementById('aiv-rows'); if (!tb) return;
+  const now = Date.parse('2026-11-13T12:00');
   const rows = AIV_DATA.filter(function(r){
-    if (AIV.status !== 'all' && r.status !== AIV.status) return false;
+    if (AIV.status !== 'all' && (r.prog !== 'completed' || r.status !== AIV.status)) return false;
+    if (AIV.f.prog && r.prog !== AIV.f.prog) return false;
+    if (AIV.f.lang && r.lang !== AIV.f.lang) return false;
+    if (AIV.f.cefr && (r.prog !== 'completed' || aivLvl(aivScores(r).overall) !== AIV.f.cefr)) return false;
+    if (AIV.f.date && (now - Date.parse(r.date)) > (+AIV.f.date) * 864e5) return false;
     return !AIV.q || (r.name + ' ' + r.email).toLowerCase().indexOf(AIV.q) >= 0;
   }).sort(function(a, b){ return Date.parse(b.date) - Date.parse(a.date); });
   document.getElementById('aiv-empty').classList.toggle('hidden', rows.length > 0);
@@ -12097,14 +12150,16 @@ function aivRenderList(){
   if (AIV.page > pages) AIV.page = pages;
   const pg = AIV.page, start = (pg - 1) * per;
   tb.innerHTML = rows.slice(start, start + per).map(function(r){
-    /* single action → the whole row opens the interview (no View button) */
-    return '<tr class="aiv-row" tabindex="0" role="link" aria-label="Open interview: ' + aivEsc(r.name) + '" onclick="aivOpen(' + r.id + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();aivOpen(' + r.id + ')}">' +
+    const done = r.prog === 'completed', s = done ? aivScores(r) : null, f = aivFlag(r);
+    const open = done ? ' tabindex="0" role="link" aria-label="Open interview: ' + aivEsc(r.name) + '" onclick="aivOpen(' + r.id + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();aivOpen(' + r.id + ')}"' : ' title="Still taking the test — results show when it\'s completed"';
+    return '<tr class="aiv-row' + (done ? '' : ' is-off') + '"' + open + '>' +
       '<td class="px-4 py-3"><div class="ail-n">' + aivEsc(r.name) + '</div><div class="ail-d">' + aivEsc(r.email) + '</div></td>' +
-      '<td class="px-4 py-3 text-gray-600 text-sm">' + aivEsc(r.country) + '</td>' +
-      '<td class="px-4 py-3 text-gray-600 text-sm whitespace-nowrap">' + aivDate(r.date) + '</td>' +
-      '<td class="px-4 py-3">' + aivBadge(r.status) + '</td>' +
-      (function(){ const f = aivFlag(r); return '<td class="px-4 py-3">' + (f ? '<span class="aiv-flag" title="' + aivEsc(f) + '" aria-label="Integrity flag: ' + aivEsc(f) + '" role="img">' + AIV_FLAG_IC + '</span>' : '') + '</td>'; })() +
-      '<td class="px-4 py-3 text-gray-600 text-sm">' + (r.reviewer ? aivEsc(r.reviewer) : '<span class="text-gray-400">—</span>') + '</td>' +
+      '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivEsc(r.lang) + '</div><div class="aiv-sub">' + (r.type === 'sw' ? 'speaking &amp; writing' : 'writing') + '</div></td>' +
+      '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivDate(r.date) + '</div><div class="aiv-sub">' + AIV_CLOCK + (r.dur || '—') + '</div></td>' +
+      '<td class="px-4 py-3 text-gray-600 text-sm">' + aivEsc(r.sentBy) + '</td>' +
+      '<td class="px-4 py-3"><span class="aiv-st">' + (done ? aivBadge(r.status) : '<span class="aiv-badge is-progress">Test in progress</span>') +
+        (f ? '<span class="aiv-flag" title="' + aivEsc(f) + '" aria-label="Integrity flag: ' + aivEsc(f) + '" role="img">' + AIV_FLAG_IC + '</span>' : '') + '</span></td>' +
+      (done ? aivScCell(s.overall, (r.lang.split(' (')[0]) + ' language', false) + (s.speak ? aivScCell(s.sAvg, 'Speaking', true) : aivScCell(s.wAvg, 'Writing', true)) + (s.speak ? aivScCell(s.wAvg, 'Writing', true) : aivScCell(null)) : aivScCell(null) + aivScCell(null) + aivScCell(null)) +
       '</tr>';
   }).join('');
   /* pagination: same component as the AI Assistant Library */
@@ -12148,14 +12203,11 @@ function aivAcc(id, title, right, body, open){
 function aivSkills(list){ return list.map(function(s){ const v = Math.max(0, Math.min(10, s[1])); return '<div class="aiv-sk"><span>' + s[0] + '</span><div class="aiv-bar"><i style="width:' + (v * 10) + '%"></i></div><b>' + aivLvl(v) + ' (' + v.toFixed(1) + ')</b></div>'; }).join(''); }
 function aivSum(label, score, date){ return '<div class="aiv-sum"><div class="l"><div class="k">' + label + ' · ' + date + '</div><div class="aiv-bar"><i style="width:' + (score * 10) + '%"></i></div></div></div>'; } /* the score itself sits in the section header (visible when collapsed) */
 function aivRenderDetail(){
-  const r = AIV.cur, b = r.base, j = function(k){ return Math.round((b + ((r.id * 7 + k * 3) % 9 - 4) / 10) * 10) / 10; };
+  const r = AIV.cur;
   const day = new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  const speak = r.type === 'sw' ? [['Fluency', j(1)], ['Vocabulary', j(2)], ['Grammar', j(3)], ['Pronunciation', j(4)], ['Coherence', j(5)]] : null;
-  const write = [['Vocabulary', j(6)], ['Grammar', j(7)], ['Coherence', j(8)], ['Organization', j(9)], ['Typing speed', j(10)]];
-  const avg = function(a){ return Math.round(a.reduce(function(s, x){ return s + x[1]; }, 0) / a.length * 10) / 10; };
-  const sAvg = speak ? avg(speak) : null, wAvg = avg(write), overall = speak ? Math.round((sAvg + wAvg) / 2 * 10) / 10 : wAvg;
+  const S = aivScores(r), speak = S.speak, write = S.write, sAvg = S.sAvg, wAvg = S.wAvg, overall = S.overall;
   const sig = aivSignals(r), cheat = sig.cheat, flag = sig.eye, ai = sig.ai, tabs = sig.tabs;
-  const shots = (speak ? ['Part 1 · 00:06','Part 1 · 02:13','Part 1 · 04:39','Part 1 · 06:58'] : []).concat(['Part 2 · 00:22','Part 2 · 03:08','Part 2 · 05:32','Part 2 · 08:11']);
+  const shots = (speak ? ['Part I · 00:49','Part I · 01:45','Part I · 03:05','Part I · 05:21','Part I · 07:40'] : []).concat(['Part II · 01:31','Part II · 02:49','Part II · 06:22','Part II · 08:05','Part II · 13:18']);
 
   let h = '<nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">' +
     '<a href="#" onclick="event.preventDefault(); aivGoList()" class="text-primary-700 hover:text-primary-800 font-medium hover:underline underline-offset-2">AI Interview</a>' +
@@ -12164,11 +12216,11 @@ function aivRenderDetail(){
   /* header */
   h += '<div class="aiv-card"><div class="aiv-top"><div><h1>' + aivEsc(r.name) + '</h1>' +
     '<div class="aiv-lines"><div class="t">' + (r.type === 'sw' ? 'Speaking &amp; Writing' : 'Writing') + ' · English (US)</div>' +
-    '<div>' + aivEsc(r.email) + ' · ' + aivEsc(r.country) + '</div>' +
+    '<div>' + aivEsc(r.email) + '</div>' +
     '<div class="aiv-id"><span>' + r.testId + '</span><button type="button" class="aiv-copy" onclick="aivCopyId()" aria-label="Copy test ID" title="Copy test ID">' + AIV_IC.copy + '</button></div>' +
-    '<div>' + aivDate(r.date) + '</div>' +
+    '<div>' + aivDate(r.date) + ' · ' + r.dur + ' · Sent by ' + aivEsc(r.sentBy) + '</div>' +
     '<div class="aiv-reason"><span>Standalone reason:</span> Specific skill needs to be reassessed (e.g., language or role-specific module)</div></div>' +
-    '<div class="aiv-meta" style="margin-top:12px">' + (r.reviewer ? 'Reviewed by <b class="font-medium text-gray-900">' + aivEsc(r.reviewer) + '</b>' : 'Not reviewed yet') + '</div></div>' +
+    '<div class="aiv-meta" style="margin-top:12px">' + (r.reviewer ? 'Reviewed by <b class="font-medium text-gray-900">' + aivEsc(r.reviewer) + '</b>' : 'Not reviewed yet') + '</div>' + aivRecRow(r) + '</div>' +
     '<div class="aiv-dd ail-dd" id="aiv-dd"><button type="button" class="ail-dd-t" aria-haspopup="listbox" aria-expanded="false" onclick="aivDdToggle()"><span class="flex items-center"><span class="aiv-dot is-' + r.status + '"></span>' + aivStatusLabel(r.status) + '</span>' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>' +
       '<div class="ail-dd-m" role="listbox" hidden>' + ['pending','approved','rejected'].map(function(s){ return '<button type="button" role="option" aria-selected="' + (s === r.status) + '" class="ail-dd-o' + (s === r.status ? ' is-sel' : '') + '" onclick="aivPick(\'' + s + '\')"><span class="flex items-center"><span class="aiv-dot is-' + s + '"></span>' + aivStatusLabel(s) + '</span>' + (s === r.status ? AIV_IC.check : '') + '</button>'; }).join('') + '</div></div>' +
@@ -12181,12 +12233,12 @@ function aivRenderDetail(){
   /* overall */
   h += '<div class="aiv-card"><div class="hd"><h2>Overall language CEFR score (EN)</h2><div class="aiv-big">' + aivScore(overall) + '</div></div></div>';
   /* speaking */
-  if (speak) h += aivAcc('aiv-speak', 'English (US) · Speaking', '<span class="aiv-big" style="font-size:16px">' + aivScore(sAvg) + '</span>',
+  if (speak) h += aivAcc('aiv-speak', 'English (US) · Speaking', '<span class="flex flex-col items-end"><span class="aiv-big" style="font-size:16px">' + aivScore(sAvg) + '</span>' + aivPassTag(sAvg) + '</span>',
     aivSum('Overall score', sAvg, day) + '<div class="aiv-h3" style="margin-top:0">Detailed skills</div>' + aivSkills(speak) +
     '<div class="aiv-h3">Speaking questions</div>' + AIV_SPEAK_Q.map(function(q, i){ const on = AIV.playing === 's' + i; return '<div class="aiv-q"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(q) + '</div><button type="button" class="aiv-play' + (on ? ' on' : '') + '" onclick="aivPlay(\'s' + i + '\')" aria-label="' + (on ? 'Pause' : 'Play') + ' response ' + (i + 1) + '">' + (on ? AIV_IC.pause + ' Playing…' : AIV_IC.play + ' Response') + '</button></div>'; }).join('') +
     '<div class="aiv-h3">Personalized feedback</div><ul class="aiv-fb">' + AIV_SPEAK_FB.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul>', true);
   /* writing */
-  h += aivAcc('aiv-write', 'English (US) · Writing', '<span class="aiv-big" style="font-size:16px">' + aivScore(wAvg) + '</span>',
+  h += aivAcc('aiv-write', 'English (US) · Writing', '<span class="flex flex-col items-end"><span class="aiv-big" style="font-size:16px">' + aivScore(wAvg) + '</span>' + aivPassTag(wAvg) + '</span>',
     aivSum('Overall score', wAvg, day) + '<div class="aiv-h3" style="margin-top:0">Detailed skills</div>' + aivSkills(write) +
     '<div class="aiv-h3">Writing questions</div>' + AIV_WRITE_Q.map(function(w, i){ return '<div class="aiv-q" style="display:block"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(w.q) + '</div><div class="aiv-ans">' + aivEsc(w.a) + '</div><div class="aiv-wc">' + w.w + ' words</div></div>'; }).join('') +
     '<div class="aiv-h3">Personalized feedback</div><ul class="aiv-fb">' + AIV_WRITE_FB.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul>', true); /* Speaking + Writing both open by default (Mai, 13 Nov) */
@@ -12194,14 +12246,13 @@ function aivRenderDetail(){
   const ov = r.override;
   h += '<div class="aiv-card aiv-acc open" id="aiv-integ"><div class="hd aiv-hd2">' +
     '<div class="flex items-center gap-2"><h2>Anti-cheating monitor</h2><span class="aiv-info" tabindex="0" aria-describedby="aiv-tip-integ">' + AIV_IC.info + '<span class="aiv-tip" role="tooltip" id="aiv-tip-integ">Signals from Hallo’s proctoring: webcam snapshots, AI-content detection and actions reported during the interview. The % is the overall chance of cheating. Use them with the answers; they aren’t a verdict.</span></span></div>' +
-    '<div class="flex items-center gap-3">' + (ov ? '<span class="aiv-badge is-' + (ov.result === 'clear' ? 'approved' : 'rejected') + '">' + (ov.result === 'clear' ? 'Overridden: no cheating' : 'Overridden: cheating') + '</span>' : '<button type="button" class="aiv-view" onclick="aivOverride()">Override result</button>') +
-    '<b class="aiv-pct' + (ov ? ' is-struck' : '') + '">' + r.cheatPct + '%</b>' +
+    '<div class="flex items-center gap-3">' +
+    '<b class="aiv-pct">' + r.cheatPct + '%</b>' +
     '<button type="button" class="aiv-chev" aria-expanded="true" aria-label="Collapse anti-cheating monitor" onclick="const c=this.closest(\'.aiv-acc\');c.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',c.classList.contains(\'open\'))">' + AIV_IC.chev + '</button></div></div>' +
     '<div class="bd"><ul class="aiv-fb aiv-sigs">' +
-      '<li>Probability of cheating (from snapshots): <b>' + cheat + '</b>' + (flag ? ' · Potential unusual eye movement' : '') + '</li>' +
+      '<li>Probability of cheating (from snapshots): <b>' + cheat + '</b>' + (flag ? ' · <span class="aiv-sig-r">Potential unusual eye movement</span>' : '') + (r.cheatPct >= 60 ? ' · <span class="aiv-sig-r">Potential camera obstruction</span>' : '') + '</li>' +
       '<li>Probability some content was AI generated: <b>' + ai + '%</b></li>' +
-      '<li>Reported actions: <b>Switched tabs ' + tabs + '×</b> · <b>Left full screen 0×</b> · <b>Screenshots 0×</b></li></ul>' +
-    (ov ? '<div class="aiv-ovnote">Result overridden by ' + aivEsc(ov.by) + ' · ' + aivDate(ov.at) + ': ' + aivEsc(ov.reason) + '</div>' : '') +
+      '<li>Reported actions: <b>Switched tabs ' + tabs + '×</b> · <b>Left full screen 0×</b> · <b>Screenshots 0×</b></li>' + (r.cheatPct >= 60 ? '<li class="aiv-sig-r">Camera was manually blocked</li>' : '') + '</ul>' +
     '<div class="aiv-shots">' + shots.map(function(s, i){ const f = flag && i === 1; return '<figure class="aiv-shot' + (f ? ' flag' : '') + '"><div class="img"></div><figcaption>' + s + (f ? ' · <b>Eye movement</b>' : '') + '</figcaption></figure>'; }).join('') + '</div></div></div>';
   /* system */
   h += aivAcc('aiv-sys', 'System diagnostics', '',
@@ -12209,26 +12260,39 @@ function aivRenderDetail(){
   document.getElementById('aiv-detail').innerHTML = h;
 }
 function aivCopyId(){ const id = AIV.cur.testId; try{ navigator.clipboard.writeText(id).catch(function(){}); }catch(e){} showToast('Test ID copied'); }
-/* Override result (from Pia's Lovable prototype; behaviour is our assumption — ask Pia): Ops can overrule the anti-cheating result with a reason */
+/* Override the AI recommendation (Pia, 13 Nov Loom: "override the recommendation of AI").
+   Assumptions (Mai, 16 Nov): an override can always be undone, and it syncs back to Hallo. */
+const AIV_SYNC = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>';
+function aivRecLabel(v){ return v === 'pass' ? 'Pass' : 'Fail'; }
+function aivPassTag(v){ const ok = v >= AIV_PASS; return '<span class="aiv-pass' + (ok ? '' : ' no') + '">' + aivPf(v) + (ok ? 'Pass' : 'Below threshold') + '</span>'; }
+function aivRecBadge(v){ return '<span class="aiv-badge is-' + (v === 'pass' ? 'approved' : 'rejected') + '">' + aivRecLabel(v) + '</span>'; }
+function aivRecRow(r){ const ai = aivAiRec(r), ov = r.override;
+  if (!ov) return '<div class="aiv-rec"><span class="lbl">AI recommendation</span>' + aivRecBadge(ai) + '<button type="button" class="aiv-view" onclick="aivOverride()">Override</button></div>';
+  return '<div class="aiv-rec"><span class="lbl">AI recommendation</span><span class="was">' + aivRecLabel(ai) + '</span>' + aivRecBadge(ov.to) +
+    '<span class="text-sm text-gray-600">Overridden by ' + aivEsc(ov.by) + ' · ' + aivDate(ov.at) + '</span><span class="sync">' + AIV_SYNC + 'Synced to Hallo</span>' +
+    '<button type="button" class="aiv-undo" onclick="aivUndoOverride()">Undo override</button>' +
+    '<div class="w-full text-sm text-gray-600"><span class="text-gray-400">Reason:</span> ' + aivEsc(ov.reason) + '</div></div>'; }
 function aivOverride(){
-  const r = AIV.cur;
+  const r = AIV.cur, ai = aivAiRec(r), to = ai === 'pass' ? 'fail' : 'pass';
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-o-t" style="width:560px">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Override anti-cheating result</div><div class="ail-ms">Hallo rated a ' + r.cheatPct + '% chance of cheating. Your decision replaces it for this interview.</div></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Override the AI recommendation?</div><div class="ail-ms">Hallo recommends <b>' + aivRecLabel(ai) + '</b> for ' + aivEsc(r.name) + '. Your recommendation replaces it here and in Hallo. You can undo it later.</div></div></div>' +
     '<div class="ail-mb"><div class="flex flex-col gap-2">' +
-      '<label class="aiv-ocard"><input class="proc-input" type="radio" name="aiv-ov" value="clear" onchange="aivOvCheck()"><span class="proc-dot"></span><span><b>No cheating</b>The flags have an innocent explanation.</span></label>' +
-      '<label class="aiv-ocard"><input class="proc-input" type="radio" name="aiv-ov" value="cheat" onchange="aivOvCheck()"><span class="proc-dot"></span><span><b>Cheating</b>Treat this interview as cheating.</span></label></div>' +
-      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" placeholder="e.g. Looked away to check a second monitor for notes" oninput="aivOvCheck()"></textarea></div></div>' +
+      '<label class="aiv-ocard"><input class="proc-input" type="radio" name="aiv-ov" value="' + to + '" checked onchange="aivOvCheck()"><span class="proc-dot"></span><span><b>' + aivRecLabel(to) + '</b>' + (to === 'pass' ? 'The scores or flags don’t reflect this agent’s real level.' : 'This agent shouldn’t pass, despite the AI result.') + '</span></label></div>' +
+      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" placeholder="' + (to === 'pass' ? 'e.g. Camera flag was a lighting issue; answers were clear and natural' : 'e.g. Answers were read from notes; writing looks AI generated') + '" oninput="aivOvCheck()"></textarea></div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Cancel</button>' +
-    '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Override result</button></div></div>';
+    '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Override</button></div></div>';
   bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
-  document.body.appendChild(bd);
+  document.body.appendChild(bd); document.getElementById('aiv-o-r').focus();
 }
 function aivOvCheck(){ const v = document.querySelector('input[name=aiv-ov]:checked'), t = document.getElementById('aiv-o-r').value.trim(); document.getElementById('aiv-o-save').disabled = !(v && t); }
 function aivSaveOverride(){ const r = AIV.cur, v = document.querySelector('input[name=aiv-ov]:checked').value, t = document.getElementById('aiv-o-r').value.trim();
-  r.override = { result:v, reason:t, by:AIV_ME, at:new Date().toISOString() };
-  r.comments.unshift({ by:AIV_ME, at:r.override.at, text:'Overrode the anti-cheating result (' + (v === 'clear' ? 'no cheating' : 'cheating') + '): ' + t });
-  aivCloseModal(); const y = window.scrollY; aivRenderDetail(); window.scrollTo(0, y); showToast('Anti-cheating result overridden'); }
+  r.override = { to:v, reason:t, by:AIV_ME, at:new Date().toISOString() };
+  r.comments.unshift({ by:AIV_ME, at:r.override.at, text:'Overrode the AI recommendation (' + aivRecLabel(aivAiRec(r)) + ' → ' + aivRecLabel(v) + '): ' + t });
+  aivCloseModal(); const y = window.scrollY; aivRenderDetail(); window.scrollTo(0, y); showToast('AI recommendation overridden and synced to Hallo'); }
+function aivUndoOverride(){ const r = AIV.cur; if (!r.override) return; const was = r.override.to;
+  r.override = null; r.comments.unshift({ by:AIV_ME, at:new Date().toISOString(), text:'Undid the override (' + aivRecLabel(was) + '). Back to the AI recommendation: ' + aivRecLabel(aivAiRec(r)) + '.' });
+  const y = window.scrollY; aivRenderDetail(); window.scrollTo(0, y); showToast('Override undone and synced to Hallo'); }
 function aivPlay(k){ AIV.playing = AIV.playing === k ? null : k; const y = window.scrollY; aivRenderDetail(); window.scrollTo(0, y);
   clearTimeout(AIV._pt); if (AIV.playing) AIV._pt = setTimeout(function(){ AIV.playing = null; const y2 = window.scrollY; aivRenderDetail(); window.scrollTo(0, y2); }, 4000); }
 function aivDdToggle(force){ const dd = document.getElementById('aiv-dd'); if (!dd) return; const t = dd.querySelector('.ail-dd-t'), m = dd.querySelector('.ail-dd-m'); const open = force != null ? force : m.hidden; m.hidden = !open; t.setAttribute('aria-expanded', String(open)); }
