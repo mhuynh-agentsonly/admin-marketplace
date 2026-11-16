@@ -367,6 +367,11 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const VIDEO='speaking-assessment-720p.mp4';
 const HOME='skills-center-agent-v2.html',LOGIN='ai-interview.html#login';
 const AGENT={fn:'Olivia',ln:'Rhye',em:'olivia.rhye@example.com'};
+/* name/email from onboarding when the agent came from there (sessionStorage 'aoOnboarding') */
+try{const o=JSON.parse(sessionStorage.getItem('aoOnboarding')||'{}');const g=k=>Object.keys(o).find(x=>x.toLowerCase()===k);
+ const fn=o[g('first name')],ln=o[g('last name')],em=o[g('email')]||o[g('email address')];if(fn&&String(fn).trim())AGENT.fn=String(fn).trim();if(ln&&String(ln).trim())AGENT.ln=String(ln).trim();if(em&&/@/.test(em))AGENT.em=String(em).trim()}catch(e){}
+/* started from a skills test card (skills-center-agent-v2.html › AII.forTest): Exit goes on to that test */
+const GATE=(()=>{try{const u=new URLSearchParams(location.search);return u.get('from')==='test'?{id:u.get('test')||'',name:u.get('tn')||''}:null}catch(e){return null}})();
 const ST={voice:true,demo:false,out:false,fast:false,paused:false,tok:0,wait:null,strikes:0,live:false,fsWanted:false,stream:null,an:null,words:[]};
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const fmt2=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
@@ -546,7 +551,7 @@ async function evaluate(tok,short){if(short){openM('m-short');await new Promise(
  for(let p=0;p<=top;p+=ST.fast?11:1){if(tok!==ST.tok)return;$('ring-c').setAttribute('stroke-dashoffset',C*(1-Math.min(p,top)/100));$('ring-t').textContent=Math.min(p,top)+'%';await sleep(ST.fast?40:60)}
  if(short){await sleep(T(4000));if(tok===ST.tok){TOS=false;syncTos();show('welcome')}return} /* Hallo today: stuck at 99%, then back to Welcome */
  try{localStorage.setItem('aoAiInterview','done')}catch(e){}show('done')}
-const exit=()=>{location.href=ST.out?LOGIN:HOME};$('b-exit').onclick=$('b-exit2').onclick=exit;
+const exit=()=>{location.href=ST.out?LOGIN:(GATE&&GATE.id?HOME+'#test='+encodeURIComponent(GATE.id):HOME)};$('b-exit').onclick=$('b-exit2').onclick=exit;
 
 /* ---------- integrity ---------- */
 function live(on){ST.live=on;placeSelf()}
