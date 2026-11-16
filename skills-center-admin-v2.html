@@ -2350,13 +2350,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
           class="border-input w-full rounded-md border bg-transparent py-1.5 text-sm outline-none transition-[color,box-shadow] focus-visible:border-primary-300 focus-visible:[box-shadow:var(--focus-ring-shadow-sm)]"
           style="padding-left:32px;padding-right:12px;height:34px"/>
       </div>
-      <div class="aiv-filters" id="aiv-filters">
-        <select class="aiv-sel" aria-label="Date" onchange="AIV.f.date=this.value;AIV.page=1;aivRenderList()"><option value="">Any date</option><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select>
-        <select class="aiv-sel" aria-label="Status" onchange="AIV.f.prog=this.value;AIV.page=1;aivRenderList()"><option value="">All statuses</option><option value="started">Started</option><option value="completed">Completed</option></select>
-        <select class="aiv-sel" aria-label="Hire status" onchange="AIV.status=this.value||'all';AIV.page=1;aivRenderList()"><option value="">All hire statuses</option><option value="pending">Pending review</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
-        <select class="aiv-sel" aria-label="Language" onchange="AIV.f.lang=this.value;AIV.page=1;aivRenderList()"><option value="">All languages</option><option>English (US)</option><option>English (UK)</option><option>Spanish (LatAm)</option></select>
-        <select class="aiv-sel" aria-label="CEFR level" onchange="AIV.f.cefr=this.value;AIV.page=1;aivRenderList()"><option value="">All CEFR levels</option><option>C2</option><option>C1</option><option>B2</option><option>B1</option><option>A2</option></select>
-      </div>
+      <div class="aiv-filters" id="aiv-filters"></div>
     </div>
     <div class="overflow-x-auto">
       <table class="text-sm w-full" id="aiv-table">
@@ -12007,10 +12001,23 @@ function invToast(title, desc){
 /* Hallo-aligned list (16 Nov) */
 .aiv-filters{display:flex;flex-wrap:wrap;gap:8px}
 .aiv-sel{height:34px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;padding:0 28px 0 10px;font-size:14px;font-family:inherit;color:#374151;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.aiv-ms-t{display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:4px 8px 4px 10px;border:1.5px solid #E5E7EB;border-radius:6px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s;min-width:140px;justify-content:space-between}
+.aiv-ms-t:hover:not([aria-expanded="true"]){border-color:#9CA3AF}
+.aiv-ms-t[aria-expanded="true"],.aiv-ms-t:focus-visible{border-color:#5FCEB1;outline:none;box-shadow:0 0 0 3px #c5fcee}
+.aiv-ms-p{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px}
+.aiv-ms-ph{color:#030712;font-size:14px;white-space:nowrap}
+.aiv-ms-dd{position:absolute;top:calc(100% + 4px);right:0;z-index:50;min-width:200px;background:#fff;border-radius:8px;box-shadow:0 8px 24px -4px rgba(0,0,0,.12),0 4px 8px -4px rgba(0,0,0,.07);overflow:hidden}
+.aiv-ms-clear{width:100%;font-size:14px;font-weight:500;text-align:center;color:#007460;background:transparent;border:none;cursor:pointer;font-family:inherit}
 .aiv-sel:focus{outline:none;border-color:#5FCEB1;box-shadow:0 0 0 3px rgba(95,206,177,.3)}
 #aiv-rows td{vertical-align:middle;white-space:nowrap}
-.aiv-row.is-off{cursor:default}
-.aiv-row.is-off:hover .ail-n{text-decoration:none}
+.aiv-wait{display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 24px}
+.aiv-wait .ic{width:48px;height:48px;border-radius:999px;background:#F3F4F6;color:#6B7280;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.aiv-wait h2{font-size:18px;font-weight:600;color:#030712;margin:0 0 6px}
+.aiv-wait p{font-size:14px;line-height:20px;color:#4B5563;max-width:440px;margin:0 0 20px}
+.aiv-parts{list-style:none;margin:0;padding:0;width:100%;max-width:360px;border:1px solid #E5E7EB;border-radius:8px}
+.aiv-parts li{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:14px;color:#111827}
+.aiv-parts li+li{border-top:1px solid #E5E7EB}
+.aiv-badge.is-idle{background:#fff;color:#6B7280;box-shadow:inset 0 0 0 1px #E5E7EB}
 .aiv-sub{font-size:13px;color:#6B7280;display:flex;align-items:center;gap:4px;margin-top:2px}
 .aiv-sc b{display:block;font-size:14px;font-weight:600;color:#111827;line-height:18px}
 .aiv-sc .v{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:#374151}
@@ -12028,6 +12035,9 @@ function invToast(title, desc){
 .aiv-rec .sync{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#6B7280}
 .aiv-undo{border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:500;color:#007460;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .aiv-sig-r{color:#B45309}
+.aiv-chg{display:flex;align-items:center;gap:16px;background:#F9FAFB;border:1px solid #F3F4F6;border-radius:12px;padding:14px 16px}
+.aiv-chg .k{font-size:13px;color:#6B7280;margin-bottom:6px}
+.aiv-chg .arr{color:#9CA3AF;margin-top:18px}
 </style>
 <script id="aiv-script">
 /* ======================= AI Interviews (admin) =======================
@@ -12046,7 +12056,7 @@ function invToast(title, desc){
   SCREEN_TO_NAV['admin-ai-interview'] = { key: 'ai-interviews' };
 })();
 
-const AIV = { q:'', status:'all', page:1, per:10, cur:null, playing:null, f:{ date:'', prog:'', lang:'', cefr:'' } };
+const AIV = { q:'', status:'all', page:1, per:10, cur:null, playing:null, f:{ date:new Set(), prog:new Set(), hire:new Set(), lang:new Set(), cefr:new Set() } };
 const AIV_PASS = 7; /* skill threshold (Hallo's Thresholds) */
 const AIV_ME = 'Sarah Davis';
 const AIV_SPEAK_Q = [
@@ -12116,9 +12126,32 @@ function aivBadge(s){ return '<span class="aiv-badge is-' + s + '">' + aivStatus
 function aivDate(iso){ return fmtSkillDate(iso); }
 
 /* ---------- list ---------- */
-function aivGoList(){ go('admin-ai-interviews'); aivRenderList(); }
+function aivGoList(){ go('admin-ai-interviews'); aivMsRender(); aivRenderList(); }
 function aivSetStatus(s){ AIV.status = s; AIV.page = 1; document.querySelectorAll('#aiv-seg button').forEach(function(b){ b.setAttribute('aria-selected', String(b.dataset.s === s)); }); aivRenderList(); }
 function aivPage(p){ AIV.page = p; aivRenderList(); }
+/* ---- multi-select filters, same pattern as the Test library (Mai, 16 Nov) ---- */
+const AIV_MS = [
+  { k:'date', all:'Any date', opts:[['1','Today'],['7','Last 7 days'],['30','Last 30 days']] },
+  { k:'prog', all:'All statuses', opts:[['started','Started'],['completed','Completed']] },
+  { k:'hire', all:'All hire statuses', opts:[['pending','Pending review'],['approved','Approved'],['rejected','Rejected']] },
+  { k:'lang', all:'All languages', opts:[['English (US)','English (US)'],['English (UK)','English (UK)'],['Spanish (LatAm)','Spanish (LatAm)']] },
+  { k:'cefr', all:'All CEFR levels', opts:[['C2','C2'],['C1','C1'],['B2','B2'],['B1','B1'],['A2','A2']] }];
+const AIV_CHECK = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function aivMsRender(){ const box = document.getElementById('aiv-filters'); if (!box) return; const open = AIV.msOpen;
+  box.innerHTML = AIV_MS.map(function(m){ const sel = AIV.f[m.k], lab = function(v){ return (m.opts.find(function(o){ return o[0] === v; }) || [v, v])[1]; };
+    const vals = [...sel], extra = vals.length - 2;
+    const pills = vals.length ? vals.slice(0, 2).map(function(v){ return '<span class="list-cat-pill">' + aivEsc(lab(v)) + '<button type="button" class="list-cat-pill-x" aria-label="Remove ' + aivEsc(lab(v)) + '" onclick="event.stopPropagation();aivMsToggle(\'' + m.k + '\',\'' + v + '\')">×</button></span>'; }).join('') + (extra > 0 ? '<span class="list-cat-pill">+' + extra + ' more</span>' : '') : '<span class="aiv-ms-ph">' + m.all + '</span>';
+    const isOpen = open === m.k;
+    return '<div class="aiv-ms" style="position:relative"><button type="button" class="aiv-ms-t" aria-haspopup="listbox" aria-expanded="' + isOpen + '" onclick="event.stopPropagation();aivMsOpen(\'' + m.k + '\')"><span class="aiv-ms-p">' + pills + '</span>' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform .15s;margin-left:2px' + (isOpen ? ';transform:rotate(180deg)' : '') + '"><path d="m6 9 6 6 6-6"/></svg></button>' +
+      (isOpen ? '<div class="aiv-ms-dd" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()"><div style="padding:4px 0">' +
+        '<button type="button" role="option" class="list-cat-item" aria-selected="' + !sel.size + '" onclick="aivMsClear(\'' + m.k + '\',true)"><span>All</span>' + (sel.size ? '' : AIV_CHECK) + '</button>' +
+        m.opts.map(function(o){ const on = sel.has(o[0]); return '<button type="button" role="option" class="list-cat-item" aria-selected="' + on + '" onclick="aivMsToggle(\'' + m.k + '\',\'' + o[0] + '\')"><span>' + aivEsc(o[1]) + '</span>' + (on ? AIV_CHECK : '') + '</button>'; }).join('') + '</div>' +
+        (sel.size ? '<div style="border-top:1px solid #E5E7EB;padding:8px 16px"><button type="button" class="aiv-ms-clear" onclick="aivMsClear(\'' + m.k + '\')">Clear selection</button></div>' : '') + '</div>' : '') + '</div>'; }).join(''); }
+function aivMsOpen(k){ AIV.msOpen = AIV.msOpen === k ? null : k; aivMsRender(); }
+function aivMsToggle(k, v){ const s = AIV.f[k]; if (s.has(v)) s.delete(v); else s.add(v); AIV.page = 1; aivMsRender(); aivRenderList(); }
+function aivMsClear(k, keepOpen){ AIV.f[k].clear(); if (!keepOpen) AIV.msOpen = null; AIV.page = 1; aivMsRender(); aivRenderList(); }
+document.addEventListener('click', function(){ if (AIV.msOpen){ AIV.msOpen = null; aivMsRender(); } });
 /* scores used by the list and the detail page (same numbers) */
 function aivScores(r){ const b = r.base, j = function(k){ return Math.round((b + ((r.id * 7 + k * 3) % 9 - 4) / 10) * 10) / 10; };
   const speak = r.type === 'sw' ? [['Fluency', j(1)], ['Vocabulary', j(2)], ['Grammar', j(3)], ['Pronunciation', j(4)], ['Coherence', j(5)]] : null;
@@ -12138,11 +12171,12 @@ function aivRenderList(){
   const tb = document.getElementById('aiv-rows'); if (!tb) return;
   const now = Date.parse('2026-11-13T12:00');
   const rows = AIV_DATA.filter(function(r){
-    if (AIV.status !== 'all' && (r.prog !== 'completed' || r.status !== AIV.status)) return false;
-    if (AIV.f.prog && r.prog !== AIV.f.prog) return false;
-    if (AIV.f.lang && r.lang !== AIV.f.lang) return false;
-    if (AIV.f.cefr && (r.prog !== 'completed' || aivLvl(aivScores(r).overall) !== AIV.f.cefr)) return false;
-    if (AIV.f.date && (now - Date.parse(r.date)) > (+AIV.f.date) * 864e5) return false;
+    const F = AIV.f;
+    if (F.hire.size && (r.prog !== 'completed' || !F.hire.has(r.status))) return false;
+    if (F.prog.size && !F.prog.has(r.prog)) return false;
+    if (F.lang.size && !F.lang.has(r.lang)) return false;
+    if (F.cefr.size && (r.prog !== 'completed' || !F.cefr.has(aivLvl(aivScores(r).overall)))) return false;
+    if (F.date.size && (now - Date.parse(r.date)) > Math.max.apply(null, [...F.date].map(Number)) * 864e5) return false; /* several ranges = the widest one */
     return !AIV.q || (r.name + ' ' + r.email).toLowerCase().indexOf(AIV.q) >= 0;
   }).sort(function(a, b){ return Date.parse(b.date) - Date.parse(a.date); });
   document.getElementById('aiv-empty').classList.toggle('hidden', rows.length > 0);
@@ -12151,8 +12185,8 @@ function aivRenderList(){
   const pg = AIV.page, start = (pg - 1) * per;
   tb.innerHTML = rows.slice(start, start + per).map(function(r){
     const done = r.prog === 'completed', s = done ? aivScores(r) : null, f = aivFlag(r);
-    const open = done ? ' tabindex="0" role="link" aria-label="Open interview: ' + aivEsc(r.name) + '" onclick="aivOpen(' + r.id + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();aivOpen(' + r.id + ')}"' : ' title="Still taking the test — results show when it\'s completed"';
-    return '<tr class="aiv-row' + (done ? '' : ' is-off') + '"' + open + '>' +
+    const open = ' tabindex="0" role="link" aria-label="Open interview: ' + aivEsc(r.name) + (done ? '' : ' (test in progress)') + '" onclick="aivOpen(' + r.id + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();aivOpen(' + r.id + ')}"';
+    return '<tr class="aiv-row"' + open + '>' +
       '<td class="px-4 py-3"><div class="ail-n">' + aivEsc(r.name) + '</div><div class="ail-d">' + aivEsc(r.email) + '</div></td>' +
       '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivEsc(r.lang) + '</div><div class="aiv-sub">' + (r.type === 'sw' ? 'speaking &amp; writing' : 'writing') + '</div></td>' +
       '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivDate(r.date) + '</div><div class="aiv-sub">' + AIV_CLOCK + (r.dur || '—') + '</div></td>' +
@@ -12204,6 +12238,7 @@ function aivSkills(list){ return list.map(function(s){ const v = Math.max(0, Mat
 function aivSum(label, score, date){ return '<div class="aiv-sum"><div class="l"><div class="k">' + label + ' · ' + date + '</div><div class="aiv-bar"><i style="width:' + (score * 10) + '%"></i></div></div></div>'; } /* the score itself sits in the section header (visible when collapsed) */
 function aivRenderDetail(){
   const r = AIV.cur;
+  if (r.prog !== 'completed') return aivRenderProgress(r);
   const day = new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
   const S = aivScores(r), speak = S.speak, write = S.write, sAvg = S.sAvg, wAvg = S.wAvg, overall = S.overall;
   const sig = aivSignals(r), cheat = sig.cheat, flag = sig.eye, ai = sig.ai, tabs = sig.tabs;
@@ -12259,6 +12294,30 @@ function aivRenderDetail(){
     '<div class="aiv-sys">' + [['globe','Browser','Chrome 142.0'],['laptop','OS','Windows 11'],['monitor','Device','Desktop'],['type','Model','Unknown'],['factory','Vendor','Unknown'],['cpu','Screen','1536 × 864'],['network','IP address','112.203.58.' + (100 + r.id)]].map(function(k){ return '<div class="aiv-sys-r">' + aivLc(k[0]) + '<b>' + k[1] + ':</b><span>' + k[2] + '</span></div>'; }).join('') + '</div>', true);
   document.getElementById('aiv-detail').innerHTML = h;
 }
+/* In-progress detail (our addition, not in Hallo — Hallo only shows finished tests). Same header and Comments,
+   no scores, recommendation or hire status until the agent finishes. */
+function aivRenderProgress(r){
+  const t = new Date(r.date).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+  const parts = r.type === 'sw' ? [['Part I · Speaking','In progress'],['Part II · Writing','Not started']] : [['Writing','In progress']];
+  let h = '<nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">' +
+    '<a href="#" onclick="event.preventDefault(); aivGoList()" class="text-primary-700 hover:text-primary-800 font-medium hover:underline underline-offset-2">AI Interview</a>' +
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
+    '<span class="text-foreground font-medium">' + aivEsc(r.name) + '</span></nav>';
+  h += '<div class="aiv-card"><div class="aiv-top"><div><h1>' + aivEsc(r.name) + '</h1>' +
+    '<div class="aiv-lines"><div class="t">' + (r.type === 'sw' ? 'Speaking &amp; Writing' : 'Writing') + ' · ' + aivEsc(r.lang) + '</div>' +
+    '<div>' + aivEsc(r.email) + '</div>' +
+    '<div class="aiv-id"><span>' + r.testId + '</span><button type="button" class="aiv-copy" onclick="aivCopyId()" aria-label="Copy test ID" title="Copy test ID">' + AIV_IC.copy + '</button></div>' +
+    '<div>Started ' + aivDate(r.date) + ' · Sent by ' + aivEsc(r.sentBy) + '</div></div></div>' +
+    '<span class="aiv-badge is-progress" style="align-self:flex-start">Test in progress</span></div></div>';
+  h += '<div class="aiv-card aiv-wait"><div class="ic" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg></div>' +
+    '<h2>No results yet</h2><p>' + aivEsc(r.name.split(' ')[0]) + ' started the AI interview on ' + t + '. Scores, answers and the anti-cheating report show here when they finish, and then you can approve or reject them.</p>' +
+    '<ul class="aiv-parts">' + parts.map(function(x){ const on = x[1] === 'In progress'; return '<li><span>' + x[0] + '</span><span class="aiv-badge ' + (on ? 'is-progress' : 'is-idle') + '">' + x[1] + '</span></li>'; }).join('') + '</ul></div>';
+  h += aivAcc('aiv-comments', 'Comments', r.comments.length ? '<span class="text-sm text-gray-500 font-normal">' + r.comments.length + '</span>' : '',
+    (r.comments.length ? r.comments.map(function(c){ return '<div class="aiv-cm"><div class="aiv-av">' + c.by.split(' ').map(function(p){ return p[0]; }).join('') + '</div><div><div class="who">' + aivEsc(c.by) + '<span class="when">' + aivDate(c.at) + '</span></div><div class="tx">' + aivEsc(c.text) + '</div></div></div>'; }).join('') : '<p class="text-sm text-gray-500" style="margin:0 0 12px">No comments yet.</p>') +
+    '<div style="margin-top:12px"><textarea class="aiv-ta" id="aiv-cm-in" placeholder="Add a comment for your team" oninput="document.getElementById(\'aiv-cm-btn\').disabled=!this.value.trim()"></textarea>' +
+    '<div class="flex justify-end" style="margin-top:8px"><button type="button" id="aiv-cm-btn" disabled class="' + DS.btnBase + ' ' + DS.btnSecondary + ' ' + DS.btnSizeDefault + '" onclick="aivPostComment()">Post comment</button></div></div>', r.comments.length > 0);
+  document.getElementById('aiv-detail').innerHTML = h;
+}
 function aivCopyId(){ const id = AIV.cur.testId; try{ navigator.clipboard.writeText(id).catch(function(){}); }catch(e){} showToast('Test ID copied'); }
 /* Override the AI recommendation (Pia, 13 Nov Loom: "override the recommendation of AI").
    Assumptions (Mai, 16 Nov): an override can always be undone, and it syncs back to Hallo. */
@@ -12273,20 +12332,19 @@ function aivRecRow(r){ const ai = aivAiRec(r), ov = r.override;
     '<button type="button" class="aiv-undo" onclick="aivUndoOverride()">Undo override</button>' +
     '<div class="w-full text-sm text-gray-600"><span class="text-gray-400">Reason:</span> ' + aivEsc(ov.reason) + '</div></div>'; }
 function aivOverride(){
-  const r = AIV.cur, ai = aivAiRec(r), to = ai === 'pass' ? 'fail' : 'pass';
+  const r = AIV.cur, ai = aivAiRec(r), to = ai === 'pass' ? 'fail' : 'pass'; AIV.ovTo = to;
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-o-t" style="width:560px">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Override the AI recommendation?</div><div class="ail-ms">Hallo recommends <b>' + aivRecLabel(ai) + '</b> for ' + aivEsc(r.name) + '. Your recommendation replaces it here and in Hallo. You can undo it later.</div></div></div>' +
-    '<div class="ail-mb"><div class="flex flex-col gap-2">' +
-      '<label class="aiv-ocard"><input class="proc-input" type="radio" name="aiv-ov" value="' + to + '" checked onchange="aivOvCheck()"><span class="proc-dot"></span><span><b>' + aivRecLabel(to) + '</b>' + (to === 'pass' ? 'The scores or flags don’t reflect this agent’s real level.' : 'This agent shouldn’t pass, despite the AI result.') + '</span></label></div>' +
-      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" placeholder="' + (to === 'pass' ? 'e.g. Camera flag was a lighting issue; answers were clear and natural' : 'e.g. Answers were read from notes; writing looks AI generated') + '" oninput="aivOvCheck()"></textarea></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Change the recommendation to ' + aivRecLabel(to) + '?</div><div class="ail-ms">Hallo’s AI recommends ' + aivRecLabel(ai) + ' for ' + aivEsc(r.name) + '. Your change also updates Hallo, and you can undo it any time.</div></div></div>' +
+    '<div class="ail-mb"><div class="aiv-chg"><div><div class="k">AI recommendation</div>' + aivRecBadge(ai) + '</div><span class="arr" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><div><div class="k">Your recommendation</div>' + aivRecBadge(to) + '</div></div>' +
+      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><div class="text-sm text-gray-500" style="margin-top:-2px">Your team sees this in Comments.</div><textarea class="aiv-ta" id="aiv-o-r" placeholder="' + (to === 'pass' ? 'e.g. Camera flag was a lighting issue; answers were clear and natural' : 'e.g. Answers were read from notes; writing looks AI generated') + '" oninput="aivOvCheck()"></textarea></div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Cancel</button>' +
-    '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Override</button></div></div>';
+    '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Change to ' + aivRecLabel(to) + '</button></div></div>';
   bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
   document.body.appendChild(bd); document.getElementById('aiv-o-r').focus();
 }
-function aivOvCheck(){ const v = document.querySelector('input[name=aiv-ov]:checked'), t = document.getElementById('aiv-o-r').value.trim(); document.getElementById('aiv-o-save').disabled = !(v && t); }
-function aivSaveOverride(){ const r = AIV.cur, v = document.querySelector('input[name=aiv-ov]:checked').value, t = document.getElementById('aiv-o-r').value.trim();
+function aivOvCheck(){ const t = document.getElementById('aiv-o-r').value.trim(); document.getElementById('aiv-o-save').disabled = !t; }
+function aivSaveOverride(){ const r = AIV.cur, v = AIV.ovTo, t = document.getElementById('aiv-o-r').value.trim();
   r.override = { to:v, reason:t, by:AIV_ME, at:new Date().toISOString() };
   r.comments.unshift({ by:AIV_ME, at:r.override.at, text:'Overrode the AI recommendation (' + aivRecLabel(aivAiRec(r)) + ' → ' + aivRecLabel(v) + '): ' + t });
   aivCloseModal(); const y = window.scrollY; aivRenderDetail(); window.scrollTo(0, y); showToast('AI recommendation overridden and synced to Hallo'); }
