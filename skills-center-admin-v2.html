@@ -11999,14 +11999,16 @@ function invToast(title, desc){
 .aiv-btn-red:hover{background:#DC2626}
 .aiv-note{font-size:13px;color:#6B7280;margin-top:10px}
 /* Hallo-aligned list (16 Nov) */
-.aiv-filters{display:flex;flex-wrap:wrap;gap:8px}
+.aiv-filters{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding-bottom:4px;margin-bottom:-4px}
+.aiv-ms{flex-shrink:0}
 .aiv-sel{height:34px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;padding:0 28px 0 10px;font-size:14px;font-family:inherit;color:#374151;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-.aiv-ms-t{display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:4px 8px 4px 10px;border:1.5px solid #E5E7EB;border-radius:6px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s;min-width:140px;justify-content:space-between}
+.aiv-ms-t{white-space:nowrap;display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:4px 8px 4px 10px;border:1.5px solid #E5E7EB;border-radius:6px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s;min-width:140px;justify-content:space-between}
 .aiv-ms-t:hover:not([aria-expanded="true"]){border-color:#9CA3AF}
 .aiv-ms-t[aria-expanded="true"],.aiv-ms-t:focus-visible{border-color:#5FCEB1;outline:none;box-shadow:0 0 0 3px #c5fcee}
-.aiv-ms-p{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px}
+.aiv-ms-p{display:inline-flex;align-items:center;flex-wrap:nowrap;gap:4px}
+.aiv-ms-v{color:#030712;font-size:14px;white-space:nowrap}
 .aiv-ms-ph{color:#030712;font-size:14px;white-space:nowrap}
-.aiv-ms-dd{position:absolute;top:calc(100% + 4px);right:0;z-index:50;min-width:200px;background:#fff;border-radius:8px;box-shadow:0 8px 24px -4px rgba(0,0,0,.12),0 4px 8px -4px rgba(0,0,0,.07);overflow:hidden}
+.aiv-ms-dd{position:fixed;z-index:50;min-width:200px;background:#fff;border-radius:8px;box-shadow:0 8px 24px -4px rgba(0,0,0,.12),0 4px 8px -4px rgba(0,0,0,.07);overflow:hidden}
 .aiv-ms-clear{width:100%;font-size:14px;font-weight:500;text-align:center;color:#007460;background:transparent;border:none;cursor:pointer;font-family:inherit}
 .aiv-sel:focus{outline:none;border-color:#5FCEB1;box-shadow:0 0 0 3px rgba(95,206,177,.3)}
 #aiv-rows td{vertical-align:middle;white-space:nowrap}
@@ -12131,23 +12133,30 @@ function aivSetStatus(s){ AIV.status = s; AIV.page = 1; document.querySelectorAl
 function aivPage(p){ AIV.page = p; aivRenderList(); }
 /* ---- multi-select filters, same pattern as the Test library (Mai, 16 Nov) ---- */
 const AIV_MS = [
-  { k:'date', all:'Any date', opts:[['1','Today'],['7','Last 7 days'],['30','Last 30 days']] },
+  { k:'date', single:true, all:'Any date', opts:[['1','Today'],['7','Last 7 days'],['30','Last 30 days']] },
   { k:'prog', all:'All statuses', opts:[['started','Started'],['completed','Completed']] },
   { k:'hire', all:'All hire statuses', opts:[['pending','Pending review'],['approved','Approved'],['rejected','Rejected']] },
   { k:'lang', all:'All languages', opts:[['English (US)','English (US)'],['English (UK)','English (UK)'],['Spanish (LatAm)','Spanish (LatAm)']] },
   { k:'cefr', all:'All CEFR levels', opts:[['C2','C2'],['C1','C1'],['B2','B2'],['B1','B1'],['A2','A2']] }];
 const AIV_CHECK = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-function aivMsRender(){ const box = document.getElementById('aiv-filters'); if (!box) return; const open = AIV.msOpen;
+function aivMsRender(){ const box = document.getElementById('aiv-filters'); if (!box) return; const open = AIV.msOpen, sx = box.scrollLeft;
   box.innerHTML = AIV_MS.map(function(m){ const sel = AIV.f[m.k], lab = function(v){ return (m.opts.find(function(o){ return o[0] === v; }) || [v, v])[1]; };
     const vals = [...sel], extra = vals.length - 2;
-    const pills = vals.length ? vals.slice(0, 2).map(function(v){ return '<span class="list-cat-pill">' + aivEsc(lab(v)) + '<button type="button" class="list-cat-pill-x" aria-label="Remove ' + aivEsc(lab(v)) + '" onclick="event.stopPropagation();aivMsToggle(\'' + m.k + '\',\'' + v + '\')">×</button></span>'; }).join('') + (extra > 0 ? '<span class="list-cat-pill">+' + extra + ' more</span>' : '') : '<span class="aiv-ms-ph">' + m.all + '</span>';
+    const pills = m.single ? '<span class="aiv-ms-v">' + (vals.length ? aivEsc(lab(vals[0])) : m.all) + '</span>' : vals.length ? vals.slice(0, 2).map(function(v){ return '<span class="list-cat-pill">' + aivEsc(lab(v)) + '<button type="button" class="list-cat-pill-x" aria-label="Remove ' + aivEsc(lab(v)) + '" onclick="event.stopPropagation();aivMsToggle(\'' + m.k + '\',\'' + v + '\')">×</button></span>'; }).join('') + (extra > 0 ? '<span class="list-cat-pill">+' + extra + ' more</span>' : '') : '<span class="aiv-ms-ph">' + m.all + '</span>';
     const isOpen = open === m.k;
     return '<div class="aiv-ms" style="position:relative"><button type="button" class="aiv-ms-t" aria-haspopup="listbox" aria-expanded="' + isOpen + '" onclick="event.stopPropagation();aivMsOpen(\'' + m.k + '\')"><span class="aiv-ms-p">' + pills + '</span>' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;transition:transform .15s;margin-left:2px' + (isOpen ? ';transform:rotate(180deg)' : '') + '"><path d="m6 9 6 6 6-6"/></svg></button>' +
-      (isOpen ? '<div class="aiv-ms-dd" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()"><div style="padding:4px 0">' +
-        '<button type="button" role="option" class="list-cat-item" aria-selected="' + !sel.size + '" onclick="aivMsClear(\'' + m.k + '\',true)"><span>All</span>' + (sel.size ? '' : AIV_CHECK) + '</button>' +
-        m.opts.map(function(o){ const on = sel.has(o[0]); return '<button type="button" role="option" class="list-cat-item" aria-selected="' + on + '" onclick="aivMsToggle(\'' + m.k + '\',\'' + o[0] + '\')"><span>' + aivEsc(o[1]) + '</span>' + (on ? AIV_CHECK : '') + '</button>'; }).join('') + '</div>' +
-        (sel.size ? '<div style="border-top:1px solid #E5E7EB;padding:8px 16px"><button type="button" class="aiv-ms-clear" onclick="aivMsClear(\'' + m.k + '\')">Clear selection</button></div>' : '') + '</div>' : '') + '</div>'; }).join(''); }
+      (isOpen ? '<div class="aiv-ms-dd" role="listbox"' + (m.single ? '' : ' aria-multiselectable="true"') + ' onclick="event.stopPropagation()"><div style="padding:4px 0">' +
+        '<button type="button" role="option" class="list-cat-item" aria-selected="' + !sel.size + '" onclick="aivMsClear(\'' + m.k + '\',' + !m.single + ')"><span>' + (m.single ? m.all : 'All') + '</span>' + (sel.size ? '' : AIV_CHECK) + '</button>' +
+        m.opts.map(function(o){ const on = sel.has(o[0]); return '<button type="button" role="option" class="list-cat-item" aria-selected="' + on + '" onclick="' + (m.single ? 'aivMsPick' : 'aivMsToggle') + '(\'' + m.k + '\',\'' + o[0] + '\')"><span>' + aivEsc(o[1]) + '</span>' + (on ? AIV_CHECK : '') + '</button>'; }).join('') + '</div>' +
+        (sel.size && !m.single ? '<div style="border-top:1px solid #E5E7EB;padding:8px 16px"><button type="button" class="aiv-ms-clear" onclick="aivMsClear(\'' + m.k + '\')">Clear selection</button></div>' : '') + '</div>' : '') + '</div>'; }).join('');
+  box.scrollLeft = sx; aivMsPlace(); }
+function aivMsPick(k, v){ AIV.f[k].clear(); AIV.f[k].add(v); AIV.msOpen = null; AIV.page = 1; aivMsRender(); aivRenderList(); }
+function aivMsPlace(){ const dd = document.querySelector('#aiv-filters .aiv-ms-dd'); if (!dd) return; const t = dd.parentNode.querySelector('.aiv-ms-t').getBoundingClientRect();
+  const w = Math.max(200, t.width), left = Math.min(t.left, window.innerWidth - w - 8);
+  dd.style.top = (t.bottom + 4) + 'px'; dd.style.left = Math.max(8, left) + 'px'; dd.style.minWidth = w + 'px'; }
+window.addEventListener('scroll', function(){ if (AIV.msOpen) aivMsPlace(); }, true);
+window.addEventListener('resize', function(){ if (AIV.msOpen){ AIV.msOpen = null; aivMsRender(); } });
 function aivMsOpen(k){ AIV.msOpen = AIV.msOpen === k ? null : k; aivMsRender(); }
 function aivMsToggle(k, v){ const s = AIV.f[k]; if (s.has(v)) s.delete(v); else s.add(v); AIV.page = 1; aivMsRender(); aivRenderList(); }
 function aivMsClear(k, keepOpen){ AIV.f[k].clear(); if (!keepOpen) AIV.msOpen = null; AIV.page = 1; aivMsRender(); aivRenderList(); }
