@@ -1917,7 +1917,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   </div>
 
   <!-- LMS embed state -->
-  <div id="ats2-lms" style="display:none;max-width:900px">
+  <div id="ats2-lms" style="display:none">
     <h2 id="ats2-lms-title" style="font-size:18px;font-weight:600;color:#111827;margin-bottom:18px">General Lawyers</h2>
     <div style="border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;background:#fff">
       <iframe id="ats2-lms-frame" title="Embedded qualification test" style="width:100%;height:620px;border:0;display:block"></iframe>
@@ -1959,7 +1959,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
   </div>
 
   <!-- Question preview (hidden initially) -->
-  <div id="ats2-preview" style="display:none;width:100%;max-width:960px;padding:24px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.10);border-radius:16px">
+  <div id="ats2-preview" style="display:none;width:100%;padding:24px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.10);border-radius:16px">
     <!-- Test title bar -->
     <div class="flex items-center justify-between mb-5">
       <h2 id="ats2-test-title" style="font-size:18px;font-weight:600;color:#111827">General Lawyers</h2>
@@ -2010,7 +2010,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
     <h1 class="text-2xl font-medium">Create Simulation</h1>
     <p id="sim-subtitle" class="text-sm text-gray-500 mt-1 max-w-2xl">Build an interactive Audio &amp; Image simulation to assess operational skills.</p>
   </div>
-  <div id="sim-card" style="width:100%;max-width:960px;padding:24px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.10);border-radius:16px">
+  <div id="sim-card" style="width:100%;padding:24px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.10);border-radius:16px">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px">
       <h2 id="sim-title-name" style="font-size:18px;line-height:28px;font-weight:500;color:#030712">Untitled test</h2>
       <span id="sim-mode-badge" style="font-size:14px;line-height:20px;font-weight:500;color:#374151;background:#F3F4F6;border-radius:999px;padding:4px 16px">Audio + Image</span>
@@ -8418,6 +8418,22 @@ function skillHeadings(){
   skillSetHeading('add-test-step2', window._ats2Viewing ? 'View Skills Test' : (ed ? 'Edit Skills Test' : 'Add Skills Test'));
   skillSetHeading('add-sim', window._simView ? 'View Skills Test' : (ed ? 'Edit Simulation' : 'Create Simulation'));
   skillCreateLabel(ed ? 'Continue' : 'Create test');
+  if (typeof skillInviteBtn === 'function') skillInviteBtn();
+}
+/* View Skills Test header › "Invite agents" (Mai 18 Nov: breadcrumb Skills Center › Test › Invite agents must be reachable from the test page).
+   Shown only while viewing an Active (Published) test; opens the same Invite agents page as the row ⋯ menu. */
+function skillInviteBtn(){
+  [['add-test-step2', window._ats2Viewing, 900], ['add-sim', window._simView, 960]].forEach(function(cfg){
+    const sec = document.getElementById(cfg[0]); if (!sec) return;
+    const hd = sec.querySelector('.mb-6'); if (!hd) return;
+    const rec = cfg[1], show = !!(rec && rec.id && rec.status === 'Published');
+    let b = hd.querySelector('.skill-inv-btn');
+    hd.classList.toggle('skill-hd-inv', show);
+    if (!show){ if (b) b.remove(); return; }
+    if (!b){ b = document.createElement('button'); b.type = 'button'; b.className = 'skill-inv-btn'; hd.appendChild(b); }
+    b.innerHTML = MENU_IC.userPlus + 'Invite agents';
+    b.onclick = function(){ const id = rec.id; invOpen(id); };
+  });
 }
 
 /* ---------- new / edit ---------- */
@@ -11578,6 +11594,35 @@ function ai2PromptHTML(kind, id, ro){
 .cf-btn.is-primary{border:none;color:#fff;background:linear-gradient(90deg,#007A5E 0%,#1C4FA0 100%)}
 .cf-btn.is-primary:disabled{opacity:.45;cursor:not-allowed}
 .cf-btn:disabled{cursor:not-allowed}
+/* Mai 18 Nov: Add / Edit / View test (Typeform + AAS sims) main containers fill the page width like the Invite agents page (Figma) */
+#add-test-step1 > .max-w-3xl,#admin-skill-form,#ats2-lms,#ats2-loading,#ats2-preview,#sim-card{max-width:none !important}
+#add-test-step2 .sk-grid,#add-sim .sk-grid{max-width:none}
+.skill-hd-inv{position:relative;padding-right:160px}
+.skill-inv-btn{position:absolute;right:0;top:0;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font:inherit;font-size:14px;font-weight:500;color:#111827;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.skill-inv-btn:hover{background:#F9FAFB}.skill-inv-btn:focus-visible{outline:none;box-shadow:0 0 0 3px #C5FBED}
+.skill-inv-btn svg{width:16px;height:16px}
+/* ---- Invite agents page (Option 3) ---- */
+#admin-invite{max-width:1270px;margin:0 auto}
+.inv-bc{display:flex;align-items:center;gap:6px;font-size:14px;color:#6B7280;margin-bottom:24px}
+.inv-bc a{color:#007460;font-weight:500;text-decoration:none}.inv-bc a:hover{text-decoration:underline}
+.inv-bc span{color:#111827;font-weight:500}
+.inv-title{font-size:24px;line-height:32px;font-weight:500;color:#111827;margin:0 0 4px}
+.inv-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:24px;margin-bottom:20px}
+.inv-h{font-size:16px;font-weight:500;color:#111827;margin:0}
+.inv-p{font-size:14px;color:#6B7280;margin:4px 0 0}
+.inv-card .inv-dz{margin-top:16px}
+.inv-search{display:flex;align-items:center;gap:8px;border:1px solid #E5E7EB;border-radius:8px;padding:0 12px;height:38px;margin-top:16px;color:#6B7280}
+.inv-search input{flex:1;border:none;outline:none;font:inherit;font-size:14px;color:#111827;background:none}
+.inv-search:focus-within{border-color:#5FCEB1;box-shadow:0 0 0 3px #E9FEF9}
+.inv-lt{margin-top:16px;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden}
+.inv-lt table{width:100%;border-collapse:collapse;font-size:14px}
+.inv-lt th{background:#F3F4F6;text-align:left;font-size:13px;font-weight:500;color:#4B5563;padding:12px 16px}
+.inv-lt td{padding:12px 16px;border-top:1px solid #F3F4F6;color:#111827}
+.inv-b{display:inline-flex;align-items:center;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;white-space:nowrap}
+.inv-b.is-completed{background:#E9FEF9;color:#007460}.inv-b.is-in-progress{background:#FFFBEB;color:#D97706}.inv-b.is-invited{border:1px solid #E5E7EB;background:#fff;color:#111827}
+.inv-more{display:flex;align-items:center;gap:20px;padding:16px;border-top:1px solid #E5E7EB;font-size:14px;font-weight:500;color:#6B7280}
+.inv-mb{width:240px;height:36px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font:inherit;font-size:14px;font-weight:500;color:#111827;cursor:pointer}.inv-mb:hover{background:#F9FAFB}
+.inv-empty{margin-top:16px;border:1px dashed #E5E7EB;border-radius:12px;padding:32px;text-align:center;font-size:14px;color:#6B7280}
 /* ---- Invite agents ---- */
 .inv-m{width:560px}
 .inv-dz{margin-top:20px;border:1px solid #E5E7EB;border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .12s,background .12s}
@@ -11657,69 +11702,89 @@ function ailConfirmDelete(kind, id){
 }
 
 /* ================================================================
-   Skills test library — Invite agents (Figma 982:117063, page "V2 - Invite /Enroll agents")
-   S2 row ⋯ › Invite agents → S3 upload CSV → S4 uploading → S5 ready ("N agents found") → Send invites → S6 toast
-   S4a wrong type / > 2 MB · S5a row check (missing / invalid email, no Marketplace account, already invited)
+   Skills test library — Invite agents, Option 3 (Figma 1152:5471, page "✏️ V2 - Invite /Enroll agents", finalised with Pia & Kathy)
+   P1 row ⋯ › Invite agents → M1 Invite agents PAGE (upload card on top, invited agents list below)
+   → M2 uploading in the card → M3 Review agents modal "Send N invites" → M4a list updated + toast → M4b Load more
+   M3a rows need attention (missing / invalid email, no Marketplace account, already invited) → Upload new file
+   File picker only allows .csv (M2a); > 2 MB / wrong type is blocked (inline error kept for drag & drop).
+   Breadcrumb "Skills Center" → back to the Test library (P5).
 ================================================================ */
 const INV_MAX = 2 * 1024 * 1024;
 const INV_NO_ACCOUNT = ['willie.jennings@example.com'];           /* mock: emails with no Marketplace account */
-const INV_SENT = { 'Coding Fundamentals': ['ruth.padilla@example.com'] }; /* mock: already invited, per test */
+/* mock invited list per test (Figma M1): email, invited on, status */
+const INV_LIST = { 'Coding Fundamentals': [
+  ['ana.morales@example.com','2026-11-03','Completed'],['ben.carter@example.com','2026-11-03','Completed'],['chloe.nguyen@example.com','2026-11-03','In progress'],
+  ['daniel.kim@example.com','2026-11-04','Invited'],['emma.wilson@example.com','2026-11-04','Completed'],['farah.haddad@example.com','2026-11-05','Invited'],
+  ['gabriel.silva@example.com','2026-11-05','In progress'],['hana.sato@example.com','2026-11-06','Invited'],['ivan.petrov@example.com','2026-11-06','Completed'],
+  ['olivia.brown@example.com','2026-11-07','Invited'],['ruth.padilla@example.com','2026-11-08','Invited'],['sam.taylor@example.com','2026-11-09','Completed']] };
 let INV = null;
+(function(){
+  if (!document.getElementById('admin-invite')){ const sec = document.createElement('section'); sec.id = 'admin-invite'; sec.className = 'screen'; sec.innerHTML = '<div id="inv-root"></div>';
+    const main = document.querySelector('main'); if (main) main.appendChild(sec); }
+  if (typeof SCREEN_TO_NAV !== 'undefined') SCREEN_TO_NAV['admin-invite'] = { key: 'skills-center-admin' };
+})();
+function invList(){ return INV_LIST[INV.test] || (INV_LIST[INV.test] = []); }
 function invOpen(testId){
   const t = (typeof adminSkills !== 'undefined') ? adminSkills.find(function(x){ return x.id === testId; }) : null;
-  INV = { test: t ? t.name : 'this test', state: 'empty', file: null, rows: [], ok: 0, prog: 0 };
-  invRender();
-}
-function invHead(desc){
-  return '<button type="button" class="cf-x" aria-label="Close" onclick="invClose()">' + CF_IC.x + '</button>' +
-    '<div class="cf-ic is-brand">' + CF_IC.userPlus + '</div><div class="cf-t">Invite agents</div><div class="cf-d">' + desc + '</div>';
+  INV = { testId: testId, test: t ? t.name : 'this test', state: 'empty', file: null, rows: [], ok: 0, prog: 0, q: '', shown: 10 };
+  go('admin-invite'); invRender(); window.scrollTo(0, 0);
 }
 function invKB(b){ return Math.max(1, Math.round(b / 1024)) + ' KB'; }
-function invRender(){
-  const v = INV; if (!v) return;
-  const intro = 'Invite agents to take ' + simEsc(v.test) + '. Upload a CSV with one agent email per row — each agent gets an email invite and the test appears in their Skills Center.';
+function invFmt(d){ return new Date(d + 'T12:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+function invBadge(st){ return '<span class="inv-b is-' + st.toLowerCase().replace(/\s+/g, '-') + '">' + st + '</span>'; }
+function invUploadCard(){
+  const v = INV;
   const dz = '<div class="inv-dz" id="inv-dz" role="button" tabindex="0" onclick="invPick()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();invPick();}" ondragover="event.preventDefault();this.classList.add(\'is-over\')" ondragleave="this.classList.remove(\'is-over\')" ondrop="invDrop(event)">' +
     '<div class="inv-dz-ic">' + CF_IC.upload + '</div><div class="inv-dz-t"><b>Click to upload</b> or drag and drop</div><div class="inv-dz-h">CSV only · one email per row · max. 2 MB</div></div>';
   const tpl = '<button type="button" class="inv-tpl" onclick="invTemplate()">' + CF_IC.download + 'Download CSV template</button>';
-  let body = '', act = '';
-  if (v.state === 'rows'){
-    const bad = v.rows.filter(function(r){ return r.status !== 'Ready'; }).length;
-    body = invHead('We checked ' + simEsc(v.file.name) + ' and found issues in ' + bad + ' row' + (bad === 1 ? '' : 's') + '. No invites were sent — fix ' + (bad === 1 ? 'this row' : 'these rows') + ' in your CSV and upload it again.') +
-      '<div class="inv-alert" role="alert">' + CF_IC.alert + '<div><b>' + bad + ' of ' + v.rows.length + ' rows need attention</b><span>Each row needs a valid email of an agent with a Marketplace account who hasn’t been invited to this test yet.</span></div></div>' +
-      '<div class="inv-tbl"><table><thead><tr><th>Row</th><th>Agent email</th><th>Status</th></tr></thead><tbody>' +
-      v.rows.map(function(r){ return '<tr><td>' + r.row + '</td><td>' + (r.email ? simEsc(r.email) : '—') + '</td><td><span class="inv-st ' + (r.status === 'Ready' ? 'ok' : 'bad') + '">' + r.status + '</span></td></tr>'; }).join('') +
-      '</tbody></table></div>';
-    act = '<button type="button" class="cf-btn" onclick="invClose()">Cancel</button><button type="button" class="cf-btn is-primary" onclick="invReset(true)">Upload new file</button>';
-  } else {
-    body = invHead(intro);
-    if (v.state === 'empty') body += dz;
-    else if (v.state === 'invalid') body += dz + '<div class="inv-file is-err"><div class="inv-fic">' + CF_IC.csv + '</div><div class="inv-fb"><div class="inv-fn">' + simEsc(v.file.name) + '</div><div class="inv-fe">' + v.err + '</div><button type="button" class="inv-rm" onclick="invReset()">Remove file</button></div></div>';
-    else {
-      const sub = v.state === 'uploading' ? invKB(v.file.size * v.prog) + ' of ' + invKB(v.file.size) : invKB(v.file.size) + ' · ' + v.ok + ' agent' + (v.ok === 1 ? '' : 's') + ' found';
-      body += '<div class="inv-file"><div class="inv-fic">' + CF_IC.csv + '</div><div class="inv-fb"><div class="inv-fn">' + simEsc(v.file.name) + '</div><div class="inv-fs" id="inv-fs">' + sub + '</div>' +
-        (v.state === 'uploading' ? '<div class="inv-bar"><i id="inv-bar" style="width:' + Math.round(v.prog * 100) + '%"></i></div>' : '') + '</div>' +
-        '<button type="button" class="inv-del" aria-label="Remove file" onclick="invReset()">' + CF_IC.bin + '</button></div>';
-    }
-    body += tpl;
-    act = '<button type="button" class="cf-btn" onclick="invClose()">Cancel</button><button type="button" class="cf-btn is-primary" onclick="invSend()"' + (v.state === 'ready' ? '' : ' disabled') + '>Send invites</button>';
+  let inner;
+  if (v.state === 'empty') inner = dz + tpl;
+  else if (v.state === 'invalid') inner = dz + '<div class="inv-file is-err"><div class="inv-fic">' + CF_IC.csv + '</div><div class="inv-fb"><div class="inv-fn">' + simEsc(v.file.name) + '</div><div class="inv-fe">' + v.err + '</div><button type="button" class="inv-rm" onclick="invReset()">Remove file</button></div></div>' + tpl;
+  else {
+    const bad = v.rows.length - v.ok;
+    const sub = v.state === 'uploading' ? invKB(v.file.size * v.prog) + ' of ' + invKB(v.file.size)
+      : invKB(v.file.size) + ' · ' + (bad ? bad + ' of ' + v.rows.length + ' rows need attention' : v.ok + ' agent' + (v.ok === 1 ? '' : 's') + ' found');
+    inner = '<div class="inv-file"><div class="inv-fic">' + CF_IC.csv + '</div><div class="inv-fb"><div class="inv-fn">' + simEsc(v.file.name) + '</div><div class="inv-fs" id="inv-fs">' + sub + '</div>' +
+      (v.state === 'uploading' ? '<div class="inv-bar"><i id="inv-bar" style="width:' + Math.round(v.prog * 100) + '%"></i></div>' : '') + '</div>' +
+      '<button type="button" class="inv-del" aria-label="Remove file" onclick="invReset()">' + CF_IC.bin + '</button></div>';
   }
-  const had = !!document.getElementById('cf-modal');
-  cfModal(body + '<div class="cf-act">' + act + '</div>', 'inv-m');
-  if (had){ const m = document.getElementById('cf-modal'); if (m) m.style.animation = 'none'; }
+  return '<div class="inv-card"><h2 class="inv-h">Upload agent list</h2><p class="inv-p">You’ll review every agent in the file before any invites are sent.</p>' + inner + '</div>';
 }
-function invClose(){ INV = null; cfClose(); }
+function invListCard(){
+  const v = INV, all = invList(), q = v.q.trim().toLowerCase();
+  const rows = q ? all.filter(function(r){ return r[0].indexOf(q) >= 0; }) : all, shown = rows.slice(0, v.shown);
+  const table = !all.length ? '<div class="inv-empty">No agents invited yet. Upload a CSV above to send the first invites.</div>'
+    : !rows.length ? '<div class="inv-empty">No invited agents match “' + simEsc(v.q) + '”.</div>'
+    : '<div class="inv-lt"><table><thead><tr><th>Agent email</th><th style="width:180px">Invited on</th><th style="width:150px">Status</th></tr></thead><tbody>' +
+      shown.map(function(r){ return '<tr><td>' + simEsc(r[0]) + '</td><td>' + invFmt(r[1]) + '</td><td>' + invBadge(r[2]) + '</td></tr>'; }).join('') + '</tbody></table>' +
+      (rows.length > 10 ? '<div class="inv-more">' + (shown.length < rows.length ? '<button type="button" class="inv-mb" onclick="INV.shown+=10;invRenderList()">Load more</button>' : '') + '<span>' + shown.length + ' of ' + rows.length + ' Shown</span></div>' : '') + '</div>';
+  return '<h2 class="inv-h">Invited agents (' + all.length + ')</h2><p class="inv-p">Agents already invited to ' + simEsc(v.test) + '. Anyone on this list is skipped if they appear in a new CSV.</p>' +
+    (all.length ? '<label class="inv-search">' + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>' +
+      '<input type="search" placeholder="Search by email" aria-label="Search invited agents by email" value="' + simEsc(v.q) + '" oninput="INV.q=this.value;INV.shown=10;invRenderList()"></label>' : '') + table;
+}
+function invRender(){
+  const v = INV, root = document.getElementById('inv-root'); if (!v || !root) return;
+  root.innerHTML = '<nav aria-label="Breadcrumb" class="inv-bc"><a href="#" onclick="event.preventDefault();skillBackToLibrary()">Skills Center</a>' + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
+    '<a href="#" onclick="event.preventDefault();skillView(\'' + v.testId + '\')">' + simEsc(v.test) + '</a><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>Invite agents</span></nav>' +
+    '<h1 class="inv-title">Invite agents</h1><p class="inv-p" style="margin-bottom:20px">Invite agents to take ' + simEsc(v.test) + ' by uploading a CSV of their emails. Each agent gets an email invite, and the test appears in their Skills Center.</p>' +
+    '<div id="inv-up">' + invUploadCard() + '</div><div class="inv-card" id="inv-lc">' + invListCard() + '</div>';
+}
+function invRenderUpload(){ const el = document.getElementById('inv-up'); if (el) el.innerHTML = invUploadCard(); }
+function invRenderList(){ const el = document.getElementById('inv-lc'); if (!el) return; const f = document.activeElement && document.activeElement.type === 'search';
+  el.innerHTML = invListCard(); if (f){ const i = el.querySelector('input[type=search]'); if (i){ i.focus(); i.setSelectionRange(i.value.length, i.value.length); } } }
+function invClose(){ cfClose(); }
 function invPick(){
   const i = document.createElement('input'); i.type = 'file'; i.accept = '.csv,text/csv';
   i.onchange = function(){ if (i.files && i.files[0]) invFile(i.files[0]); };
   i.click();
 }
 function invDrop(e){ e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) invFile(f); }
-function invReset(pick){ if (!INV) return; INV.state = 'empty'; INV.file = null; INV.rows = []; invRender(); if (pick) invPick(); }
+function invReset(pick){ if (!INV) return; cfClose(); INV.state = 'empty'; INV.file = null; INV.rows = []; INV.ok = 0; invRenderUpload(); if (pick) invPick(); }
 function invFile(f){
   const v = INV; if (!v) return;
   v.file = { name: f.name, size: f.size };
-  if (!/\.csv$/i.test(f.name) || f.size > INV_MAX){ v.state = 'invalid'; v.err = 'Upload failed. Only .csv files up to 2 MB are supported.'; invRender(); return; }
-  v.state = 'uploading'; v.prog = 0; invRender();
+  if (!/\.csv$/i.test(f.name) || f.size > INV_MAX){ v.state = 'invalid'; v.err = 'Upload failed. Only .csv files up to 2 MB are supported.'; invRenderUpload(); return; }
+  v.state = 'uploading'; v.prog = 0; invRenderUpload();
   const reader = new FileReader();
   reader.onload = function(){
     const text = String(reader.result || '');
@@ -11739,7 +11804,7 @@ function invCheck(text){
   const v = INV; if (!v) return;
   const lines = text.replace(/\r/g, '').split('\n');
   let start = 0; if (lines.length && /e-?mail/i.test(lines[0])) start = 1;   /* header row */
-  const sent = INV_SENT[v.test] || [], seen = {};
+  const sent = invList().map(function(r){ return r[0].toLowerCase(); }), seen = {};
   const rows = [];
   for (let i = start; i < lines.length; i++){
     const raw = lines[i]; if (!raw.trim() && i === lines.length - 1) continue;   /* trailing newline */
@@ -11751,16 +11816,31 @@ function invCheck(text){
     else if (INV_NO_ACCOUNT.indexOf(low) >= 0) status = 'No Marketplace account';
     else if (sent.indexOf(low) >= 0 || seen[low]) status = 'Already invited';
     if (email) seen[low] = true;
-    rows.push({ row: i + 1, email: email, status: status });
+    rows.push({ row: rows.length + 1, email: email, status: status });
   }
-  if (!rows.length){ v.state = 'invalid'; v.err = 'This file has no agent emails. Add one email per row and upload it again.'; invRender(); return; }
+  if (!rows.length){ v.state = 'invalid'; v.err = 'This file has no agent emails. Add one email per row and upload it again.'; invRenderUpload(); return; }
   v.rows = rows; v.ok = rows.filter(function(r){ return r.status === 'Ready'; }).length;
   v.state = v.ok === rows.length ? 'ready' : 'rows';
-  invRender();
+  invRenderUpload(); invReview();
 }
+/* M3 / M3a — Review agents modal (opens as soon as the upload finishes) */
+function invReview(){
+  const v = INV; if (!v || !v.rows.length) return;
+  const bad = v.rows.length - v.ok, ok = !bad;
+  const head = '<button type="button" class="cf-x" aria-label="Close" onclick="invCancel()">' + CF_IC.x + '</button>' +
+    '<div class="cf-ic is-brand">' + CF_IC.userPlus + '</div><div class="cf-t">Review agents (' + v.rows.length + ')</div>' +
+    '<div class="cf-d">' + (ok ? v.ok + ' agent' + (v.ok === 1 ? '' : 's') + ' in ' + simEsc(v.file.name) + ' will be invited to ' + simEsc(v.test) + '.' : 'We checked every row in ' + simEsc(v.file.name) + '.') + '</div>';
+  const alert = ok ? '' : '<div class="inv-alert" role="alert">' + CF_IC.alert + '<div><b>' + bad + ' of ' + v.rows.length + ' rows need attention — no invites were sent</b><span>Fix these rows in your CSV, remove this file and upload the corrected one.</span></div></div>';
+  const tbl = '<div class="inv-tbl"><table><thead><tr><th>Row</th><th>Agent email</th><th>Status</th></tr></thead><tbody>' +
+    v.rows.map(function(r){ return '<tr><td>' + r.row + '</td><td>' + (r.email ? simEsc(r.email) : '—') + '</td><td><span class="inv-st ' + (r.status === 'Ready' ? 'ok' : 'bad') + '">' + r.status + '</span></td></tr>'; }).join('') + '</tbody></table></div>';
+  const act = ok ? '<button type="button" class="cf-btn" onclick="invCancel()">Cancel</button><button type="button" class="cf-btn is-primary" onclick="invSend()">Send ' + v.ok + ' invite' + (v.ok === 1 ? '' : 's') + '</button>'
+    : '<button type="button" class="cf-btn" onclick="invCancel()">Cancel</button><button type="button" class="cf-btn is-primary" onclick="invReset(true)">Upload new file</button>';
+  cfModal(head + alert + tbl + '<div class="cf-act">' + act + '</div>', 'inv-m');
+}
+/* Cancel: nothing is sent. A clean file is dropped; a file with issues stays in the card so the admin can remove it (Figma M3a copy). */
+function invCancel(){ cfClose(); if (INV && INV.state === 'ready') invReset(); }
 async function invTemplate(){
   const csv = 'email\nagent.one@example.com\nagent.two@example.com\n';
-  /* published artifact: the viewer only allows saves through the downloads capability */
   try {
     const dl = (window.claude && typeof window.claude.use === 'function') ? await window.claude.use('downloads') : null;
     if (dl){ try { await dl.save({ filename: 'invite-agents-template.csv', data: csv }); } catch(e){} return; }
@@ -11769,12 +11849,13 @@ async function invTemplate(){
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'invite-agents-template.csv';
   document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
+/* M4a — invites sent: new agents go on top of the list (Invited), upload card resets, toast */
 function invSend(){
   const v = INV; if (!v || v.state !== 'ready') return;
-  const list = INV_SENT[v.test] || (INV_SENT[v.test] = []);
-  v.rows.forEach(function(r){ list.push(r.email.toLowerCase()); });
+  const today = new Date().toISOString().slice(0, 10), list = invList();
+  v.rows.slice().reverse().forEach(function(r){ list.unshift([r.email.toLowerCase(), today, 'Invited']); });
   const n = v.ok, test = v.test;
-  invClose();
+  cfClose(); v.state = 'empty'; v.file = null; v.rows = []; v.ok = 0; v.q = ''; v.shown = 10; invRender();
   invToast('Invites sent to ' + n + ' agent' + (n === 1 ? '' : 's'), 'They’ll get an email, and ' + test + ' now shows in their Skills Center.');
 }
 function invToast(title, desc){
@@ -11900,6 +11981,8 @@ function invToast(title, desc){
 .aiv-badge.is-pending{background:#FEF3C7;color:#D97706}
 .aiv-badge.is-approved{background:#E9FEF9;color:#007460}
 .aiv-badge.is-rejected{background:#FEF2F2;color:#EF4444}
+.aiv-badge.is-completed{background:#EEF2FF;color:#4F46E5}
+.aiv-badge.is-disqualified{background:#FEF2F2;color:#EF4444}
 .aiv-view{height:32px;padding:0 12px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;font-size:14px;font-weight:500;color:#111827;cursor:pointer;font-family:inherit;box-shadow:0 1px 2px rgba(16,24,40,.05)}
 .aiv-view:hover{background:#F9FAFB}
 .aiv-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;margin-bottom:16px}
@@ -12041,6 +12124,8 @@ button.aiv-info{border:none;background:none;padding:0;cursor:pointer}
 .aiv-dd .ail-dd-m{width:100%}
 .aiv-dot{width:8px;height:8px;border-radius:99px;display:inline-block;margin-right:8px;flex:none}
 .aiv-dot.is-pending{background:#F59E0B}.aiv-dot.is-approved{background:#10B981}.aiv-dot.is-rejected{background:#EF4444}
+.aiv-dot.is-completed{background:#4F46E5}
+.aiv-dot.is-disqualified{background:#EF4444}
 .aiv-btn-red{height:40px;padding:0 18px;border:none;border-radius:8px;background:#EF4444;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
 .aiv-btn-red:hover{background:#DC2626}
 .aiv-note{font-size:13px;color:#6B7280;margin-top:10px}
@@ -12107,6 +12192,44 @@ button.aiv-info{border:none;background:none;padding:0;cursor:pointer}
 .aiv-chg .k{font-size:13px;color:#6B7280;margin-bottom:6px}
 .aiv-chg .arr{color:#9CA3AF;margin-top:18px}
 </style>
+<style id="aiv-nov18">
+/* 18 Nov sync with Figma: section spacing, headings, header score, popover arrows, other test types */
+.aiv-card{margin-bottom:20px}
+.aiv-hsc{display:inline-flex!important;flex-direction:row;align-items:center;gap:10px}
+.aiv-hsc .aiv-big{font-size:16px}
+.aiv-hsc .aiv-big small{font-size:13px}
+.aiv-rate{font-size:14px;font-weight:600;color:#111827}
+.aiv-sech,.aiv-qh{font-size:16px;font-weight:500}
+.aiv-sec{padding-top:24px}
+.aiv-pop::before,.aiv-pop::after{content:"";position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-bottom-color:#E5E7EB}
+.aiv-pop::after{border-width:6px;border-bottom-color:#fff}
+.aiv-pop.is-r::before{left:auto;right:13px;transform:none}.aiv-pop.is-r::after{left:auto;right:14px;transform:none}
+.aiv-pop.is-l::before{left:15px;transform:none}.aiv-pop.is-l::after{left:16px;transform:none}
+.aiv-flag .aiv-pop{width:240px;white-space:normal}
+.aiv-cr{border:1px solid #E5E7EB;border-radius:12px;margin-top:8px}
+.aiv-cr>.hd{display:flex;align-items:center;gap:16px;width:100%;padding:12px 20px;background:none;border:none;font:inherit;cursor:pointer;text-align:left}
+.aiv-cr .nm{flex:1;font-size:14px;font-weight:500;color:#111827}
+.aiv-cr .sc{font-size:14px;color:#111827;font-variant-numeric:tabular-nums}
+.aiv-cr .lb{font-size:14px;font-weight:500;color:#111827;min-width:64px}
+.aiv-cr .chev{color:#6B7280;transition:transform .15s}
+.aiv-cr>.bd{display:none;padding:0 20px 20px;font-size:14px;line-height:22px;color:#374151}
+.aiv-cr.open>.bd{display:block}.aiv-cr.open .chev{transform:rotate(180deg)}
+.aiv-cr-q{display:flex;gap:24px;align-items:flex-start;border-top:1px solid #E5E7EB;margin-top:16px;padding-top:16px}
+.aiv-cr-q .t{flex:1}.aiv-cr-q .t b{color:#111827}
+.aiv-vid{width:200px;flex:none}
+.aiv-vid .img{position:relative}
+.aiv-vid .pl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:99px;background:#fff;color:#111827;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.aiv-vid .du{position:absolute;right:6px;bottom:6px;font-size:11px;color:#fff;background:rgba(17,24,39,.7);border-radius:4px;padding:1px 5px}
+.aiv-chat{display:flex;flex-direction:column;gap:8px}
+.aiv-msg{max-width:680px;background:#F3F4F6;border-radius:12px;padding:10px 14px;font-size:14px;line-height:21px;color:#374151;align-self:flex-start}
+.aiv-msg b{color:#111827;font-weight:600}
+.aiv-qz{border:1px solid #E5E7EB;border-radius:12px;padding:12px 16px;margin-top:8px}
+.aiv-qz .q{font-size:14px;line-height:21px;font-weight:500;color:#111827}
+.aiv-qz .a{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;color:#374151}
+.aiv-rd{width:16px;height:16px;border-radius:99px;border:1px solid #007460;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.aiv-rd::after{content:"";width:8px;height:8px;border-radius:99px;background:#007460}
+.aiv-sum-p{margin:0;font-size:14px;line-height:22px;color:#374151}
+</style>
 <script id="aiv-script">
 /* ======================= AI Interviews (admin) =======================
    New top-nav tab (Pia, Miro "Frame 1", 13 Nov). Content follows her Lovable prototype; Hallo's red-boxed
@@ -12160,19 +12283,21 @@ const AIV_DATA = [
   ['Karina Cruz','karina.cruz@gmail.com','Vietnam','2026-11-13T09:58','approved','Sarah Davis',9.4,'sw'],
   ['Bryan Navarro','bryan.navarro@gmail.com','India','2026-11-13T09:44','pending','',8.6,'sw'],
   ['Mei Tanaka','mei.tanaka@gmail.com','Philippines','2026-11-13T09:30','pending','',8.0,'w'],
-  ['Dion Reyes','dion.reyes@gmail.com','Malaysia','2026-11-13T09:12','pending','',7.1,'sw'],
-  ['Lucas Ferreira','lucas.ferreira@gmail.com','Brazil','2026-11-12T17:40','rejected','Linh Pham',5.8,'sw'],
+  ['Dion Reyes','dion.reyes@gmail.com','Malaysia','2026-11-13T09:12','completed','',7.1,'sw'],
+  ['Lucas Ferreira','lucas.ferreira@gmail.com','Brazil','2026-11-12T17:40','disqualified','Linh Pham',5.8,'sw'],
   ['Hana Kim','hana.kim@gmail.com','South Korea','2026-11-12T16:05','approved','Linh Pham',9.0,'sw'],
   ['Omar Haddad','omar.haddad@gmail.com','Egypt','2026-11-12T14:22','pending','',8.4,'sw'],
   ['Sofia Alvarez','sofia.alvarez@gmail.com','Mexico','2026-11-12T11:48','approved','Kevin Tran',8.8,'w'],
   ['Jasmine Ocampo','jasmine.ocampo@gmail.com','Philippines','2026-11-13T11:32','pending','',0,'sw','started'],
-  ['Arjun Mehta','arjun.mehta@gmail.com','India','2026-11-13T11:28','pending','',0,'w','started']
+  ['Arjun Mehta','arjun.mehta@gmail.com','India','2026-11-13T11:28','pending','',0,'w','started'],
+  ['Hong Nguyen','hong.nguyen@gmail.com','Vietnam','2026-11-13T11:15','pending','',7.8,'ai'],
+  ['Kamal Aarief','kamal.aarief@gmail.com','Malaysia','2026-11-13T10:50','pending','',8.67,'quiz']
 ].map(function(r, i){
   const rec = { testId:aivMakeId(r[1]), cheatPct: r[6] < 7 ? 72 : 20 + ((i * 17) % 40), id:i+1, name:r[0], email:r[1], country:r[2], date:r[3], status:r[4], reviewer:r[5], base:r[6], type:r[7], comments:[],
-    prog: r[8] || 'completed', lang: i === 4 ? 'Spanish (LatAm)' : i === 11 ? 'English (UK)' : 'English (US)',
+    prog: r[8] || 'completed', lang: r[7] === 'ai' ? 'Vietnamese' : i === 4 ? 'Spanish (LatAm)' : i === 11 ? 'English (UK)' : 'English (US)',
     sentBy: ['AO Recruitment','Generic Link','AO Recruitment','Kevin Tran','AO Recruitment','Generic Link'][i % 6],
-    dur: r[8] ? '' : (r[7] === 'sw' ? 26 + (i * 7) % 8 : 11 + (i * 3) % 4) + ':' + String((i * 23) % 60).padStart(2, '0') };
-  if (r[4] !== 'pending') rec.comments.push({ by:r[5], at:r[3].slice(0,10)+'T15:10', text: r[4]==='approved' ? 'Clear, natural answers. Approved for the talent pool.' : 'Several answers were read from notes, and the writing looks AI generated. Rejected.', status:r[4] });
+    dur: r[8] ? '' : r[7] === 'ai' ? '5:48' : r[7] === 'quiz' ? '6:02' : (r[7] === 'sw' ? 26 + (i * 7) % 8 : 11 + (i * 3) % 4) + ':' + String((i * 23) % 60).padStart(2, '0') };
+  if (r[4] === 'approved' || r[4] === 'rejected' || r[4] === 'disqualified') rec.comments.push({ by:r[5], at:r[3].slice(0,10)+'T15:10', text: { approved:'Clear, natural answers. Approved for the talent pool.', rejected:'Several answers were read from notes, and the writing looks AI generated. Rejected.', disqualified:'Used notes during the interview. Disqualified.' }[r[4]], status:r[4] });
   return rec;
 });
 
@@ -12181,7 +12306,7 @@ function aivEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, functi
 const AIV_CEFR = [['A1','0 – 2.6'],['A2','2.7 – 4.4'],['B1','4.5 – 7.1'],['B2','7.2 – 8.6'],['C1','8.7 – 9.3'],['C2','9.4 – 10']];
 function aivLvl(s){ s = Math.round(s * 10) / 10; return s >= 9.4 ? 'C2' : s >= 8.7 ? 'C1' : s >= 7.2 ? 'B2' : s >= 4.5 ? 'B1' : s >= 2.7 ? 'A2' : 'A1'; }
 /* Hallo's proctoring signal levels (Anti-cheating monitor tooltip) */
-const AIV_SIG = [[0,44,'No signals','ok','No significant proctoring signals were detected.'],[45,64,'Moderate signals','mod','Some potential integrity signals were detected. Consider reviewing the flagged events.'],[65,84,'Strong signals','strong','Multiple or more significant potential integrity signals were detected. Manual review is recommended.'],[85,100,'Critical signals','crit','High-severity or multiple potential integrity signals were detected. Careful review is strongly recommended before making a hiring decision.']];
+const AIV_SIG = [[0,44,'No Signals','ok','No significant proctoring signals were detected.'],[45,64,'Moderate Signals','mod','Some potential integrity signals were detected. Consider reviewing the flagged events.'],[65,84,'Strong Signals','strong','Multiple or more significant potential integrity signals were detected. Manual review is recommended.'],[85,100,'Critical Signals','crit','High-severity or multiple potential integrity signals were detected. Careful review is strongly recommended before making a hiring decision.']];
 const AIV_SHIELD = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>';
 function aivSigBadge(row){ return '<span class="aiv-lvl is-' + row[3] + '">' + AIV_SHIELD + row[2] + '</span>'; }
 function aivSigOf(pct){ return AIV_SIG.find(function(x){ return pct >= x[0] && pct <= x[1]; }) || AIV_SIG[0]; }
@@ -12215,7 +12340,7 @@ function aivFlag(r){ const g = aivSignals(r);
   if (g.tabs) why.push('Switched tabs ' + g.tabs + '×'); if (g.fs) why.push('Left full screen ' + g.fs + '×'); if (g.shots) why.push('Screenshots ' + g.shots + '×');
   return why.join(' · '); }
 const AIV_FLAG_IC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></svg>';
-function aivStatusLabel(s){ return { pending:'Pending review', approved:'Approved', rejected:'Rejected' }[s]; }
+function aivStatusLabel(s){ return { pending:'Pending review', approved:'Approved', rejected:'Rejected', completed:'Interview completed', disqualified:'Disqualified' }[s]; }
 function aivBadge(s){ return '<span class="aiv-badge is-' + s + '">' + aivStatusLabel(s) + '</span>'; }
 function aivDate(iso){ return fmtSkillDate(iso); }
 
@@ -12227,7 +12352,7 @@ function aivPage(p){ AIV.page = p; aivRenderList(); }
 const AIV_MS = [
   { k:'date', single:true, all:'Any date', opts:[['1','Today'],['7','Last 7 days'],['30','Last 30 days']] },
   { k:'prog', all:'All statuses', opts:[['started','Started'],['completed','Completed']] },
-  { k:'hire', all:'All hire statuses', opts:[['pending','Pending review'],['approved','Approved'],['rejected','Rejected']] },
+  { k:'hire', all:'All hire statuses', opts:[['pending','Pending review'],['approved','Approved'],['rejected','Rejected'],['completed','Interview completed'],['disqualified','Disqualified']] },
   { k:'lang', all:'All languages', opts:[['English (US)','English (US)'],['English (UK)','English (UK)'],['Spanish (LatAm)','Spanish (LatAm)']] },
   { k:'cefr', all:'All CEFR levels', opts:[['C2','C2'],['C1','C1'],['B2','B2'],['B1','B1'],['A2','A2'],['A1','A1']] }];
 const AIV_CHECK = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="flex-shrink:0"><path d="M15 4.5L6.75 12.75L3 9" stroke="#007460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -12254,14 +12379,18 @@ function aivMsToggle(k, v){ const s = AIV.f[k]; if (s.has(v)) s.delete(v); else 
 function aivMsClear(k, keepOpen){ AIV.f[k].clear(); if (!keepOpen) AIV.msOpen = null; AIV.page = 1; aivMsRender(); aivRenderList(); }
 document.addEventListener('click', function(){ if (AIV.msOpen){ AIV.msOpen = null; aivMsRender(); } });
 /* scores used by the list and the detail page (same numbers) */
-function aivScores(r){ const b = r.base, j = function(k){ return Math.round((b + ((r.id * 7 + k * 3) % 9 - 4) / 10) * 10) / 10; };
+const AIV_RATE = [[0,2.9,'Bad'],[3,4.3,'Poor'],[4.4,6.9,'Okay'],[7,8.7,'Good'],[8.8,10,'Excellent']]; /* Hallo's AI Interview score scale */
+function aivRate(v){ v = Math.round(v * 100) / 100; return (AIV_RATE.find(function(x){ return v <= x[1] + 0.049; }) || AIV_RATE[4])[2]; }
+function aivIsOther(r){ return r.type === 'ai' || r.type === 'quiz'; }
+function aivScores(r){ if (aivIsOther(r)) return { other:true, speak:null, write:null, sAvg:null, wAvg:null, overall:r.base };
+  const b = r.base, j = function(k){ return Math.round((b + ((r.id * 7 + k * 3) % 9 - 4) / 10) * 10) / 10; };
   const speak = r.type === 'sw' ? [['Fluency', j(1)], ['Vocabulary', j(2)], ['Grammar', j(3)], ['Pronunciation', j(4)], ['Coherence', j(5)]] : null;
   const write = [['Vocabulary', j(6)], ['Grammar', j(7)], ['Coherence', j(8)], ['Organization', j(9)], ['Typing speed', j(10)]];
   const avg = function(a){ return Math.round(a.reduce(function(s, x){ return s + x[1]; }, 0) / a.length * 10) / 10; };
   const sAvg = speak ? avg(speak) : null, wAvg = avg(write), overall = speak ? Math.round((sAvg + wAvg) / 2 * 10) / 10 : wAvg;
   return { speak:speak, write:write, sAvg:sAvg, wAvg:wAvg, overall:overall }; }
 /* Hallo's AI recommendation: every skill at or above the threshold and a low cheating risk */
-function aivAiRec(r){ const s = aivScores(r); return ((s.sAvg == null || s.sAvg >= AIV_PASS) && s.wAvg >= AIV_PASS && r.cheatPct < 60) ? 'pass' : 'fail'; }
+function aivAiRec(r){ if (aivIsOther(r)) return (r.base >= AIV_PASS && r.cheatPct < 60) ? 'pass' : 'fail'; const s = aivScores(r); return ((s.sAvg == null || s.sAvg >= AIV_PASS) && s.wAvg >= AIV_PASS && r.cheatPct < 60) ? 'pass' : 'fail'; }
 function aivRec(r){ return r.override ? r.override.to : aivAiRec(r); }
 const AIV_TICK = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 const AIV_X = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
@@ -12276,7 +12405,7 @@ function aivRenderList(){
     if (F.hire.size && (r.prog !== 'completed' || !F.hire.has(r.status))) return false;
     if (F.prog.size && !F.prog.has(r.prog)) return false;
     if (F.lang.size && !F.lang.has(r.lang)) return false;
-    if (F.cefr.size && (r.prog !== 'completed' || !F.cefr.has(aivLvl(aivScores(r).overall)))) return false;
+    if (F.cefr.size && (r.prog !== 'completed' || aivIsOther(r) || !F.cefr.has(aivLvl(aivScores(r).overall)))) return false;
     if (F.date.size && (now - Date.parse(r.date)) > Math.max.apply(null, [...F.date].map(Number)) * 864e5) return false; /* several ranges = the widest one */
     return !AIV.q || (r.name + ' ' + r.email).toLowerCase().indexOf(AIV.q) >= 0;
   }).sort(function(a, b){ return Date.parse(b.date) - Date.parse(a.date); });
@@ -12289,12 +12418,13 @@ function aivRenderList(){
     const open = ' tabindex="0" role="link" aria-label="Open interview: ' + aivEsc(r.name) + (done ? '' : ' (test in progress)') + '" onclick="aivOpen(' + r.id + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();aivOpen(' + r.id + ')}"';
     return '<tr class="aiv-row"' + open + '>' +
       '<td class="px-4 py-3"><div class="ail-n">' + aivEsc(r.name) + '</div><div class="ail-d">' + aivEsc(r.email) + '</div></td>' +
-      '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivEsc(r.lang) + '</div><div class="aiv-sub">' + (r.type === 'sw' ? 'speaking &amp; writing' : 'writing') + '</div></td>' +
+      '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivEsc(r.lang) + '</div><div class="aiv-sub">' + ({ sw:'speaking &amp; writing', w:'writing', ai:'AI interview', quiz:'quiz' }[r.type]) + '</div></td>' +
       '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivDate(r.date) + '</div><div class="aiv-sub">' + AIV_CLOCK + (r.dur || '—') + '</div></td>' +
       '<td class="px-4 py-3 text-gray-600 text-sm">' + aivEsc(r.sentBy) + '</td>' +
       '<td class="px-4 py-3"><span class="aiv-st">' + (done ? aivBadge(r.status) : '<span class="aiv-badge is-progress">Test in progress</span>') + '</span></td>' +
-      '<td class="aiv-flagcol">' + (f ? '<span class="aiv-flag" title="' + aivEsc(f) + '" aria-label="Integrity flag: ' + aivEsc(f) + '" role="img">' + AIV_FLAG_IC + '</span>' : '') + '</td>' +
-      (done ? aivScCell(s.overall, (r.lang.split(' (')[0]) + ' language', false) + (s.speak ? aivScCell(s.sAvg, 'Speaking', true) : aivScCell(s.wAvg, 'Writing', true)) + (s.speak ? aivScCell(s.wAvg, 'Writing', true) : aivScCell(null)) : aivScCell(null) + aivScCell(null) + aivScCell(null)) +
+      '<td class="aiv-flagcol">' + (f ? '<span class="aiv-flag aiv-info" tabindex="0" role="img" aria-label="Integrity flag: ' + aivEsc(f) + '" onclick="event.stopPropagation()">' + AIV_FLAG_IC + '<span class="aiv-pop" role="tooltip"><div class="aiv-pop-t">Integrity flag</div><div style="color:#6B7280;font-size:12px">' + aivEsc(f) + '</div></span></span>' : '') + '</td>' +
+      (done && s.other ? '<td class="px-4 py-3 aiv-sc"><b>' + (r.type === 'quiz' ? r.base.toFixed(2) : r.base.toFixed(1)) + '</b><span class="v">' + aivRate(r.base) + '</span><div class="k">' + (r.type === 'quiz' ? 'Work Safety' : 'AI interview') + '</div></td>' + aivScCell(null) + aivScCell(null) :
+       done ? aivScCell(s.overall, (r.lang.split(' (')[0]) + ' language', false) + (s.speak ? aivScCell(s.sAvg, 'Speaking', true) : aivScCell(s.wAvg, 'Writing', true)) + (s.speak ? aivScCell(s.wAvg, 'Writing', true) : aivScCell(null)) : aivScCell(null) + aivScCell(null) + aivScCell(null)) +
       '</tr>';
   }).join('');
   /* pagination: same component as the AI Assistant Library */
@@ -12332,9 +12462,9 @@ const AIV_LC = {
   cpu:'<rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/>',
   network:'<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/>'};
 function aivLc(n){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + AIV_LC[n] + '</svg>'; }
-function aivOpen(id){ AIV.cur = AIV_DATA.find(function(r){ return r.id === id; }); if (!AIV.cur) return; AIV.playing = null; aivRenderDetail(); go('admin-ai-interview'); }
+function aivOpen(id){ AIV.cur = AIV_DATA.find(function(r){ return r.id === id; }); if (!AIV.cur) return; AIV.playing = null; AIV.openSecs = {}; aivRenderDetail(); go('admin-ai-interview'); }
 function aivAcc(id, title, right, body, open){
-  return '<div class="aiv-card aiv-acc' + (open ? ' open' : '') + '" id="' + id + '"><button type="button" class="hd" aria-expanded="' + !!open + '" onclick="this.parentNode.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',this.parentNode.classList.contains(\'open\'))"><h2>' + title + '</h2><span class="flex items-center gap-3">' + (right || '') + AIV_IC.chev + '</span></button><div class="bd">' + body + '</div></div>';
+  return '<div class="aiv-card aiv-acc' + (open ? ' open' : '') + '" id="' + id + '"><button type="button" class="hd" aria-expanded="' + !!open + '" onclick="this.parentNode.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',this.parentNode.classList.contains(\'open\'));AIV.openSecs=AIV.openSecs||{};AIV.openSecs[\'' + id + '\']=this.parentNode.classList.contains(\'open\')"><h2>' + title + '</h2><span class="flex items-center gap-3">' + (right || '') + AIV_IC.chev + '</span></button><div class="bd">' + body + '</div></div>';
 }
 function aivSkills(list){ return list.map(function(s){ const v = Math.max(0, Math.min(10, s[1])); return '<div class="aiv-sk"><span>' + s[0] + '</span><div class="aiv-bar"><i style="width:' + (v * 10) + '%"></i></div><b>' + aivLvl(v) + ' (' + v.toFixed(1) + ')</b></div>'; }).join(''); }
 function aivSum(label, score, date){ return '<div class="aiv-sum"><div class="l"><div class="k">' + label + ' · ' + date + '</div><div class="aiv-bar"><i style="width:' + (score * 10) + '%"></i></div></div></div>'; } /* the score itself sits in the section header (visible when collapsed) */
@@ -12347,11 +12477,43 @@ function aivLangSec(id, kind, avg, skills, r, day, qHtml, fb){
       '<div class="r"><div class="k">Overall score</div><div class="aiv-big">' + aivScore(avg) + aivCefrInfo(id + '-tip') + '</div><div class="d">' + aivDesc(avg) + '</div></div></div>' +
     '<div class="aiv-sec"><div class="aiv-sech">Detailed skills<button type="button" class="aiv-info" aria-label="Evaluated criteria" onclick="event.stopPropagation();aivCriteria(\'' + kind + '\')">' + AIV_IC.info + '</button></div>' + aivSkills(skills) + '</div>' +
     '<div class="aiv-sec">' + qHtml + '</div>' +
-    '<div class="aiv-sec"><div class="aiv-sech" style="justify-content:space-between">Personalized feedback<button type="button" class="aiv-tr" aria-label="Translate feedback" title="Translate feedback" onclick="showToast(\'Feedback translated to English\')">' + AIV_IC.lang + '</button></div><ul class="aiv-fb">' + fb.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul></div>';
-  return aivAcc(id, aivEsc(r.lang.split(' (')[0]) + ' · ' + kind, '<span class="aiv-hsc"><span class="aiv-big" style="font-size:16px">' + aivScore(avg) + '</span>' + aivPassTag(avg) + '</span>', body, true);
+    '<div class="aiv-sec"><div class="aiv-sech" style="justify-content:space-between">Personalized Feedback<button type="button" class="aiv-tr" aria-label="Translate feedback" title="Translate feedback" onclick="showToast(\'Feedback translated to English\')">' + AIV_IC.lang + '</button></div><ul class="aiv-fb">' + fb.map(function(f){ return '<li>' + aivEsc(f) + '</li>'; }).join('') + '</ul></div>';
+  return aivAcc(id, aivEsc(r.lang.split(' (')[0]) + ' - ' + kind, '<span class="aiv-hsc"><span class="aiv-big" style="font-size:16px">' + aivScore(avg) + '</span>' + aivPassTag(avg) + '</span>', body, !!(AIV.openSecs && AIV.openSecs[id]));
+}
+/* Other Hallo test types (Mai, 18 Nov, from Hallo screenshots): AI Interview and Quiz (Likert). Collapsed by default like every result section. */
+const AIV_AI = {
+  summary:'The candidate shows a general fit with the company’s work environment and values, but could give more specific examples to strengthen culture fit. They understand customer experience well and describe a clear approach to a billing issue. Their problem solving is structured, though more creative short-term fixes would help keep customer trust.',
+  crit:[['Culture Fit',6.8,'To improve culture fit, the candidate should be clearer about the specific parts of TP’s work environment they like and how these match their personal values. For example, they could mention how TP encourages creativity or open communication between teams, and how that fits the way they work best.','Why do you want to work at TP?','1:12'],
+    ['Customer Experience Excellence',7.6,'The candidate could improve customer experience by describing each investigation and resolution step in more detail — for example, how they would contact the relevant teams to verify information, or how they would keep the customer updated throughout.','A customer contacts you because they were charged twice for the same transaction. Explain the steps you would take to investigate the issue, resolve it and make sure the customer gets an appropriate response.','1:58'],
+    ['Problem Solving',7.9,'The candidate should take a more creative and flexible approach to difficult situations. They could name temporary measures or alternative solutions while the main issue is fixed, and commit to a timeline and next steps to keep the customer satisfied.','Imagine a customer is extremely disappointed by a service issue our company caused. They want an immediate solution, but you know it can’t be fully resolved right away. How would you handle this to keep their trust and satisfaction?','2:05']],
+  fb:[['Problem solving: ','Suggest short-term workarounds and give the customer a clear timeline while the root cause is fixed.'],['Culture fit: ','Name the specific parts of the TP work environment you value and how they match your way of working.'],['Customer experience: ','Describe each investigation step and how you would keep the customer updated.']],
+  strengths:['Shows real interest in TP’s culture.','Has a clear plan to resolve billing issues.','Explains difficult situations clearly and honestly.'],
+  weak:['Doesn’t name specific parts of the work environment they like.','Light on detail in investigation steps.','Could offer more creative, flexible solutions.'],
+  chat:[['Assistant','Hi, it’s great to meet you today! Thanks for joining the interview. Relax — we’ll just chat and get to know each other.'],['User','OK.'],['Assistant','Why do you want to work at TP?'],['User','I like TP’s work environment and the way the team works.'],['Assistant','A customer contacts you because they were charged twice for one transaction. Walk me through how you would investigate and resolve it.'],['User','I’d ask how they paid and check the transaction history to find the cause, then refund the duplicate charge and confirm with the customer.'],['Assistant','Thanks for explaining that clearly. The recruitment team will contact you about next steps.']] };
+const AIV_QUIZ = [['I check that equipment is safe to use before starting work.',5],['I report damaged tools or equipment instead of continuing to use them.',5],['I follow lockout or isolation procedures whenever they apply.',4],['I can identify the emergency process for my usual work area.',4],['I would speak up if a colleague was about to work unsafely.',4],['I refuse to take shortcuts that increase the chance of injury.',4],['I make sure walkways and exits stay clear while I work.',4],['I review safety instructions before starting unfamiliar work.',5],['I take near misses seriously and use them to prevent future incidents.',5],['I adapt my work when weather or site conditions become unsafe.',2],['I take responsibility for keeping others safe as well as myself.',5],['I understand that working quickly never justifies bypassing a safety control.',5]];
+const AIV_LIKERT = { 1:'Strongly Disagree', 2:'Disagree', 3:'Neutral', 4:'Agree', 5:'Strongly Agree' };
+function aivOpenState(id){ return !!(AIV.openSecs && AIV.openSecs[id]); }
+function aivCrToggle(el, id){ const c = el.parentNode; c.classList.toggle('open'); el.setAttribute('aria-expanded', c.classList.contains('open')); AIV.openSecs = AIV.openSecs || {}; AIV.openSecs[id] = c.classList.contains('open'); }
+function aivAiSec(r){
+  const scale = aivPopInfo('aiv-ai-tip', 'AI Interview Score Scale', '<div class="aiv-pop-t">AI Interview Score Scale</div><table class="aiv-pop-tb"><thead><tr><th>Rating</th><th>Score</th></tr></thead><tbody>' + AIV_RATE.map(function(x){ return '<tr><td>' + x[2] + '</td><td>' + x[0] + ' – ' + x[1] + '</td></tr>'; }).join('') + '</tbody></table>', 'r');
+  const crit = AIV_AI.crit.map(function(c, i){ const id = 'aiv-cr-' + i, on = aivOpenState(id);
+    return '<div class="aiv-cr' + (on ? ' open' : '') + '"><button type="button" class="hd" aria-expanded="' + on + '" onclick="aivCrToggle(this,\'' + id + '\')"><span class="nm">' + c[0] + '</span><span class="sc">' + c[1].toFixed(1) + '</span><span class="lb">' + aivRate(c[1]) + '</span>' + AIV_IC.chev + '</button>' +
+      '<div class="bd"><div>' + aivEsc(c[2]) + '</div><div class="aiv-cr-q"><div class="t"><b>Q' + (i + 1) + '.</b> ' + aivEsc(c[3]) + '</div>' +
+      '<figure class="aiv-shot aiv-vid"><div class="img"><button type="button" class="pl" aria-label="Play answer video for Q' + (i + 1) + '" onclick="showToast(\'Playing answer video (prototype)\')">' + AIV_IC.play + '</button><span class="du">' + c[4] + '</span></div></figure></div></div></div>'; }).join('');
+  const body = '<p class="aiv-sum-p">' + aivEsc(AIV_AI.summary) + '</p><div style="margin-top:12px">' + crit + '</div>' +
+    '<div class="aiv-sec" style="margin-top:20px"><div class="aiv-sech" style="justify-content:space-between">Personalized Feedback<button type="button" class="aiv-tr" aria-label="Translate feedback" title="Translate feedback" onclick="showToast(\'Feedback translated to English\')">' + AIV_IC.lang + '</button></div>' + AIV_AI.fb.map(function(f){ return '<p class="aiv-sum-p" style="margin:4px 0"><b>' + f[0] + '</b>' + aivEsc(f[1]) + '</p>'; }).join('') + '</div>' +
+    '<div class="aiv-sec"><div class="aiv-sech">Candidate’s Strengths</div><ul class="aiv-fb">' + AIV_AI.strengths.map(function(x){ return '<li>' + aivEsc(x) + '</li>'; }).join('') + '</ul></div>' +
+    '<div class="aiv-sec"><div class="aiv-sech">Candidate’s Weaknesses</div><ul class="aiv-fb">' + AIV_AI.weak.map(function(x){ return '<li>' + aivEsc(x) + '</li>'; }).join('') + '</ul></div>' +
+    '<div class="aiv-sec"><div class="aiv-sech">Interview Conversation</div><div class="aiv-chat">' + AIV_AI.chat.map(function(m){ return '<div class="aiv-msg"><b>' + m[0] + ':</b> ' + aivEsc(m[1]) + '</div>'; }).join('') + '</div></div>';
+  return aivAcc('aiv-ai', aivEsc(r.lang) + ' - AI Interview', '<span class="aiv-hsc"><span class="aiv-big">' + r.base.toFixed(1) + '</span>' + scale + '<span class="aiv-rate">' + aivRate(r.base) + '</span></span>', body, aivOpenState('aiv-ai'));
+}
+function aivQuizSec(r){
+  const pts = AIV_QUIZ.reduce(function(s, q){ return s + q[1]; }, 0), max = AIV_QUIZ.length * 5;
+  const body = AIV_QUIZ.map(function(q, i){ return '<div class="aiv-qz"><div class="q">Q' + (i + 1) + '.&nbsp; ' + aivEsc(q[0]) + '</div><div class="a"><span class="aiv-rd" aria-hidden="true"></span>' + q[1] + ' - ' + AIV_LIKERT[q[1]] + '</div></div>'; }).join('');
+  return aivAcc('aiv-quiz', 'Work Safety', '<span class="aiv-hsc"><span class="aiv-big">' + r.base.toFixed(2) + ' <small>(' + pts + '/' + max + ')</small></span><span class="aiv-rate">' + aivRate(r.base) + '</span></span>', body, aivOpenState('aiv-quiz'));
 }
 function aivHdrLines(r, when){
-  return '<div class="aiv-lines"><div><span class="t">' + (r.type === 'sw' ? 'Speaking &amp; Writing' : 'Writing') + ' · ' + aivEsc(r.lang) + '</span> · <span class="aiv-id" style="color:inherit">' + aivEsc(r.email) + '<button type="button" class="aiv-copy" onclick="aivCopyEmail()" aria-label="Copy email" title="Copy email">' + AIV_IC.copy + '</button></span></div>' +
+  return '<div class="aiv-lines"><div><span class="t">' + ({ sw:'Speaking &amp; Writing', w:'Writing', ai:'AI Interview', quiz:'Work Safety' }[r.type]) + (r.type === 'quiz' ? '' : ' · ' + aivEsc(r.lang)) + '</span> · <span class="aiv-id" style="color:inherit">' + aivEsc(r.email) + '<button type="button" class="aiv-copy" onclick="aivCopyEmail()" aria-label="Copy email" title="Copy email">' + AIV_IC.copy + '</button></span></div>' +
     '<div class="aiv-sub2">' + when + ' · Sent by ' + aivEsc(r.sentBy) + ' · <span class="aiv-id" title="Hallo test ID: ' + r.testId + '">' + r.testId.slice(0, 4) + '…' + r.testId.slice(-4) +
     '<button type="button" class="aiv-copy" onclick="aivCopyId()" aria-label="Copy test ID" title="Copy test ID">' + AIV_IC.copy + '</button></span></div></div>'; }
 function aivRenderDetail(){
@@ -12362,7 +12524,7 @@ function aivRenderDetail(){
   const sig = aivSignals(r), cheat = sig.cheat, flag = sig.eye, ai = sig.ai, tabs = sig.tabs;
   const shots = (speak ? ['Part I · 00:49','Part I · 01:45','Part I · 03:05','Part I · 05:21','Part I · 07:40'] : []).concat(['Part II · 01:31','Part II · 02:49','Part II · 06:22','Part II · 08:05','Part II · 13:18']);
 
-  let h = '<nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">' +
+  let h = '<nav aria-label="Breadcrumb" style="margin-bottom:32px" class="flex items-center gap-1.5 text-sm text-muted-foreground">' +
     '<a href="#" onclick="event.preventDefault(); aivGoList()" class="text-primary-700 hover:text-primary-800 font-medium hover:underline underline-offset-2">AI Interview</a>' +
     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
     '<span class="text-foreground font-medium">' + aivEsc(r.name) + '</span></nav>';
@@ -12371,26 +12533,27 @@ function aivRenderDetail(){
     aivHdrLines(r, aivDate(r.date) + ' · ' + r.dur) + aivRecRow(r) + '</div>' +
     '<div class="aiv-dd ail-dd" id="aiv-dd"><button type="button" class="ail-dd-t" aria-haspopup="listbox" aria-expanded="false" onclick="aivDdToggle()"><span class="flex items-center"><span class="aiv-dot is-' + r.status + '"></span>' + aivStatusLabel(r.status) + '</span>' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>' +
-      '<div class="ail-dd-m" role="listbox" hidden>' + ['pending','approved','rejected'].map(function(s){ return '<button type="button" role="option" aria-selected="' + (s === r.status) + '" class="ail-dd-o' + (s === r.status ? ' is-sel' : '') + '" onclick="aivPick(\'' + s + '\')"><span class="flex items-center"><span class="aiv-dot is-' + s + '"></span>' + aivStatusLabel(s) + '</span>' + (s === r.status ? AIV_IC.check : '') + '</button>'; }).join('') + '</div></div>' +
+      '<div class="ail-dd-m" role="listbox" hidden>' + ['pending','approved','rejected','completed','disqualified'].map(function(s){ return '<button type="button" role="option" aria-selected="' + (s === r.status) + '" class="ail-dd-o' + (s === r.status ? ' is-sel' : '') + '" onclick="aivPick(\'' + s + '\')"><span class="flex items-center"><span class="aiv-dot is-' + s + '"></span>' + aivStatusLabel(s) + '</span>' + (s === r.status ? AIV_IC.check : '') + '</button>'; }).join('') + '</div></div>' +
     '</div></div>';
   /* comments */
   h += aivAcc('aiv-comments', 'Comments', r.comments.length ? '<span class="text-sm text-gray-500 font-normal">' + r.comments.length + '</span>' : '',
     (r.comments.length ? r.comments.map(function(c){ return '<div class="aiv-cm"><div class="aiv-av">' + c.by.split(' ').map(function(p){ return p[0]; }).join('') + '</div><div><div class="who">' + aivEsc(c.by) + '<span class="when">' + aivDate(c.at) + '</span>' + (c.status ? aivBadge(c.status) : '') + '</div><div class="tx">' + aivEsc(c.text) + '</div></div></div>'; }).join('') : '<p class="text-sm text-gray-500" style="margin:0 0 12px">No comments yet.</p>') +
     '<div style="margin-top:12px"><textarea class="aiv-ta" id="aiv-cm-in" placeholder="Add a comment for your team" oninput="document.getElementById(\'aiv-cm-btn\').disabled=!this.value.trim()"></textarea>' +
     '<div class="flex justify-end" style="margin-top:8px"><button type="button" id="aiv-cm-btn" disabled class="' + DS.btnBase + ' ' + DS.btnSecondary + ' ' + DS.btnSizeDefault + '" onclick="aivPostComment()">Post comment</button></div></div>', r.comments.length > 0);
+  if (aivIsOther(r)) h += r.type === 'ai' ? aivAiSec(r) : aivQuizSec(r);
   /* overall */
-  h += '<div class="aiv-card"><div class="hd"><h2>Overall language CEFR score (EN)</h2><div class="aiv-big" style="display:inline-flex;align-items:center;gap:6px">' + aivScore(overall) + aivCefrInfo('aiv-ov-tip') + '</div></div></div>';
-  /* speaking + writing: Hallo's section layout, Marketplace styling (Mai, 16 Nov). Both open by default (Mai, 13 Nov) */
-  if (speak) h += aivLangSec('aiv-speak', 'Speaking', sAvg, speak, r, day,
+  if (!aivIsOther(r)) h += '<div class="aiv-card"><div class="hd"><h2>Overall Language CEFR Score (EN)</h2><div class="aiv-big" style="display:inline-flex;align-items:center;gap:6px">' + aivScore(overall) + aivCefrInfo('aiv-ov-tip') + '</div></div></div>';
+  /* speaking + writing: Hallo's section layout, Marketplace styling (Mai, 16 Nov). Collapsed by default; header shows CEFR score + Pass/Below (Mai, 18 Nov — all test types) */
+  if (speak && !aivIsOther(r)) h += aivLangSec('aiv-speak', 'Speaking', sAvg, speak, r, day,
     '<div class="aiv-qh"><span>Speaking assessment questions</span><span>Response</span></div>' + AIV_SPEAK_Q.map(function(q, i){ const on = AIV.playing === 's' + i; return '<div class="aiv-q"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(q) + '</div><button type="button" aria-pressed="' + on + '" class="aiv-play ' + DS.btnBase + ' ' + DS.btnSecondary + ' size-9' + (on ? ' on' : '') + '" onclick="aivPlay(\'s' + i + '\')" aria-label="' + (on ? 'Pause' : 'Play') + ' response ' + (i + 1) + '" title="' + (on ? 'Pause' : 'Play response') + '">' + (on ? AIV_IC.pause : AIV_IC.play) + '</button></div>'; }).join(''),
     AIV_SPEAK_FB);
-  h += aivLangSec('aiv-write', 'Writing', wAvg, write, r, day,
+  if (!aivIsOther(r)) h += aivLangSec('aiv-write', 'Writing', wAvg, write, r, day,
     '<div class="aiv-qh"><span>Writing assessment questions</span></div>' + AIV_WRITE_Q.map(function(w, i){ return '<div class="aiv-q" style="display:block"><div><span class="n">Q' + (i + 1) + '.</span> ' + aivEsc(w.q) + '</div><div class="aiv-ans">' + aivEsc(w.a) + '</div><div class="aiv-wc">' + w.w + ' words</div></div>'; }).join(''),
     AIV_WRITE_FB);
   /* integrity */
   const ov = r.override;
   h += '<div class="aiv-card aiv-acc open" id="aiv-integ"><div class="hd aiv-hd2">' +
-    '<div class="flex items-center gap-2"><h2>Anti-cheating monitor</h2>' + aivPopInfo('aiv-tip-integ', 'Proctoring signal information', '<p class="aiv-pop-p">Proctoring signals are indicators generated during the assessment and are not definitive evidence of misconduct. They give recruiters more context to support informed hiring decisions.</p><div class="aiv-pop-t">Proctoring signal information</div><table class="aiv-pop-tb is-sig"><thead><tr><th>Signal score</th><th>Level</th><th>Guidance</th></tr></thead><tbody>' + AIV_SIG.map(function(x){ return '<tr><td>' + x[0] + '–' + x[1] + '%</td><td>' + aivSigBadge(x) + '</td><td>' + x[4] + '</td></tr>'; }).join('') + '</tbody></table>', 'l') + '</div>' +
+    '<div class="flex items-center gap-2"><h2>Anti-Cheating Monitor</h2>' + aivPopInfo('aiv-tip-integ', 'Proctoring signal information', '<p class="aiv-pop-p">Proctoring signals are indicators generated during the assessment and are not definitive evidence of misconduct. They give recruiters more context to support informed hiring decisions.</p><div class="aiv-pop-t">Proctoring signal information</div><table class="aiv-pop-tb is-sig"><thead><tr><th>Signal score</th><th>Level</th><th>Guidance</th></tr></thead><tbody>' + AIV_SIG.map(function(x){ return '<tr><td>' + x[0] + '–' + x[1] + '%</td><td>' + aivSigBadge(x) + '</td><td>' + x[4] + '</td></tr>'; }).join('') + '</tbody></table>', 'l') + '</div>' +
     '<div class="flex items-center gap-3">' +
     aivSigBadge(aivSigOf(r.cheatPct)) + '<b class="aiv-pct">' + r.cheatPct + '%</b>' +
     '<button type="button" class="aiv-chev" aria-expanded="true" aria-label="Collapse anti-cheating monitor" onclick="const c=this.closest(\'.aiv-acc\');c.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',c.classList.contains(\'open\'))">' + AIV_IC.chev + '</button></div></div>' +
@@ -12400,8 +12563,8 @@ function aivRenderDetail(){
       '<li>Reported actions: <b>Switched tabs ' + tabs + '×</b> · <b>Left full screen 0×</b> · <b>Screenshots 0×</b></li>' + (r.cheatPct >= 60 ? '<li class="aiv-sig-r">Camera was manually blocked</li>' : '') + '</ul>' +
     '<div class="aiv-shots">' + shots.map(function(s, i){ const f = flag && i === 1; return '<figure class="aiv-shot' + (f ? ' flag' : '') + '"><div class="img"></div><figcaption>' + s + (f ? ' · <b>Eye movement</b>' : '') + '</figcaption></figure>'; }).join('') + '</div></div></div>';
   /* system */
-  h += aivAcc('aiv-sys', 'System diagnostics', '',
-    '<div class="aiv-sys">' + [['globe','Browser','Chrome 142.0'],['laptop','OS','Windows 11'],['monitor','Device','Desktop'],['type','Model','Unknown'],['factory','Vendor','Unknown'],['cpu','Screen','1536 × 864'],['network','IP address','112.203.58.' + (100 + r.id)]].map(function(k){ return '<div class="aiv-sys-r">' + aivLc(k[0]) + '<b>' + k[1] + ':</b><span>' + k[2] + '</span></div>'; }).join('') + '</div>', true);
+  h += aivAcc('aiv-sys', 'System Diagnostic Tool', '',
+    '<div class="aiv-sys">' + [['globe','Browser','Chrome 142.0'],['laptop','OS','Windows 11'],['monitor','Device','Desktop'],['type','Model','Unknown'],['factory','Vendor','Unknown'],['cpu','Screen','1536 × 864'],['network','IP Address','112.203.58.' + (100 + r.id)]].map(function(k){ return '<div class="aiv-sys-r">' + aivLc(k[0]) + '<b>' + k[1] + ':</b><span>' + k[2] + '</span></div>'; }).join('') + '</div>', true);
   document.getElementById('aiv-detail').innerHTML = h;
 }
 /* In-progress detail (our addition, not in Hallo — Hallo only shows finished tests). Same header and Comments,
@@ -12409,7 +12572,7 @@ function aivRenderDetail(){
 function aivRenderProgress(r){
   const t = new Date(r.date).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
   const parts = r.type === 'sw' ? [['Part I · Speaking','In progress'],['Part II · Writing','Not started']] : [['Writing','In progress']];
-  let h = '<nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">' +
+  let h = '<nav aria-label="Breadcrumb" style="margin-bottom:32px" class="flex items-center gap-1.5 text-sm text-muted-foreground">' +
     '<a href="#" onclick="event.preventDefault(); aivGoList()" class="text-primary-700 hover:text-primary-800 font-medium hover:underline underline-offset-2">AI Interview</a>' +
     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
     '<span class="text-foreground font-medium">' + aivEsc(r.name) + '</span></nav>';
@@ -12469,22 +12632,23 @@ function aivDdToggle(force){ const dd = document.getElementById('aiv-dd'); if (!
 document.addEventListener('click', function(e){ const dd = document.getElementById('aiv-dd'); if (dd && !dd.contains(e.target)) aivDdToggle(false); });
 function aivPick(s){ aivDdToggle(false); const r = AIV.cur; if (s === r.status) return;
   if (s === 'pending'){ r.status = 'pending'; r.reviewer = ''; aivRenderDetail(); showToast('“' + r.name + '” moved back to Pending review'); return; }
+  if (s === 'completed'){ r.status = 'completed'; r.reviewer = ''; aivRenderDetail(); showToast('“' + r.name + '” marked as Interview completed'); return; }
   aivConfirm(s); }
 function aivConfirm(s){
-  const r = AIV.cur, ap = s === 'approved';
+  const r = AIV.cur, ap = s === 'approved', dq = s === 'disqualified';
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-m-t" style="width:520px">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-m-t">' + (ap ? 'Approve ' : 'Reject ') + aivEsc(r.name) + '?</div><div class="ail-ms">' + (ap ? 'They’ll be added to the talent pool.' : 'They won’t be added to the talent pool.') + '</div></div></div>' +
-    '<div class="ail-mb"><div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-m-c">Comment (Optional)</label><textarea class="aiv-ta" id="aiv-m-c" placeholder="' + (ap ? 'e.g. Clear answers, no integrity concerns' : 'e.g. Answers read from notes; writing looks AI generated') + '"></textarea></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-m-t">' + (ap ? 'Approve ' : dq ? 'Disqualify ' : 'Reject ') + aivEsc(r.name) + '?</div><div class="ail-ms">' + (ap ? 'They’ll be added to the talent pool.' : dq ? 'They’ll be marked as disqualified and won’t be added to the talent pool.' : 'They won’t be added to the talent pool.') + '</div></div></div>' +
+    '<div class="ail-mb"><div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-m-c">Comment (Optional)</label><textarea class="aiv-ta" id="aiv-m-c" placeholder="' + (ap ? 'e.g. Clear answers, no integrity concerns' : dq ? 'e.g. Used notes during the interview; not eligible for this role' : 'e.g. Answers read from notes; writing looks AI generated') + '"></textarea></div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Cancel</button>' +
-    (ap ? '<button type="button" class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSetDecision(\'approved\')">Approve</button>' : '<button type="button" class="aiv-btn-red" onclick="aivSetDecision(\'rejected\')">Reject</button>') + '</div></div>';
+    (ap ? '<button type="button" class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSetDecision(\'approved\')">Approve</button>' : (dq ? '<button type="button" class="aiv-btn-red" onclick="aivSetDecision(\'disqualified\')">Disqualify</button>' : '<button type="button" class="aiv-btn-red" onclick="aivSetDecision(\'rejected\')">Reject</button>')) + '</div></div>';
   bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
   document.body.appendChild(bd);
 }
 function aivCloseModal(){ const m = document.getElementById('aiv-modal'); if (m) m.remove(); }
 function aivSetDecision(s){ const r = AIV.cur, c = (document.getElementById('aiv-m-c') || {}).value || '';
-  r.status = s; r.reviewer = AIV_ME; r.comments.unshift({ by:AIV_ME, at:new Date().toISOString(), text:c.trim() || (s === 'approved' ? 'Approved.' : 'Rejected.'), status:s });
-  aivCloseModal(); aivRenderDetail(); showToast('“' + r.name + '” ' + (s === 'approved' ? 'approved' : 'rejected')); }
+  r.status = s; r.reviewer = AIV_ME; r.comments.unshift({ by:AIV_ME, at:new Date().toISOString(), text:c.trim() || ({ approved:'Approved.', rejected:'Rejected.', disqualified:'Disqualified.' }[s]), status:s });
+  aivCloseModal(); aivRenderDetail(); showToast('“' + r.name + '” ' + ({ approved:'approved', rejected:'rejected', disqualified:'disqualified' }[s])); }
 function aivPostComment(){ const el = document.getElementById('aiv-cm-in'); const t = el && el.value.trim(); if (!t) return;
   AIV.cur.comments.unshift({ by:AIV_ME, at:new Date().toISOString(), text:t }); aivRenderDetail(); showToast('Comment posted'); }
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ aivCloseModal(); aivDdToggle(false); } });
