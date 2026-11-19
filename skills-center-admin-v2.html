@@ -2359,7 +2359,6 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
             <th class="px-4 py-3 text-xs font-medium text-gray-500">User</th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500">Language</th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500">Date</th>
-            <th class="px-4 py-3 text-xs font-medium text-gray-500">Sent by</th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500">Status</th>
             <th class="aiv-flagcol" aria-label="Integrity flag"></th>
             <th class="px-4 py-3 text-xs font-medium text-gray-500">Score I</th>
@@ -8423,6 +8422,9 @@ function skillHeadings(){
 /* View Skills Test header › "Invite agents" (Mai 18 Nov: breadcrumb Skills Center › Test › Invite agents must be reachable from the test page).
    Shown only while viewing an Active (Published) test; opens the same Invite agents page as the row ⋯ menu. */
 function skillInviteBtn(){
+  /* Mai 19 Nov: approach 2 (Figma 1283:20663) — breadcrumb is Skills Center › Invite agents for <test>; no button on the View test page */
+  document.querySelectorAll('.skill-inv-btn').forEach(function(b){ b.remove(); }); document.querySelectorAll('.skill-hd-inv').forEach(function(h){ h.classList.remove('skill-hd-inv'); });
+  return;
   [['add-test-step2', window._ats2Viewing, 900], ['add-sim', window._simView, 960]].forEach(function(cfg){
     const sec = document.getElementById(cfg[0]); if (!sec) return;
     const hd = sec.querySelector('.mb-6'); if (!hd) return;
@@ -11707,7 +11709,7 @@ function ailConfirmDelete(kind, id){
    → M2 uploading in the card → M3 Review agents modal "Send N invites" → M4a list updated + toast → M4b Load more
    M3a rows need attention (missing / invalid email, no Marketplace account, already invited) → Upload new file
    File picker only allows .csv (M2a); > 2 MB / wrong type is blocked (inline error kept for drag & drop).
-   Breadcrumb "Skills Center" → back to the Test library (P5).
+   Breadcrumb "Skills Center › Invite agents for <test>" (approach 2, Figma 1283:20663); "Skills Center" → back to the Test library.
 ================================================================ */
 const INV_MAX = 2 * 1024 * 1024;
 const INV_NO_ACCOUNT = ['willie.jennings@example.com'];           /* mock: emails with no Marketplace account */
@@ -11765,7 +11767,7 @@ function invListCard(){
 function invRender(){
   const v = INV, root = document.getElementById('inv-root'); if (!v || !root) return;
   root.innerHTML = '<nav aria-label="Breadcrumb" class="inv-bc"><a href="#" onclick="event.preventDefault();skillBackToLibrary()">Skills Center</a>' + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
-    '<a href="#" onclick="event.preventDefault();skillView(\'' + v.testId + '\')">' + simEsc(v.test) + '</a><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>Invite agents</span></nav>' +
+    '<span>Invite agents for ' + simEsc(v.test) + '</span></nav>' +
     '<h1 class="inv-title">Invite agents</h1><p class="inv-p" style="margin-bottom:20px">Invite agents to take ' + simEsc(v.test) + ' by uploading a CSV of their emails. Each agent gets an email invite, and the test appears in their Skills Center.</p>' +
     '<div id="inv-up">' + invUploadCard() + '</div><div class="inv-card" id="inv-lc">' + invListCard() + '</div>';
 }
@@ -12420,7 +12422,6 @@ function aivRenderList(){
       '<td class="px-4 py-3"><div class="ail-n">' + aivEsc(r.name) + '</div><div class="ail-d">' + aivEsc(r.email) + '</div></td>' +
       '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivEsc(r.lang) + '</div><div class="aiv-sub">' + ({ sw:'speaking &amp; writing', w:'writing', ai:'AI interview', quiz:'quiz' }[r.type]) + '</div></td>' +
       '<td class="px-4 py-3 text-sm"><div class="text-gray-900">' + aivDate(r.date) + '</div><div class="aiv-sub">' + AIV_CLOCK + (r.dur || '—') + '</div></td>' +
-      '<td class="px-4 py-3 text-gray-600 text-sm">' + aivEsc(r.sentBy) + '</td>' +
       '<td class="px-4 py-3"><span class="aiv-st">' + (done ? aivBadge(r.status) : '<span class="aiv-badge is-progress">Test in progress</span>') + '</span></td>' +
       '<td class="aiv-flagcol">' + (f ? '<span class="aiv-flag aiv-info" tabindex="0" role="img" aria-label="Integrity flag: ' + aivEsc(f) + '" onclick="event.stopPropagation()">' + AIV_FLAG_IC + '<span class="aiv-pop" role="tooltip"><div class="aiv-pop-t">Integrity flag</div><div style="color:#6B7280;font-size:12px">' + aivEsc(f) + '</div></span></span>' : '') + '</td>' +
       (done && s.other ? '<td class="px-4 py-3 aiv-sc"><b>' + (r.type === 'quiz' ? r.base.toFixed(2) : r.base.toFixed(1)) + '</b><span class="v">' + aivRate(r.base) + '</span><div class="k">' + (r.type === 'quiz' ? 'Work Safety' : 'AI interview') + '</div></td>' + aivScCell(null) + aivScCell(null) :
@@ -12514,7 +12515,7 @@ function aivQuizSec(r){
 }
 function aivHdrLines(r, when){
   return '<div class="aiv-lines"><div><span class="t">' + ({ sw:'Speaking &amp; Writing', w:'Writing', ai:'AI Interview', quiz:'Work Safety' }[r.type]) + (r.type === 'quiz' ? '' : ' · ' + aivEsc(r.lang)) + '</span> · <span class="aiv-id" style="color:inherit">' + aivEsc(r.email) + '<button type="button" class="aiv-copy" onclick="aivCopyEmail()" aria-label="Copy email" title="Copy email">' + AIV_IC.copy + '</button></span></div>' +
-    '<div class="aiv-sub2">' + when + ' · Sent by ' + aivEsc(r.sentBy) + ' · <span class="aiv-id" title="Hallo test ID: ' + r.testId + '">' + r.testId.slice(0, 4) + '…' + r.testId.slice(-4) +
+    '<div class="aiv-sub2">' + when + ' · <span class="aiv-id" title="Hallo test ID: ' + r.testId + '">' + r.testId.slice(0, 4) + '…' + r.testId.slice(-4) +
     '<button type="button" class="aiv-copy" onclick="aivCopyId()" aria-label="Copy test ID" title="Copy test ID">' + AIV_IC.copy + '</button></span></div></div>'; }
 function aivRenderDetail(){
   const r = AIV.cur;
