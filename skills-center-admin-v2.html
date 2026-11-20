@@ -7551,7 +7551,8 @@ function simImgConfirmDelete(uid){
   simImgCloseLayer();
   const ov = document.createElement('div');
   ov.id = 'si-layer'; ov.className = 'si-lightbox';
-  ov.innerHTML = '<div class="si-cf-box" role="alertdialog" aria-modal="true" aria-labelledby="si-cf-t">' +
+  ov.innerHTML = '<div class="si-cf-box" role="alertdialog" aria-modal="true" aria-labelledby="si-cf-t" style="position:relative">' +
+    '<button type="button" class="cf-x" aria-label="Close" onclick="simImgCloseLayer()">' + AI2_IC.close + '</button>' +
     '<div class="si-cf-ic">' + SI_IC.trash + '</div>' +
     '<div id="si-cf-t" class="si-cf-t">Delete “' + simEsc(im.name) + '”?</div>' +
     '<div class="si-cf-d">' + (im.hotspots.length ? 'Its ' + im.hotspots.length + ' hotspot' + (im.hotspots.length === 1 ? '' : 's') + ' will be removed. ' : '') +
@@ -12330,7 +12331,7 @@ function aivCefrInfo(id){ return aivPopInfo(id, 'CEFR scale', '<div class="aiv-p
 function aivCriteria(kind){ const S = aivScores(AIV.cur), list = (kind === 'Speaking' ? S.speak : S.write).map(function(x){ return x[0]; });
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-cr-t" style="width:560px">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-cr-t">Evaluated criteria</div><div class="ail-ms">To evaluate ' + kind.toLowerCase() + ' proficiency accurately, Hallo scores these ' + list.length + ' key criteria.</div></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-cr-t">Evaluated criteria</div><div class="ail-ms">To evaluate ' + kind.toLowerCase() + ' proficiency accurately, Hallo scores these ' + list.length + ' key criteria.</div></div><button type="button" class="mp-m-x" onclick="aivCloseModal()" aria-label="Close">' + AI2_IC.close + '</button></div>' +
     '<div class="ail-mb"><div class="aiv-crit">' + list.map(function(k){ return '<div><b>' + k + '</b><span>' + AIV_CRIT[k] + '</span></div>'; }).join('') + '</div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Close</button></div></div>';
   bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
@@ -12628,7 +12629,7 @@ function aivOverride(){
   const r = AIV.cur, ai = aivAiRec(r); AIV.ovTo = ai;
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-o-t" style="width:560px;overflow:visible">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Change the AI recommendation?</div><div class="ail-ms">Hallo’s AI recommends ' + aivRecLabel(ai) + ' for ' + aivEsc(r.name) + '. Your change also updates Hallo, and you can undo it any time.</div></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Change the AI recommendation?</div><div class="ail-ms">Hallo’s AI recommends ' + aivRecLabel(ai) + ' for ' + aivEsc(r.name) + '. Your change also updates Hallo, and you can undo it any time.</div></div><button type="button" class="mp-m-x" onclick="aivCloseModal()" aria-label="Close">' + AI2_IC.close + '</button></div>' +
     '<div class="ail-mb" style="overflow:visible"><div class="flex flex-col gap-1.5"><span class="text-sm font-medium text-gray-900" id="aiv-o-l">Your recommendation</span><div class="aiv-dd ail-dd" id="aiv-o-dd">' + aivOvDdHtml() + '</div></div>' +
       '<div id="aiv-o-more" hidden><div class="aiv-ovsum"><div class="aiv-chg"><div><div class="k">AI recommendation</div>' + aivRecBadge(ai) + '</div>' + AIV_ARR + '<div><div class="k">Your recommendation</div><span id="aiv-o-to"></span></div></div></div>' +
       '<div class="flex flex-col gap-1.5" style="margin-top:18px"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" aria-describedby="aiv-o-help" placeholder="e.g. Camera flag was a lighting issue; answers were clear and natural" oninput="aivOvCheck()"></textarea><div class="text-sm text-gray-500" id="aiv-o-help">Your team sees this in Comments.</div></div></div></div>' +
@@ -12662,7 +12663,7 @@ function aivConfirm(s){
   const r = AIV.cur, ap = s === 'approved', dq = s === 'disqualified';
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-m-t" style="width:520px">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-m-t">' + (ap ? 'Approve ' : dq ? 'Disqualify ' : 'Reject ') + aivEsc(r.name) + '?</div><div class="ail-ms">' + (ap ? 'They’ll be added to the talent pool.' : dq ? 'They’ll be marked as disqualified and won’t be added to the talent pool.' : 'They won’t be added to the talent pool.') + '</div></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-m-t">' + (ap ? 'Approve ' : dq ? 'Disqualify ' : 'Reject ') + aivEsc(r.name) + '?</div><div class="ail-ms">' + (ap ? 'They’ll be added to the talent pool.' : dq ? 'They’ll be marked as disqualified and won’t be added to the talent pool.' : 'They won’t be added to the talent pool.') + '</div></div><button type="button" class="mp-m-x" onclick="aivCloseModal()" aria-label="Close">' + AI2_IC.close + '</button></div>' +
     '<div class="ail-mb"><div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-m-c">Comment (Optional)</label><textarea class="aiv-ta" id="aiv-m-c" placeholder="' + (ap ? 'e.g. Clear answers, no integrity concerns' : dq ? 'e.g. Used notes during the interview; not eligible for this role' : 'e.g. Answers read from notes; writing looks AI generated') + '"></textarea></div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Cancel</button>' +
     (ap ? '<button type="button" class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSetDecision(\'approved\')">Approve</button>' : (dq ? '<button type="button" class="aiv-btn-red" onclick="aivSetDecision(\'disqualified\')">Disqualify</button>' : '<button type="button" class="aiv-btn-red" onclick="aivSetDecision(\'rejected\')">Reject</button>')) + '</div></div>';
