@@ -11983,7 +11983,7 @@ function invToast(title, desc){
 .aiv-badge.is-pending{background:#FEF3C7;color:#D97706}
 .aiv-badge.is-approved{background:#E9FEF9;color:#007460}
 .aiv-badge.is-rejected{background:#FEF2F2;color:#EF4444}
-.aiv-badge.is-completed{background:#EEF2FF;color:#4F46E5}
+.aiv-badge.is-completed{background:#EEF2FF;color:#4F46E5}.aiv-ovopts{display:flex;gap:8px;margin-top:6px}.aiv-ovopt{border:1px solid #E5E7EB;border-radius:999px;padding:3px;background:#fff;cursor:pointer}.aiv-ovopt.on{border-color:#007460;box-shadow:0 0 0 3px #C5FBED}.aiv-ovopt:focus-visible{outline:none;box-shadow:0 0 0 3px #C5FBED}
 .aiv-badge.is-disqualified{background:#FEF2F2;color:#EF4444}
 .aiv-view{height:32px;padding:0 12px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;font-size:14px;font-weight:500;color:#111827;cursor:pointer;font-family:inherit;box-shadow:0 1px 2px rgba(16,24,40,.05)}
 .aiv-view:hover{background:#F9FAFB}
@@ -12392,7 +12392,11 @@ function aivScores(r){ if (aivIsOther(r)) return { other:true, speak:null, write
   const sAvg = speak ? avg(speak) : null, wAvg = avg(write), overall = speak ? Math.round((sAvg + wAvg) / 2 * 10) / 10 : wAvg;
   return { speak:speak, write:write, sAvg:sAvg, wAvg:wAvg, overall:overall }; }
 /* Hallo's AI recommendation: every skill at or above the threshold and a low cheating risk */
-function aivAiRec(r){ if (aivIsOther(r)) return (r.base >= AIV_PASS && r.cheatPct < 60) ? 'pass' : 'fail'; const s = aivScores(r); return ((s.sAvg == null || s.sAvg >= AIV_PASS) && s.wAvg >= AIV_PASS && r.cheatPct < 60) ? 'pass' : 'fail'; }
+/* Hallo returns Hire / Premium / Don't hire (Yuki, AOP-9583 #7) — not Pass/Fail. Mock rule: Premium = every score ≥ 8.7 (C1+), Hire = every score ≥ the threshold, both with low cheating risk. */
+const AIV_PREMIUM = 8.7;
+function aivAiRec(r){ if (r.cheatPct >= 60) return 'nohire';
+  const low = aivIsOther(r) ? r.base : (function(){ const s = aivScores(r); return Math.min(s.sAvg == null ? 99 : s.sAvg, s.wAvg); })();
+  return low >= AIV_PREMIUM ? 'premium' : low >= AIV_PASS ? 'hire' : 'nohire'; }
 function aivRec(r){ return r.override ? r.override.to : aivAiRec(r); }
 const AIV_TICK = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 const AIV_X = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
@@ -12594,9 +12598,9 @@ function aivCopyId(){ const id = AIV.cur.testId; try{ navigator.clipboard.writeT
 /* Override the AI recommendation (Pia, 13 Nov Loom: "override the recommendation of AI").
    Assumptions (Mai, 16 Nov): an override can always be undone, and it syncs back to Hallo. */
 const AIV_SYNC = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>';
-function aivRecLabel(v){ return v === 'pass' ? 'Pass' : 'Fail'; }
+function aivRecLabel(v){ return { hire:'Hire', premium:'Premium', nohire:'Don’t hire', pass:'Hire', fail:'Don’t hire' }[v] || v; }
 function aivPassTag(v){ const ok = v >= AIV_PASS; return '<span class="aiv-pass' + (ok ? '' : ' no') + '">' + aivPf(v) + (ok ? 'Pass' : 'Below threshold') + '</span>'; }
-function aivRecBadge(v){ return '<span class="aiv-badge is-' + (v === 'pass' ? 'approved' : 'rejected') + '">' + aivRecLabel(v) + '</span>'; }
+function aivRecBadge(v){ return '<span class="aiv-badge is-' + ({ hire:'approved', premium:'completed', pass:'approved' }[v] || 'rejected') + '">' + aivRecLabel(v) + '</span>'; }
 function aivRecRow(r){ const ai = aivAiRec(r), ov = r.override;
   if (!ov) return '<div class="aiv-rec"><span class="lbl">AI recommendation</span>' + aivRecBadge(ai) + '<button type="button" class="aiv-view" onclick="aivOverride()">Override</button></div>';
   /* overridden: same AI → final comparison as the override modal, then the reason, then who/when (Mai, 16 Nov) */
@@ -12608,17 +12612,18 @@ function aivRecRow(r){ const ai = aivAiRec(r), ov = r.override;
     '<div class="aiv-ovp-meta">Overridden by <b>' + aivEsc(ov.by) + '</b> · ' + aivDate(ov.at) + '<span class="sync">' + AIV_SYNC + 'Synced to Hallo</span></div>' +
     '</div></div>'; }
 function aivOverride(){
-  const r = AIV.cur, ai = aivAiRec(r), to = ai === 'pass' ? 'fail' : 'pass'; AIV.ovTo = to;
+  const r = AIV.cur, ai = aivAiRec(r), opts = ['hire','premium','nohire'].filter(function(v){ return v !== ai; }), to = opts[0]; AIV.ovTo = to;
   const bd = document.createElement('div'); bd.id = 'aiv-modal'; bd.className = 'ail-bd';
   bd.innerHTML = '<div class="ail-m" role="dialog" aria-modal="true" aria-labelledby="aiv-o-t" style="width:560px">' +
-    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Change the recommendation to ' + aivRecLabel(to) + '?</div><div class="ail-ms">Hallo’s AI recommends ' + aivRecLabel(ai) + ' for ' + aivEsc(r.name) + '. Your change also updates Hallo, and you can undo it any time.</div></div></div>' +
-    '<div class="ail-mb"><div class="aiv-chg"><div><div class="k">AI recommendation</div>' + aivRecBadge(ai) + '</div><span class="arr" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><div><div class="k">Your recommendation</div>' + aivRecBadge(to) + '</div></div>' +
-      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" aria-describedby="aiv-o-help" placeholder="' + (to === 'pass' ? 'e.g. Camera flag was a lighting issue; answers were clear and natural' : 'e.g. Answers were read from notes; writing looks AI generated') + '" oninput="aivOvCheck()"></textarea><div class="text-sm text-gray-500" id="aiv-o-help">Your team sees this in Comments.</div></div></div>' +
+    '<div class="ail-mh"><div><div class="ail-mt" id="aiv-o-t">Change the AI recommendation?</div><div class="ail-ms">Hallo’s AI recommends ' + aivRecLabel(ai) + ' for ' + aivEsc(r.name) + '. Your change also updates Hallo, and you can undo it any time.</div></div></div>' +
+    '<div class="ail-mb"><div class="aiv-chg"><div><div class="k">AI recommendation</div>' + aivRecBadge(ai) + '</div><span class="arr" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><div><div class="k">Your recommendation</div><div class="aiv-ovopts" role="radiogroup" aria-label="Your recommendation">' + opts.map(function(v){ return '<button type="button" role="radio" aria-checked="' + (v === to) + '" class="aiv-ovopt' + (v === to ? ' on' : '') + '" data-v="' + v + '" onclick="aivPickOv(this)">' + aivRecBadge(v) + '</button>'; }).join('') + '</div></div></div>' +
+      '<div class="flex flex-col gap-1.5"><label class="text-sm font-medium text-gray-900" for="aiv-o-r">Reason</label><textarea class="aiv-ta" id="aiv-o-r" aria-describedby="aiv-o-help" placeholder="e.g. Camera flag was a lighting issue; answers were clear and natural" oninput="aivOvCheck()"></textarea><div class="text-sm text-gray-500" id="aiv-o-help">Your team sees this in Comments.</div></div></div>' +
     '<div class="ail-mf"><button type="button" class="' + DS.btnBase + ' ' + DS.btnOutline + ' h-10 px-4" onclick="aivCloseModal()">Cancel</button>' +
-    '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Change to ' + aivRecLabel(to) + '</button></div></div>';
+    '<button type="button" id="aiv-o-save" disabled class="' + DS.btnBase + ' ' + DS.btnDefault + ' h-10 px-4" onclick="aivSaveOverride()">Change to <span id="aiv-o-to">' + aivRecLabel(to) + '</span></button></div></div>';
   bd.addEventListener('mousedown', function(e){ if (e.target === bd) aivCloseModal(); });
   document.body.appendChild(bd); document.getElementById('aiv-o-r').focus();
 }
+function aivPickOv(b){ AIV.ovTo = b.dataset.v; document.querySelectorAll('.aiv-ovopt').forEach(function(x){ const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); document.getElementById('aiv-o-to').textContent = aivRecLabel(AIV.ovTo); }
 function aivOvCheck(){ const t = document.getElementById('aiv-o-r').value.trim(); document.getElementById('aiv-o-save').disabled = !t; }
 function aivSaveOverride(){ const r = AIV.cur, v = AIV.ovTo, t = document.getElementById('aiv-o-r').value.trim();
   r.override = { to:v, reason:t, by:AIV_ME, at:new Date().toISOString() };
