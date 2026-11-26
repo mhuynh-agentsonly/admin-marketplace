@@ -1080,7 +1080,7 @@ input[type="radio"], input[type="checkbox"] { accent-color:#007460; }
 <!-- ======================================================================
      HEADER NAVIGATION
 ====================================================================== -->
-<header class="bg-white px-16 border-b border-border sticky top-0 z-40">
+<header class="bg-white px-16 border-b border-border relative z-40"><!-- 26 Nov (Mai): header scrolls with the page (was sticky) -->
   <div class="flex items-center w-full justify-between h-[80px]">
     <a href="#" onclick="event.preventDefault(); go('admin-home')"
        class="flex min-w-0 overflow-hidden items-center gap-3 hover:opacity-80 transition-opacity">
@@ -12747,6 +12747,161 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ aivCl
     _switch(tab);
     var p=document.getElementById('ap-panel-badges'); if(p) p.style.display = tab==='badges' ? '' : 'none';
   };
+})();
+</script>
+<style id="rm-css">
+/* ===== Agent Profile › Remove from Marketplace (TRX Figma 2447:97764, 27 Nov 2026) ===== */
+.rm-foot{border-top:1px solid #E5E7EB;margin-top:28px;padding-top:20px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.rm-link{background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:500;color:#F04438;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.rm-link:hover{color:#D92D20}
+.rm-link:focus-visible{outline:none;box-shadow:0 0 0 3px #FECDCA;border-radius:4px}
+.rm-hint{font-size:14px;color:#6B7280}   /* always visible, below the link (Mai 27 Nov) */
+.rm-badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:500}
+.rm-badge.red{background:#FEF3F2;color:#F04438}
+.rm-badge.grey{background:#F3F4F6;color:#374151}
+.rm-alert{border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:20px 1fr;gap:4px 12px;margin-bottom:16px;font-size:14px}
+.rm-alert svg{margin-top:1px}
+.rm-alert.red{background:#FEF3F2;border:1px solid #FDA29B;color:#B42318}
+.rm-alert.amber{background:#FFFCF0;border:1px solid #FDB022;color:#111827}
+.rm-alert.amber svg{color:#B54708}
+.rm-alert.grey{background:#F9FAFB;border:1px solid #E5E7EB;color:#111827;mix-blend-mode:multiply}   /* Figma 2496:3080: Alert Default, multiply */
+.rm-alert .t{font-weight:500}
+.rm-alert .d{grid-column:2;color:#374151;line-height:20px}
+.rm-alert.red .t{color:#D92D20;font-weight:400}
+.rm-kv{grid-column:2;display:grid;grid-template-columns:140px 1fr;gap:6px 16px;margin-top:6px;font-size:13.5px}
+.rm-kv .k{color:#6B7280}.rm-kv .v{color:#111827}
+.rm-final{grid-column:2;color:#6B7280;font-size:13.5px;margin-top:8px}
+/* dialog */
+.rm-m .ail-mb{gap:16px}
+.rm-sub{font-size:14px;color:#374151;margin-top:4px}
+.rm-fld{display:flex;flex-direction:column;gap:6px}
+.rm-fld label,.rm-fld .lb{font-size:14px;font-weight:500;color:#111827}
+.rm-err{font-size:13.5px;color:#F04438}
+.rm-fld.is-err .ail-dd-t,.rm-fld.is-err textarea{border-color:#F97066 !important;box-shadow:0 0 0 3px rgba(249,112,102,.15)}
+.rm-dd .ail-dd-t{height:40px;border:1px solid #E5E7EB;border-radius:8px;padding:0 12px;background:#fff;font-size:14px;font-family:inherit;color:#111827}
+.rm-dd .ail-dd-t .ph{color:#6B7280}
+.rm-dd .ail-dd-m{max-height:none}
+.rm-info{border:1px solid #E5E7EB;border-radius:10px;overflow:hidden}
+.rm-info .h{background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:10px 16px;font-size:14px;font-weight:500;color:#111827}
+.rm-info .b{padding:12px 16px;font-size:14px;line-height:20px;color:#111827;display:flex;flex-direction:column;gap:8px}
+.rm-m .ail-mf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rm-m .ail-mf button{height:44px;border-radius:999px;font-size:15px}
+.rm-danger{border:1px solid #F97066;background:#fff;color:#F04438;font-family:inherit;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.rm-danger:hover{background:#FEF3F2}
+.rm-danger.is-soft{border-color:#FDA29B;color:#F97066}
+.rm-danger[disabled]{cursor:default;opacity:.75}
+.rm-spin{width:16px;height:16px;border:2px solid #FECDCA;border-top-color:#F04438;border-radius:50%;animation:rmspin .8s linear infinite}
+@keyframes rmspin{to{transform:rotate(360deg)}}
+.toast.rm-toast-err{background:#FEF3F2 !important;border-color:#FDA29B !important;color:#B42318 !important}
+.toast.rm-toast-err .toast-icon{background:#F04438 !important;color:#fff !important}
+.toast.rm-toast-err .toast-close{color:#B42318 !important}
+/* prototype controls (agent profile only) */
+#rm-proto{position:fixed;right:16px;bottom:16px;z-index:260;display:none;font-family:inherit}
+body.rm-on #rm-proto{display:block}
+#rm-proto .btn{display:inline-flex;align-items:center;gap:6px;background:#111827;color:#fff;border:none;border-radius:999px;padding:7px 12px;font-size:12.5px;cursor:pointer;box-shadow:0 6px 16px rgba(16,24,40,.2)}
+#rm-proto .menu{display:none;position:absolute;right:0;bottom:calc(100% + 8px);width:290px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;box-shadow:0 12px 32px rgba(16,24,40,.16);padding:6px}
+#rm-proto.open .menu{display:block}
+#rm-proto .h{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#9CA3AF;padding:8px 10px 4px}
+#rm-proto .menu button{display:flex;width:100%;align-items:center;gap:8px;background:none;border:none;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13.5px;color:#111827;cursor:pointer;text-align:left}
+#rm-proto .menu button:hover{background:#F3F4F6}
+#rm-proto .menu button[disabled]{color:#9CA3AF;cursor:default;background:none}
+#rm-proto .tg{margin-left:auto;width:28px;height:16px;border-radius:99px;background:#D1D5DB;position:relative;flex:none}
+#rm-proto .tg::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:99px;background:#fff;transition:left .15s}
+#rm-proto .on .tg{background:#007460}
+#rm-proto .on .tg::after{left:14px}
+</style>
+<div id="rm-proto"><div class="menu" role="menu">
+  <div class="h">Remove from Marketplace</div>
+  <button type="button" role="menuitem" id="rm-p-fail" onclick="RM.toggleFail()">Next removal fails<span class="tg"></span></button>
+  <button type="button" role="menuitem" id="rm-p-del" onclick="RM.retentionEnds()">Retention period ends (delete data)</button>
+  <button type="button" role="menuitem" id="rm-p-reset" onclick="RM.resetAgent()">Reset this agent</button>
+</div><button type="button" class="btn" onclick="event.stopPropagation();document.getElementById('rm-proto').classList.toggle('open')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Prototype</button></div>
+<script id="rm-js">
+/* Agent Profile › Remove from Marketplace (Figma TRXsrgVKRsDdMdturZ8oOx 2447:97764).
+   Link at the bottom of Personal information → dialog (reason + internal note, both required; Access and data box;
+   amber "Agent Portal account" note when the agent also has Agent Portal access) → Removing… → success toast +
+   "Removed from Marketplace" badge and summary on the profile. Failure = dialog stays as is + red toast.
+   Retention period ends → "Data deleted" page. Reasons A–Z, catch-all last; reason always starts empty. */
+(function(){
+  const REASONS=['Cultural fit','Failed government ID','Failed PC check','Failed police clearance','Failed speed test','Fraud','Quality or performance','Other red flag'];
+  const ME='Sarah Davis';
+  const ST={}; let FAIL=false, CUR=null;
+  const X='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+  const IC_ALERT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>';
+  const IC_INFO='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+  const CHEV='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  const CHECK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtD=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  /* same derivations as renderAgentProfile */
+  const info=a=>{ const idx=parseInt(a.id.replace('a',''),10)-1; const slug=a.name.toLowerCase().replace(/\s+/g,'.').replace(/[^a-z.]/g,'');
+    const dom=['gmail.com','yahoo.com','outlook.com','hotmail.com','proton.me'][idx%5]; return { email:slug+'@'+dom, ap:(idx%4)!==3 }; };
+  const apNote='<div class="rm-alert amber">'+IC_INFO+'<div class="t">Agent Portal account</div><div class="d">This agent also has an Agent Portal account. Removing them from the Marketplace will not remove that account. To remove their Agent Portal access, do so separately in the Agent Portal.</div></div>';
+
+  function decorate(agent){
+    CUR=agent; const root=document.getElementById('ap-root'); if(!root) return; const s=ST[agent.id], inf=info(agent);
+    const h1=root.querySelector('h1'), titleRow=h1&&h1.parentElement, card=titleRow&&titleRow.nextElementSibling;
+    if (s && s.deleted){
+      titleRow.innerHTML='<h1 style="font-size:26px;font-weight:600;color:#030712;line-height:1.2;margin:0">'+esc(agent.name)+'</h1><span class="rm-badge grey">Data deleted</span>';
+      if (card) card.remove();
+      titleRow.insertAdjacentHTML('afterend','<div class="rm-alert grey" style="margin-bottom:48px">'+IC_INFO+'<div class="t">Personal data deleted on '+fmtD(s.deletedAt)+'</div><div class="d" style="color:#374151">All of this agent’s personal data has been permanently deleted. Records we’re required by law to keep, like payout records and signed contracts, are stored separately.</div></div>');
+    } else if (s){
+      titleRow.insertAdjacentHTML('beforeend','<span class="rm-badge red">Removed from Marketplace</span>');
+      titleRow.insertAdjacentHTML('afterend','<div class="rm-alert red">'+IC_ALERT+'<div class="t">Removed from Marketplace on '+fmtD(s.at)+' by '+esc(s.by)+'</div>'+
+        '<div class="rm-kv"><span class="k">Reason</span><span class="v">'+esc(s.reason)+'</span><span class="k">Internal note</span><span class="v">'+esc(s.note)+'</span><span class="k">Portal access</span><span class="v">Revoked</span><span class="k">Data</span><span class="v">Soft deleted. Permanently deleted when their country’s data retention period ends.</span></div>'+
+        '<div class="rm-final">Removal is final. This agent can’t be reinstated.</div></div>'+(inf.ap?apNote:''));
+    } else {
+      const p=document.getElementById('ap-panel-personal-info');
+      if (p) p.insertAdjacentHTML('beforeend','<div class="rm-foot"><button type="button" class="rm-link" onclick="RM.open()">Remove from Marketplace</button><span class="rm-hint">Revokes portal access, removes them from all projects and pays out their wallet.</span></div>');
+    }
+    syncProto();
+  }
+  function ddHtml(v){ return '<button type="button" class="ail-dd-t" id="rm-dt" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="rm-l-r rm-dt" onclick="RM.toggleDD()"><span class="'+(v?'':'ph')+'">'+(v?esc(v):'Select a reason')+'</span>'+CHEV+'</button>'+
+    '<div class="ail-dd-m" role="listbox" aria-labelledby="rm-l-r" hidden>'+REASONS.map(r=>'<button type="button" role="option" aria-selected="'+(r===v)+'" class="ail-dd-o'+(r===v?' is-sel':'')+'" onclick="RM.pick(\''+r+'\')"><span>'+esc(r)+'</span>'+(r===v?CHECK:'')+'</button>').join('')+'</div>'; }
+  const F={reason:'', note:''};
+  window.RM={
+    open(){ const a=CUR; if(!a) return; const inf=info(a); F.reason=''; F.note='';
+      const bd=document.createElement('div'); bd.id='rm-modal'; bd.className='ail-bd';
+      bd.innerHTML='<div class="ail-m rm-m" role="dialog" aria-modal="true" aria-labelledby="rm-t" style="width:560px;overflow:visible">'+
+        '<div class="ail-mh"><div><div class="ail-mt" id="rm-t">Remove '+esc(a.name)+' from the Marketplace?</div><div class="rm-sub">'+esc(inf.email)+' · '+esc(a.country)+'</div></div><button type="button" class="mp-m-x" onclick="RM.close()" aria-label="Close">'+X+'</button></div>'+
+        '<div class="ail-mb" style="overflow:visible">'+(inf.ap?apNote.replace('rm-alert amber','rm-alert amber" style="margin:0'):'')+
+          '<div class="rm-fld" id="rm-f-r"><span class="lb" id="rm-l-r">Reason</span><div class="aiv-dd ail-dd rm-dd" id="rm-dd">'+ddHtml('')+'</div><div class="rm-err" id="rm-e-r" hidden>Select a reason.</div></div>'+
+          '<div class="rm-fld" id="rm-f-n"><label for="rm-n">Internal note</label><textarea class="aiv-ta" id="rm-n" placeholder="What happened and what evidence you reviewed" oninput="RM.note(this.value)"></textarea><div class="rm-err" id="rm-e-n" hidden>Add a note for the audit trail.</div></div>'+
+          '<div class="rm-info"><div class="h">Access and data</div><div class="b"><div>Marketplace access is revoked immediately. If the agent is signed in, they’re signed out.</div><div>Their personal data is soft deleted now and permanently deleted when their country’s data retention period ends. The agent can ask for earlier deletion. We must delete it without undue delay, and no later than one month after we receive the request. Records we’re required by law to keep, like payout records and signed contracts, are kept separately for their own legal period.</div><div><b style="font-weight:500">Removal is final.</b> This agent can’t be reinstated.</div></div></div>'+
+        '</div>'+
+        '<div class="ail-mf"><button type="button" class="'+DS.btnBase+' '+DS.btnOutline+'" onclick="RM.close()">Cancel</button><button type="button" class="rm-danger is-soft" id="rm-go" onclick="RM.submit()">Remove from Marketplace</button></div></div>';
+      bd.addEventListener('mousedown',e=>{ if(e.target===bd) RM.close(); else { const dd=document.getElementById('rm-dd'); if(dd && !dd.contains(e.target)) RM.toggleDD(false); } });
+      document.body.appendChild(bd); document.getElementById('rm-dt').focus(); },
+    close(){ const m=document.getElementById('rm-modal'); if(m) m.remove(); },
+    toggleDD(force){ const dd=document.getElementById('rm-dd'); if(!dd) return; const t=dd.querySelector('.ail-dd-t'), m=dd.querySelector('.ail-dd-m'); const open=force!=null?force:m.hidden; m.hidden=!open; t.setAttribute('aria-expanded',String(open)); },
+    pick(r){ F.reason=r; const dd=document.getElementById('rm-dd'); dd.innerHTML=ddHtml(r); document.getElementById('rm-f-r').classList.remove('is-err'); document.getElementById('rm-e-r').hidden=true; RM.sync(); dd.querySelector('.ail-dd-t').focus(); },
+    note(v){ F.note=v; if(v.trim()){ document.getElementById('rm-f-n').classList.remove('is-err'); document.getElementById('rm-e-n').hidden=true; } RM.sync(); },
+    sync(){ const b=document.getElementById('rm-go'); if(b) b.classList.toggle('is-soft', !(F.reason && F.note.trim())); },
+    submit(){ const okR=!!F.reason, okN=!!F.note.trim();
+      document.getElementById('rm-f-r').classList.toggle('is-err',!okR); document.getElementById('rm-e-r').hidden=okR;
+      document.getElementById('rm-f-n').classList.toggle('is-err',!okN); document.getElementById('rm-e-n').hidden=okN;
+      if(!okR||!okN){ (okR?document.getElementById('rm-n'):document.getElementById('rm-dt')).focus(); return; }
+      const b=document.getElementById('rm-go'); b.disabled=true; b.innerHTML='<span class="rm-spin" aria-hidden="true"></span>Removing…';
+      document.querySelectorAll('#rm-modal .ail-mf button,#rm-modal .mp-m-x').forEach(x=>x.disabled=true);
+      setTimeout(()=>{ const a=CUR;
+        if (FAIL){ FAIL=false; syncProto();
+          document.querySelectorAll('#rm-modal .ail-mf button,#rm-modal .mp-m-x').forEach(x=>x.disabled=false); b.innerHTML='Remove from Marketplace';
+          showToast('Failed to remove '+a.name+' from the Marketplace. Please try again.'); const c=document.getElementById('toast-container'); const t=c&&c.lastElementChild; if(t){ t.classList.add('rm-toast-err'); const i=t.querySelector('.toast-icon'); if(i) i.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><line x1="12" x2="12" y1="7" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>'; }
+          return; }
+        ST[a.id]={ reason:F.reason, note:F.note.trim(), at:new Date(), by:ME };
+        RM.close(); renderAgentProfile(a); window.scrollTo(0,0); showToast('Successfully removed '+a.name+' from the Marketplace');
+      }, 1400); },
+    toggleFail(){ FAIL=!FAIL; syncProto(); },
+    retentionEnds(){ const a=CUR; if(!a||!ST[a.id]) return; ST[a.id].deleted=true; ST[a.id].deletedAt=new Date(Date.now()+15*864e5); document.getElementById('rm-proto').classList.remove('open'); renderAgentProfile(a); },
+    resetAgent(){ const a=CUR; if(!a) return; delete ST[a.id]; document.getElementById('rm-proto').classList.remove('open'); renderAgentProfile(a); },
+    state:ST
+  };
+  function syncProto(){ const f=document.getElementById('rm-p-fail'); if(f) f.classList.toggle('on',FAIL);
+    const s=CUR&&ST[CUR.id]; const d=document.getElementById('rm-p-del'); if(d) d.disabled=!(s&&!s.deleted); const r=document.getElementById('rm-p-reset'); if(r) r.disabled=!s; }
+  const base=window.renderAgentProfile; window.renderAgentProfile=renderAgentProfile=function(agent){ base(agent); decorate(agent); };
+  const g=window.go; window.go=go=function(s){ const r=g.apply(this,arguments); document.body.classList.toggle('rm-on', s==='agent-profile'); if(s!=='agent-profile'){ const p=document.getElementById('rm-proto'); if(p) p.classList.remove('open'); } return r; };
+  document.addEventListener('click',e=>{ if(!e.target.closest('#rm-proto')){ const p=document.getElementById('rm-proto'); if(p) p.classList.remove('open'); } });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.getElementById('rm-modal')){ const dd=document.querySelector('#rm-dd .ail-dd-m'); if(dd && !dd.hidden) RM.toggleDD(false); else RM.close(); } });
 })();
 </script>
 </body>
