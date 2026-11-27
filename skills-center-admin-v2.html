@@ -12245,7 +12245,8 @@ button.aiv-info{border:none;background:none;padding:0;cursor:pointer}
 (function(){
   /* nav: add the tab after Skills Center */
   const sc = document.querySelector('#nav-admin a[data-link="skills-center-admin"]');
-  if (sc && !document.querySelector('#nav-admin a[data-link="ai-interviews"]')){
+  /* ARCHIVED 27 Nov (PO Pia): no need to replicate Hallo's admin dashboard — Ops use Hallo directly. Code kept; set window.AIV_ON=true to bring the tab back. */
+  if (window.AIV_ON && sc && !document.querySelector('#nav-admin a[data-link="ai-interviews"]')){
     const li = document.createElement('li');
     li.innerHTML = '<a href="#" data-link="ai-interviews" onclick="event.preventDefault(); aivGoList()" class="hn-link inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-all h-9 px-4 py-2 bg-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-700" style="font-weight:400"><span class="text-[16px] leading-[1.4]">AI Interview</span></a>';
     sc.closest('li').after(li);
@@ -12678,7 +12679,7 @@ function aivPostComment(){ const el = document.getElementById('aiv-cm-in'); cons
   AIV.cur.comments.unshift({ by:AIV_ME, at:new Date().toISOString(), text:t }); aivRenderDetail(); showToast('Comment posted'); }
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ aivCloseModal(); aivDdToggle(false); } });
 /* deep link: skills-center-admin-v2.html#ai-interviews */
-(function(){ const goHash = function(){ if ((location.hash || '') === '#ai-interviews') aivGoList(); }; if (document.readyState === 'complete') goHash(); else addEventListener('load', goHash); addEventListener('hashchange', goHash); })();
+(function(){ const goHash = function(){ if (window.AIV_ON && (location.hash || '') === '#ai-interviews') aivGoList(); }; if (document.readyState === 'complete') goHash(); else addEventListener('load', goHash); addEventListener('hashchange', goHash); })();
 </script>
 
 
